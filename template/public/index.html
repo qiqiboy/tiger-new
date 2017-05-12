@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+        <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+        <title>TigerFintech-Fed Project</title>
+    </head>
+    <body>
+        <div id="wrap" class="wrapper">
+            <header class="site-header">
+                <div class="main clearfix">
+                    <h1 class="logo"><img src="/images/logo.png" alt="老虎证券" />TigerFintech Fed</h1>
+                    <nav class="menu">
+                        <a href="/">首页</a>
+                        <a href="/about.html">关于</a>
+                    </nav>
+                </div>
+            </header>
+            <div class="site-container">
+                <div class="main">
+                    <section class="section">
+                        <h3 class="title">介绍</h3>
+                        <div class="content">
+                            <p>本项目示例用来快速创建基于webpack + es6开发环境，以支持开发以下类型项目：</p>
+                            <ul>
+                                <li>SPA 单页应用</li>
+                                <li>MPA 多页面应用</li>
+                            </ul>
+                            <p>由于增加了对jsx的编译识别，所以可以在项目中随意使用react全家桶。当然，使用jquery也是没有任何问题的。</p>
+                        </div>
+                    </section>
+                    <section class="section">
+                        <h3 class="title">上手使用</h3>
+                        <div class="content">
+                            <p>开始开发前，要了解以下几个基本情况：</p>
+                            <ul>
+                                <li>页面入口文件放置在 public 目录下，js入口文件放在 app 目录下（入口文件需直接放置与该目录下，如果嵌套文件夹放置，则不会被当作入口文件）。
+                                    其中html文件名与其要调用的js文件名保持一致。例如：piblic/index.html 对应于 app/index.js</li>
+                                <li>package.json文件
+                                    <ul>
+                                        <li>
+                                            vendor：该字段用来指定需要单独合并打包放置的模块，本示例默认打包了 jquery、react、react-dom和公共css模块。这在多页面应用中会很有用，可以抽取公共的模块单独打包，避免单一文件过大。
+                                        </li>
+                                        <li>
+                                            noRewrite: 本地server服务器是够重写所有访问路径至默认入口，默认是true。如果开发的是单页应用，则可以关闭该选项。
+                                        </li>
+                                        <li>
+                                            proxy: 代理服务器地址，如果指定了该参数，本地server可以代理所有接口请求到目标服务器，可以很方便的避开跨域限制。
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    常用命令：
+                                    <ul>
+                                        <li>
+                                            <span class="text-primary">npm start</span> 用来在开发时使用，运营本命令后，会在本地启动一个node server服务，同时用浏览器打开。开发时保存文件时可以实时刷新浏览器（支持hot reload）。
+                                        </li>
+                                        <li>
+                                            <span class="text-primary">npm run build:dev</span> build测试包，打包后的文件未经过压缩合并，包含了map信息，方便测试环境查错。
+                                        </li>
+                                        <li>
+                                            <span class="text-primary">npm run build</span> build线上包，打包后的文件经过压缩合并，保证最小size。
+                                        </li>
+                                        <li>
+                                            <span class="text-primary">npm run pack</span> build线上包并同时上传到cdn。需要上线时运行该命令。
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p>由于增加爱了对jsx的编译识别，所以可以在项目中随意使用react全家桶。当然，使用jquery也是没有任何问题的。</p>
+                        </div>
+                    </section>
+                    <section class="section">
+                        <h3 class="title">使用示例</h3>
+                        <div class="content">
+                            <ul>
+                                <li>
+                                    <p>js里引用不同位置模块</p>
+                                    <img src="/images/cat.jpg" width="200" />
+                                    <pre class="code">
+import API from 'utils/API'; //引用app/utils下模块, 也可以通过 import API from 'app/utils/API';
+import FeedBack from 'compoennts/FeedBack'; //引用app/components下模块
+import APP from 'modules/APP'; //引用app/modules下模块
+import favicon from 'public/favicon.ico'; //引用其它位置模块
+</pre>
+                                </li>
+                                <li>
+                                    <p>html模版中引用图片等静态资源</p>
+                                    <img src="/images/cat.jpg" width="200" />
+                                    <pre class="code">
+&lt;img src=&quot;/images/cat.jpg&quot; width=&quot;200&quot; /&gt;
+&lt;img src=&quot;../static/images/cat.jpg&quot; width=&quot;200&quot; /&gt;</pre>
+                                    <p>同理适用于link、audio、video等标签，引用音视频资源</p>
+                                </li>
+                                <li>
+                                    <p>react组件里引用静态资源（下面demo为react组件）</p>
+                                    <div id="img-demo"></div>
+<pre class="code">
+import React, { Component } from 'react';
+import img from '../../../static/images/cat.jpg'; //或者
+// import img from 'static/images/cat.jpg';
+
+class ImgDemo extends Component {
+    render() {
+        return (
+            &lt;img src={img} width=&quot;200&quot; /&gt;
+        );
+    }
+}
+</pre>
+                                </li>
+                                <li>多页面应用，你可以点击<a href="./about.html">此处</a>查看另一页面</li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            ${require('./layout/footer.html')}
+        </div>
+    </body>
+</html>

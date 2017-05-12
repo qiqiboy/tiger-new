@@ -1,0 +1,45 @@
+$fonts: "Helvetica Neue",Helvetica,Arial,sans-serif;
+
+$color-default: #ffffff;
+$color-danger:#a94442;
+$color-primary: #ffe100;
+$color-success: #5cb85c;
+$color-warning: #f0ad4e;
+$color-info: #5bc0de;
+
+$brand: $color-primary;
+$bg: #fff;
+$color: #333333;
+$gray: #9999a3;
+
+$width-large: 1020px;
+$width-medium: 780px;
+$width-small: 540px;
+
+@mixin screen-retina() {/*! 高分屏 */
+    @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+    only screen and (min--moz-device-pixel-ratio: 1.5),
+    only screen and (-moz-min-device-pixel-ratio: 1.5),
+    only screen and (-o-min-device-pixel-ratio: 3/2),
+    only screen and (min-device-pixel-ratio: 1.5) {
+        @content;
+    }
+}
+
+@mixin screen-lg(){
+    @media (min-width: $width-large) {
+        @content;
+    }
+}
+
+@mixin screen-md(){
+    @media (max-width: $width-medium) {
+        @content;
+    }
+}
+
+@mixin screen-sm(){
+    @media (max-width: $width-small) {
+        @content;
+    }
+}

@@ -1,0 +1,63 @@
+@import './variable';
+html, body, #wrap{
+    height: 100%;
+}
+html {
+    box-sizing: border-box;
+    overflow-y: scroll; /* All browsers without overlaying scrollbars */
+}
+
+*,
+::before,
+::after {
+    box-sizing: inherit;
+}
+
+.wrapper{
+    width:100%;
+}
+.main{
+    width: $width-large;
+    margin: 0 auto;
+    @include screen-md{
+        width: 100%;
+        padding: 0 15px;
+    }
+}
+.clearfix{
+    &:after{
+        content:"";
+        display:block;
+        height:0;
+        font-size:0;
+        clear:both;
+    }
+}
+.alignleft{
+    float:left;
+}
+.alignright{
+    float:right;
+}
+.aligncenter{
+    margin-right: auto;
+    margin-left: auto;
+    display: block;
+}
+.none{
+    display: none;
+    overflow: hidden;
+}
+input,button,select,textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+body {
+    background: $bg;
+    color: $color;
+    line-height: 1.6;
+    font-size: 14px;
+    font-family: $fonts;
+}

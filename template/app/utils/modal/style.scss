@@ -1,0 +1,83 @@
+@mixin full{
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+}
+.modal-backdrop{
+    @include full;
+    position:fixed;
+    background-color:rgba(0,0,0,.4);
+}
+.modal{
+    @include full;
+    position:fixed;
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+.modal-container{
+    margin:30px auto;
+}
+.modal-lg,
+.modal-md,
+.modal-sm{
+    max-width:100%;
+}
+.modal-lg{
+    width:900px;
+}
+.modal-md{
+    width:600px;
+}
+.modal-sm{
+    width:300px;
+}
+
+.modal-animation-fade{
+    animation:modal-fade .45s ease-in-out;
+}
+.modal-animation-fadeOut{
+    animation:modal-fade .45s ease-in-out reverse both;
+}
+@keyframes modal-fade{
+    from {
+        opacity:0;
+    }
+    to {
+        opacity:1;
+    }
+}
+
+.modal-animation-slide{
+    animation:modal-slide .45s ease-in-out;
+}
+.modal-animation-slideOut{
+    animation:modal-slide .45s ease-in-out reverse both;
+}
+@keyframes modal-slide{
+    from {
+        opacity:0;
+        transform:translateY(-100%) scale(.5);
+    }
+    to {
+        opacity:1;
+        transform:translateY(0)  scale(1);
+    }
+}
+
+.modal-animation-zoom{
+    animation:modal-zoom .45s ease-in-out;
+}
+.modal-animation-zoomOut{
+    animation:modal-zoom .45s ease-in-out reverse both;
+}
+@keyframes modal-zoom{
+    from {
+        opacity:0;
+        transform:scale(.01);
+    }
+    to {
+        opacity:1;
+        transform:scale(1);
+    }
+}

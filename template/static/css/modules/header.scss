@@ -1,0 +1,31 @@
+@import './variable';
+.site-header{
+    background-color: #000;
+    .logo{
+        float: left;
+        margin: 0;
+        padding: 5px 0;
+        color: $color-primary;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 40px;
+        img{
+            width: 40px;
+            float: left;
+            margin-right: 10px;
+        }
+    }
+    .menu{
+        float: right;
+        a{
+            color: #fff;
+            text-decoration: none;
+            line-height: 50px;
+            display: inline-block;
+            padding: 0 20px;
+            &:hover{
+                background-color: #777;
+            }
+        }
+    }
+}
