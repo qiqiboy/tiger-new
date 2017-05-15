@@ -17,6 +17,7 @@ if (currentNodeVersion.split('.')[0] < 4) {
 }
 
 var commander = require('commander');
+var inquirer = require('inquirer');
 var fs = require('fs-extra');
 var path = require('path');
 var execSync = require('child_process').execSync;
@@ -26,6 +27,7 @@ var semver = require('semver');
 var ownPath = __dirname;
 var oldPath = process.cwd();
 var projectName;
+var projectCustom;
 
 var program = commander
     .version(require('./package.json').version)
@@ -46,11 +48,87 @@ if (typeof projectName === 'undefined') {
     process.exit(1);
 }
 
-createApp(projectName);
+inquirer
+    .prompt([{
+            name: 'version',
+            type: 'input',
+            message: '请输入项目版本号:',
+            default: '1.0.0'
+        }, {
+            name: 'host',
+            type: 'input',
+            message: '请输入cdn服务器host地址:',
+            default: 'https://static.example.com',
+            validate: function(input) {
+                return /^http/.test(input) ? true : '请输入一个服务器地址';
+            }
+        },
+        {
+            name: 'pathname',
+            type: 'input',
+            message: '请输入项目在cdn服务器上的存储文件夹名:',
+            default: '/spa-' + path.basename(projectName),
+            validate: function(input) {
+                return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
+            }
+        },
+        {
+            name: 'author',
+            type: 'input',
+            message: '请输入项目所属者（组织）的联系邮箱:',
+            default: 'imqiqiboy@gmail.com'
+        },
+        {
+            name: 'libs',
+            type: 'list',
+            choices: [
+                { name: '无框架依赖', value: 0 },
+                { name: 'jquery 项目', value: 1 },
+                { name: 'react 项目', value: 2 },
+                { name: 'jquery + react 项目', value: 3 }
+            ],
+            message: '请选择项目框架（将会默认安装所选相关框架依赖）:',
+            default: 3
+        },
+        {
+            name: 'proxy',
+            type: 'input',
+            message: '项目接口代理服务器地址：',
+            validate: function(input) {
+                return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+            }
+        },
+        {
+            name: 'isSpa',
+            type: 'confirm',
+            message: '该项目是否为SPA（单页面应用）?',
+            default: false
+        }
+    ])
+    .then(function(answers) {
+        projectCustom = answers;
+
+        createApp(projectName);
+    });
 
 function createApp(name) {
     var root = path.resolve(name);
     var appName = path.basename(root);
+    var pkgVendor = [];
+
+    switch (projectCustom.libs) {
+        case 1:
+            pkgVendor.push('jquery');
+            break;
+        case 2:
+            pkgVendor.push('react', 'react-dom');
+            break;
+        case 3:
+            pkgVendor.push('jquery', 'react', 'react-dom');
+            break;
+    }
+
+    pkgVendor.push('./static/css/vendor');
 
     fs.ensureDirSync(name);
     if (!isSafeToCreateProjectIn(root)) {
@@ -66,21 +144,16 @@ function createApp(name) {
 
     var packageJson = {
         name: appName,
-        author: 'imqiqiboy@gmail.com',
-        version: '1.0.0',
+        author: projectCustom.author,
+        version: projectCustom.version,
         private: true,
         cdn: {
-            host: "https://static.host.com",
-            path: "/spa-" + appName
+            host: projectCustom.host,
+            path: '/' + projectCustom.pathname.replace(/^\//, '')
         },
-        vendor: [
-            "jquery",
-            "react",
-            "react-dom",
-            "./static/css/vendor"
-        ],
-        noRewrite: false,
-        proxy: null,
+        vendor: pkgVendor,
+        noRewrite: !projectCustom.isSpa,
+        proxy: projectCustom.proxy || null,
         scripts: {
             start: "node scripts/start.js",
             build: "node scripts/build.js",
@@ -198,7 +271,7 @@ function run(appPath, appName) {
                 }
 
                 console.log();
-                console.log('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' +  chalk.green(appPath));
+                console.log('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(appPath));
                 console.log('在该项目，你可以运行以下几个命令：');
                 console.log();
                 console.log(chalk.cyan('  npm start'));

@@ -137,7 +137,7 @@ var webpackConfig = {
         new webpack.HotModuleReplacementPlugin(),
         new CaseSensitivePathsPlugin(),
         new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-        new webpack.BannerPlugin('@author ' + (pkg.author || 'imqiqiboy@gmail.com'))
+        new webpack.BannerPlugin('@author ' + pkg.author)
     ]),
     node: {
         fs: 'empty',

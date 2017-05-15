@@ -191,7 +191,7 @@ var webpackConfig = {
         new ExtractTextPlugin('static/css/[name].[contenthash:8].css', {
             allChunks: true
         }),
-        new webpack.BannerPlugin('@author ' + (pkg.author || 'imqiqiboy@gmail.com'))
+        new webpack.BannerPlugin('@author ' + pkg.author)
     ]),
     // Some libraries import Node modules but don't use them in the browser.
     // Tell Webpack to provide empty mocks for them so importing them works.
