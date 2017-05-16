@@ -1,3 +1,4 @@
+import React from 'react';
 import modal from '../modal';
 import DialogContainer from './container';
 
@@ -20,8 +21,7 @@ const btnConfig = {
 
 const Dialog = (content, config = {}) => {
     let btns = config.btns || ['ok'];
-
-    DialogContainer.defaultProps = {
+    let propsConfig = {
         content: content || '这是一条信息',
         title: config.title,
         btns: btns.map(btn => btnConfig[btn] || btn)
@@ -31,7 +31,7 @@ const Dialog = (content, config = {}) => {
         size: 'dialog',
         backdrop: config.backdrop || 'static',
         animation: config.animation || 'slide',
-        component: DialogContainer
+        component: modalProps => <DialogContainer {...propsConfig} {...modalProps} />
     }).result;
 }
 

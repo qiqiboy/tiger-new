@@ -1,13 +1,13 @@
 /*eslint no-invalid-this: 0 */
-import React, {isValidElement, Component, PropTypes} from 'react';
+import React, { isValidElement, Component, PropTypes } from 'react';
 
 class ModalContainer extends Component {
     render() {
-        const {size, component: MyComponent, windowClass} = this.props;
+        const { size, component: MyComponent, windowClass } = this.props;
         //const MyComponent = component;
         let classes = ['modal-container', `modal-${size}`];
 
-        if(windowClass) {
+        if (windowClass) {
             classes.push(windowClass);
         }
 
@@ -19,20 +19,20 @@ class ModalContainer extends Component {
     }
 
     eventHandler = ev => {
-        const {container} = this.refs;
+        const { container } = this.refs;
 
-        if (ev.type == 'click') {
-            container != ev.target && !container.contains(ev.target) &&
+        if (container != ev.target && !container.contains(ev.target)) {
+            if (ev.type == 'click') {
                 this.props.dismiss();
-        } else {
-            ev.preventDefault();
-            ev.stopPropagation();
+            } else {
+                ev.preventDefault();
+            }
         }
     }
 
     getEvents() {
         let events = ['touchmove', 'mousewheel', 'DOMMouseScroll'];
-        if(this.props.backdrop != 'static') {
+        if (this.props.backdrop != 'static') {
             events.push('click');
         }
 
@@ -43,14 +43,14 @@ class ModalContainer extends Component {
         const element = this.refs.container.parentNode;
 
         this.getEvents().forEach(event =>
-                                 element.addEventListener(event, this.eventHandler, false));
+            element.addEventListener(event, this.eventHandler, false));
     }
 
     componentWillUnmount() {
         const element = this.refs.container.parentNode;
 
         this.getEvents().forEach(event =>
-                                 element.removeEventListener(event, this.eventHandler, false));
+            element.removeEventListener(event, this.eventHandler, false));
     }
 
     static propTypes = {

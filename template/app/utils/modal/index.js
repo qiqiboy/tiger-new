@@ -49,8 +49,8 @@ export const open = (settings = {}) => {
         animationElements.push(elements[0]);
     }
 
-    let bodyStyle = document.body.style;
-    let original_overflow = bodyStyle.overflow;
+    //let bodyStyle = document.body.style;
+    //let original_overflow = bodyStyle.overflow;
 
     let withResolve, withReject, instance, destroying;
 
@@ -69,7 +69,7 @@ export const open = (settings = {}) => {
 
                 elements.forEach(element => document.body.removeChild(element));
 
-                bodyStyle.overflow = original_overflow;
+                //bodyStyle.overflow = original_overflow;
 
                 let i = 0,
                     len = modalInstances.length;
@@ -93,7 +93,7 @@ export const open = (settings = {}) => {
         destroy();
     }
 
-    bodyStyle.overflow = 'hidden';
+    //bodyStyle.overflow = 'hidden';
 
     function render(component, onComplete) {
         if(destroying) {
