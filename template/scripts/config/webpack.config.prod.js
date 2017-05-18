@@ -154,6 +154,7 @@ var webpackConfig = {
                 browsers: [
                     '>1%',
                     'last 4 versions',
+                    'iOS 7',
                     'Firefox ESR',
                     'not ie < 9', // React doesn't support IE8 anyway
                 ]
