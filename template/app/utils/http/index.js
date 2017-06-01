@@ -54,11 +54,22 @@ axios.interceptors.response.use(response => {
         if (data.is_succ === false) {
             error_code = data.error_code || -1;
 
-            return Promise.reject(new Error(ERROR_MSG[error_code] || data.error_msg || '网络异常' + error_code + '）'));
+            return Promise.reject(new Error(ERROR_MSG[error_code] || data.error_msg || '请求失败（' + error_code + '）'));
         }
 
         return data;
     }
 
     return response;
+}, respError => {console.dir(respError)
+    const response = respError.response;
+    let error;
+    if(respError.code === 'ECONNABORTED') {
+        error = new Error('网络请求超时（' + error.config.timeout + 'ms），请确认网络正常并重试。');
+    } else {
+        let error_code = response.status || -1;
+        error = new Error(ERROR_MSG[error_code] || response.statusText || '网络异常（' + error_code + '）');
+    }
+
+    return Promise.reject(error);
 });
