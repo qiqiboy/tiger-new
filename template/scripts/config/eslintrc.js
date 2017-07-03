@@ -8,6 +8,8 @@ module.exports = {
         "amd": true
     },
     "rules": {
+        "react/no-deprecated": 0,
+        "react/jsx-no-target-blank": 0,
         "eqeqeq": 0,
         "radix": 0,
         "no-script-url": 0,
@@ -32,7 +34,7 @@ module.exports = {
         "semi": 0,
         "quotes": 0,
         "array-callback-return": 2,
-        "complexity": [2, 20],
+        //"complexity": [2, 20],
         "default-case": 2,
         "curly": 2,
         "dot-location": ["error", "property"],

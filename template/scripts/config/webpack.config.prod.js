@@ -4,8 +4,13 @@ var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var DirectoryNamedWebpackPlugin = require("directory-named-webpack-plugin")
 var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
+var ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
+var eslintFormatter = require('react-dev-utils/eslintFormatter');
 var ImageminPlugin = require('imagemin-webpack-plugin').default;
+var WebpackChunkHash = require("webpack-chunk-hash");
+var InlineChunkManifestHtmlWebpackPlugin = require('inline-chunk-manifest-html-webpack-plugin');
 var paths = require('./paths');
 var getClientEnvironment = require('./env');
 var pkg = require(paths.appPackageJson);
@@ -90,81 +95,91 @@ var webpackConfig = {
         path: paths.appBuild,
         filename: 'static/js/[name].[chunkhash:8].js',
         chunkFilename: 'static/js/[name].chunk.[chunkhash:8].js',
-        publicPath: publicPath
+        publicPath: publicPath,
+        devtoolModuleFilenameTemplate: info =>
+            path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')
     },
     resolve: {
-        fallback: paths.nodePaths,
-        extensions: ['.js', '.json', '.jsx', ''],
+        modules: ['node_modules', paths.appNodeModules, paths.root].concat(paths.nodePaths),
+        extensions: ['.js', '.json', '.jsx'],
         alias: Object.assign({
             'react-native': 'react-native-web'
         }, paths.alias),
-        root: paths.root
+        plugins: [
+            //new ModuleScopePlugin(paths.appSrc),
+            new DirectoryNamedWebpackPlugin({
+                honorIndex: true,
+                exclude: /node_modules|libs/
+            })
+        ]
     },
 
     module: {
-        // First, run the linter.
-        // It's important to do this before Babel processes the JS.
-        preLoaders: [{
-            test: /\.(js|jsx)$/,
-            loader: 'eslint',
-            include: paths.appSrc
-        }],
-        loaders: [{
-            exclude: [],
-            loader: 'file',
-            query: {
-                name: 'static/images/[name].[hash:8].[ext]'
+        strictExportPresence: true,
+        rules: [ // nothing
+            {
+                test: /\.(js|jsx)$/,
+                enforce: 'pre',
+                use: [{
+                    options: {
+                        formatter: eslintFormatter,
+                    },
+                    loader: 'eslint-loader',
+                }, ],
+                include: paths.appSrc
+            },
+            {
+                exclude: [/\.json$/],
+                loader: 'file-loader',
+                options: {
+                    name: 'static/images/[name].[hash:8].[ext]'
+                }
+            }, {
+                test: /\.html$/,
+                loader: 'html-loader',
+                options: {
+                    interpolate: 'require',
+                    root: paths.staticSrc,
+                    attrs: ['img:src', 'img:data-src', 'video:src', 'source:src', 'audio:src', 'script:src', 'link:href']
+                }
+            }, {
+                test: /\.(js|jsx)$/,
+                include: [paths.appSrc, paths.staticSrc],
+                loader: 'babel-loader',
+                options: {
+                    compact: true
+                }
+            }, {
+                test: /\.css$/,
+                loader: getCssRule()
+            }, {
+                test: /\.s[ac]ss$/,
+                loader: getCssRule('sass-loader')
+            }, {
+                test: /\.less$/,
+                loader: getCssRule('less-loader')
+            }, {
+                test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
+                loader: 'file-loader',
+                query: {
+                    name: 'static/media/[name].[hash:8].[ext]'
+                }
+            }, {
+                test: /\.(txt|htm)$/,
+                loader: 'raw-loader',
             }
-        }, {
-            test: /\.html$/,
-            loader: 'html-loader',
-            query: {
-                interpolate: 'require',
-                root: paths.staticSrc,
-                attrs: ['img:src', 'img:data-src', 'video:src', 'source:src', 'audio:src', 'script:src', 'link:href']
-            }
-        }, {
-            test: /\.(js|jsx)$/,
-            include: [paths.appSrc, paths.staticSrc],
-            loader: 'babel'
-        }, {
-            test: /\.css$/,
-            loader: ExtractTextPlugin.extract('style', 'css?importLoaders=1!postcss')
-        }, {
-            test: /\.s[ac]ss$/,
-            loader: ExtractTextPlugin.extract('style', 'css?importLoaders=2!postcss!sass')
-        }, {
-            test: /\.less$/,
-            loader: ExtractTextPlugin.extract('style', 'css?importLoaders=2!postcss!less')
-        }, {
-            test: /\.json$/,
-            loader: 'json'
-        }, {
-            test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)(\?.*)?$/,
-            loader: 'file',
-            query: {
-                name: 'static/media/[name].[hash:8].[ext]'
-            }
-        }]
+        ]
     },
 
-    postcss: function() {
-        return [
-            autoprefixer({
-                browsers: [
-                    '>1%',
-                    'last 4 versions',
-                    'iOS 7',
-                    'Firefox ESR',
-                    'not ie < 9', // React doesn't support IE8 anyway
-                ]
-            }),
-        ];
-    },
     plugins: injects.concat([
+        new InlineChunkManifestHtmlWebpackPlugin({
+            dropAsset: true
+        }),
         new InterpolateHtmlPlugin({
             PUBLIC_URL: '.' //publicUrl
         }),
+        new webpack.HashedModuleIdsPlugin(),
+        new WebpackChunkHash(),
         new ImageminPlugin({
             pngquant: {
                 //quality: '95-100'
@@ -173,23 +188,19 @@ var webpackConfig = {
         new webpack.DefinePlugin(env),
         // This helps ensure the builds are consistent if source hasn't changed:
         new webpack.optimize.OccurrenceOrderPlugin(),
-        // Try to dedupe duplicated modules, if any:
-        new webpack.optimize.DedupePlugin(),
         // Minify the code.
         new webpack.optimize.UglifyJsPlugin({
             compress: {
-                screw_ie8: true, // React doesn't support IE8
+                comparisons: false,
                 warnings: false
-            },
-            mangle: {
-                screw_ie8: true
             },
             output: {
                 comments: false,
-                screw_ie8: true
+                ascii_only: true
             }
         }),
-        new ExtractTextPlugin('static/css/[name].[contenthash:8].css', {
+        new ExtractTextPlugin({
+            filename: 'static/css/[name].[contenthash:8].css',
             allChunks: true
         }),
         new webpack.BannerPlugin('@author ' + pkg.author)
@@ -203,9 +214,48 @@ var webpackConfig = {
     }
 };
 
-var excludeLoader = webpackConfig.module.loaders[0];
-excludeLoader.exclude = excludeLoader.exclude.concat(webpackConfig.module.loaders.slice(1).map(function(config) {
+var excludeLoader = webpackConfig.module.rules[1];
+excludeLoader.exclude = excludeLoader.exclude.concat(webpackConfig.module.rules.slice(2).map(function(config) {
     return config.test;
 }));
+
+function getCssRule(extraRule) {
+    var defaultRule = [{
+            loader: 'css-loader',
+            options: {
+                importLoaders: extraRule ? 2 : 1,
+                minimize: true
+            }
+        },
+        {
+            loader: 'postcss-loader',
+            options: {
+                ident: 'postcss',
+                plugins: () => [
+                    require('postcss-flexbugs-fixes'),
+                    autoprefixer({
+                        browsers: [
+                            '>1%',
+                            'last 4 versions',
+                            'iOS 7',
+                            'Firefox ESR',
+                            'not ie < 9', // React doesn't support IE8 anyway
+                        ],
+                        flexbox: 'no-2009',
+                    })
+                ]
+            }
+        }
+    ];
+
+    if (extraRule) {
+        defaultRule.push(extraRule);
+    }
+
+    return ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: defaultRule,
+    });
+}
 
 module.exports = webpackConfig;

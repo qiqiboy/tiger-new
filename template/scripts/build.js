@@ -1,4 +1,7 @@
 process.env.NODE_ENV = 'production';
+process.on('unhandledRejection', err => {
+  throw err;
+});
 
 require('dotenv').config({
     silent: true

@@ -15,6 +15,11 @@
 
 ![screenshot](https://cloud.githubusercontent.com/assets/3774036/26042794/b2ee8ce0-396a-11e7-97e1-b52f31309c2c.png)
 
+## v2.x新功能
+* 持久化缓存的优化
+* webpack升级到2.x
+* webpack-dev-server的升级，带来更好的proxy支持
+
 ## 安装
     $ npm install tiger-new -g
 
