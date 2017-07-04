@@ -50,61 +50,77 @@ if (typeof projectName === 'undefined') {
 
 inquirer
     .prompt([{
-            name: 'version',
-            type: 'input',
-            message: '请输入项目版本号:',
-            default: '1.0.0'
-        }, {
-            name: 'host',
-            type: 'input',
-            message: '请输入cdn服务器host地址:',
-            default: 'https://static.example.com',
-            validate: function(input) {
-                return /^http/.test(input) ? true : '请输入一个服务器地址';
+        name: 'version',
+        type: 'input',
+        message: '请输入项目版本号:',
+        default: '1.0.0'
+    }, {
+        name: 'useCdn',
+        type: 'confirm',
+        message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
+        default: false
+    }])
+    .then(function(answers) {
+        var questions = [{
+                name: 'author',
+                type: 'input',
+                message: '请输入项目所属者（组织）的联系邮箱:',
+                default: 'imqiqiboy@gmail.com'
+            },
+            {
+                name: 'libs',
+                type: 'list',
+                choices: [
+                    { name: '无框架依赖', value: 0 },
+                    { name: 'jquery 项目', value: 1 },
+                    { name: 'react 项目', value: 2 },
+                    { name: 'jquery + react 项目', value: 3 }
+                ],
+                message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
+                default: 3
+            },
+            {
+                name: 'proxy',
+                type: 'input',
+                message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
+                validate: function(input) {
+                    return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+                }
+            },
+            {
+                name: 'isSpa',
+                type: 'confirm',
+                message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
+                default: false
             }
-        },
-        {
-            name: 'pathname',
-            type: 'input',
-            message: '请输入项目在cdn服务器上的存储文件夹名:',
-            default: '/spa-' + path.basename(projectName),
-            validate: function(input) {
-                return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
-            }
-        },
-        {
-            name: 'author',
-            type: 'input',
-            message: '请输入项目所属者（组织）的联系邮箱:',
-            default: 'imqiqiboy@gmail.com'
-        },
-        {
-            name: 'libs',
-            type: 'list',
-            choices: [
-                { name: '无框架依赖', value: 0 },
-                { name: 'jquery 项目', value: 1 },
-                { name: 'react 项目', value: 2 },
-                { name: 'jquery + react 项目', value: 3 }
-            ],
-            message: '请选择项目框架（将会默认安装所选相关框架依赖）:',
-            default: 3
-        },
-        {
-            name: 'proxy',
-            type: 'input',
-            message: '项目接口代理服务器地址：',
-            validate: function(input) {
-                return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
-            }
-        },
-        {
-            name: 'isSpa',
-            type: 'confirm',
-            message: '该项目是否为SPA（单页面应用）?',
-            default: false
+        ];
+
+        if (answers.useCdn) {
+            questions.unshift({
+                name: 'host',
+                type: 'input',
+                message: '请输入cdn服务器host地址:',
+                default: 'https://static.example.com',
+                validate: function(input) {
+                    return /^http/.test(input) ? true : '请输入一个服务器地址';
+                }
+            }, {
+                name: 'pathname',
+                type: 'input',
+                message: '请输入项目在cdn服务器上的存储文件夹名:',
+                default: '/spa-' + path.basename(projectName),
+                validate: function(input) {
+                    return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
+                }
+            });
         }
-    ])
+
+        return inquirer
+            .prompt(questions)
+            .then(function(answers_rest) {
+                return Object.assign(answers, answers_rest);
+            });
+    })
     .then(function(answers) {
         projectCustom = answers;
 
@@ -147,10 +163,6 @@ function createApp(name) {
         author: projectCustom.author,
         version: projectCustom.version,
         private: true,
-        cdn: {
-            host: projectCustom.host,
-            path: '/' + projectCustom.pathname.replace(/^\//, '')
-        },
         vendor: pkgVendor,
         noRewrite: !projectCustom.isSpa,
         proxy: projectCustom.proxy || null,
@@ -158,7 +170,7 @@ function createApp(name) {
             start: "node scripts/start.js",
             build: "node scripts/build.js",
             "build:dev": "node scripts/build.js --dev",
-            pack: "npm run build && gulp cdn",
+            pack: "npm run build",
             count: "node scripts/count.js"
         },
         babel: {
@@ -173,6 +185,15 @@ function createApp(name) {
             ]
         }
     };
+
+    if(projectCustom.useCdn) {
+        packageJson.cdn = {
+            host: projectCustom.host,
+            path: '/' + projectCustom.pathname.replace(/^\//, '')
+        }
+        packageJson.scripts.pack += ' && gulp cdn';
+    }
+
     fs.writeFileSync(
         path.join(root, 'package.json'),
         JSON.stringify(packageJson, null, 2)

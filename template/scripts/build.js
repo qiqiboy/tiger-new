@@ -1,6 +1,6 @@
 process.env.NODE_ENV = 'production';
 process.on('unhandledRejection', err => {
-  throw err;
+    throw err;
 });
 
 require('dotenv').config({
@@ -20,14 +20,26 @@ var paths = require('./config/paths');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
+var execSync = require('child_process').execSync;
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
     process.exit(1);
 }
 
-if(userDevConfig) {
+if (userDevConfig) {
     config.output.publicPath = './';
+}
+
+function hasInstallServe(){
+    try {
+        execSync('serve --version', {
+            stdio: 'ignore'
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 // Input: /User/dan/app/build/static/js/main.82be8.js
@@ -127,7 +139,7 @@ function build(previousSizeMap) {
     var startTime = Date.now();
     var ticks = 1;
     var timer
-    var logProgress = function(){
+    var logProgress = function() {
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write(chalk.yellow('已耗时：' + ((Date.now() - startTime) / 1000).toFixed(3) + 's ') + (new Array(ticks).join('+')));
@@ -161,8 +173,16 @@ function build(previousSizeMap) {
         printFileSizes(stats, previousSizeMap);
         console.log();
 
-        var publicPath = config.output.publicPath;
-        console.log('项目打包完成，请确保资源已上传到：' + chalk.green(publicPath) + '.');
+        if (/^http/.test(config.output.publicPath)) {
+            console.log(gutil.colors.green('项目打包完成，运行以下命令可即时预览：'));
+            if (!hasInstallServe()) {
+                console.log(gutil.colors.cyan('npm') + ' install -g serve');
+            }
+            console.log(gutil.colors.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
+        } else {
+            var publicPath = config.output.publicPath;
+            console.log('项目打包完成，请确保资源已上传到：' + chalk.green(publicPath) + '.');
+        }
         console.log();
     });
 
@@ -179,4 +199,3 @@ function copyPublicFolder() {
         }
     });
 }
-

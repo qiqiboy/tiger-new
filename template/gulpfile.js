@@ -10,15 +10,26 @@ var rimrafSync = require('rimraf').sync;
 var notify = require("gulp-notify");
 var livereload = require('gulp-livereload');
 var _ = require('lodash');
+var execSync = require('child_process').execSync;
 
 var paths = require('./scripts/config/paths');
 var pkg = require(paths.appPackageJson);
-
 
 var staticFileName = 'static.config.json';
 var staticConfigFile = path.resolve(paths.root, staticFileName);
 var oldStaticConfig = lodash.invert(getStaticConfig(staticConfigFile));
 var newStaticConfig = {};
+
+function hasInstallServe(){
+    try {
+        execSync('serve --version', {
+            stdio: 'ignore'
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
 
 function getStaticConfig(path) {
     try {
@@ -52,8 +63,8 @@ function one(callback) {
 }
 
 function sleep(seconds) {
-    return through.obj(function(file, enc, cb){
-        setTimeout(function(){
+    return through.obj(function(file, enc, cb) {
+        setTimeout(function() {
             cb(null, file);
         }, seconds * 1000)
     })
@@ -65,13 +76,13 @@ function removeFileNameHash(fileName) {
     return pipes.join('.');
 }
 
-gulp.task('watch', function(){
+gulp.task('watch', function() {
     livereload.listen();
 
     gulp.watch(paths.appPublic + '/*.html', ['html']);
 });
 
-gulp.task('html', function(){
+gulp.task('html', function() {
     return gulp.src(paths.appPublic + '/*.html')
         .pipe(sleep(.5))
         .pipe(livereload({
@@ -154,6 +165,13 @@ gulp.task('cdn', function() {
         if (!failNum) {
             fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 4));
             console.log(gutil.colors.blue("配置文件已经更新: " + staticConfigFile));
+            console.log();
+            console.log(gutil.colors.green('项目已经成功编译，运行以下命令可即时预览：'));
+            if(!hasInstallServe()) {
+                console.log(gutil.colors.cyan('npm') + ' install -g serve');
+            }
+            console.log(gutil.colors.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
+            console.log();
             cb();
         } else {
             console.log(gutil.colors.red("文件未全部上传，请单独运行") + gutil.colors.green(' gulp cdn ') + gutil.colors.red("命令!"));
