@@ -179,7 +179,9 @@ var webpackConfig = {
             PUBLIC_URL: '.' //publicUrl
         }),
         new webpack.HashedModuleIdsPlugin(),
-        new WebpackChunkHash(),
+        new WebpackChunkHash({
+            additionalHashContent: function(chunk) { return chunk.id; }
+        }),
         new ImageminPlugin({
             pngquant: {
                 //quality: '95-100'
