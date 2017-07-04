@@ -26,7 +26,7 @@ function ensureSlash(path, needsSlash) {
     }
 }
 
-var cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : '';
+var cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : '.';
 var publicPath = ensureSlash(cdnUrl, true);
 var publicUrl = ensureSlash(cdnUrl, false);
 // Get environment variables to inject into our app.

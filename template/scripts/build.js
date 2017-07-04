@@ -173,12 +173,12 @@ function build(previousSizeMap) {
         printFileSizes(stats, previousSizeMap);
         console.log();
 
-        if (/^http/.test(config.output.publicPath)) {
-            console.log(gutil.colors.green('项目打包完成，运行以下命令可即时预览：'));
+        if (/^http/.test(config.output.publicPath) === false) {
+            console.log(chalk.green('项目打包完成，运行以下命令可即时预览：'));
             if (!hasInstallServe()) {
-                console.log(gutil.colors.cyan('npm') + ' install -g serve');
+                console.log(chalk.cyan('npm') + ' install -g serve');
             }
-            console.log(gutil.colors.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
+            console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
         } else {
             var publicPath = config.output.publicPath;
             console.log('项目打包完成，请确保资源已上传到：' + chalk.green(publicPath) + '.');
