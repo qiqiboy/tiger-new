@@ -210,6 +210,10 @@ function prepareProxy(proxy) {
 function runDevServer(host, port, protocol) {
     var pkg = require(paths.appPackageJson);
     var devServer = new WebpackDevServer(compiler, {
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, HEAD, DELETE'
+        },
         clientLogLevel: 'none',
         contentBase: paths.appPublic,
         hot: true,
