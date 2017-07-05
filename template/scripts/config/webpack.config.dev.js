@@ -149,6 +149,7 @@ var webpackConfig = {
         new webpack.DefinePlugin(env),
         new CaseSensitivePathsPlugin(),
         new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.BannerPlugin('@author ' + pkg.author)
     ]),
     node: {

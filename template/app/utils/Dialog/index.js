@@ -35,7 +35,7 @@ const Dialog = (content, config = {}) => {
     }).result;
 }
 
-export const alert = (content, settings = {}) => Dialog(content, {...settings, btns: ['ok']});
-export const confirm = (content, settings = {}) => Dialog(content, {...settings, btns: ['ok', 'cancel']});
+export const alert = Dialog.alert = (content, settings = {}) => Dialog(content, {...settings, btns: ['ok']});
+export const confirm = Dialog.confirm = (content, settings = {}) => Dialog(content, {...settings, btns: ['ok', 'cancel']});
 
 export default Dialog;

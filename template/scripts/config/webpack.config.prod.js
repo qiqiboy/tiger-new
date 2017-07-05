@@ -205,6 +205,7 @@ var webpackConfig = {
             filename: 'static/css/[name].[contenthash:8].css',
             allChunks: true
         }),
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.BannerPlugin('@author ' + pkg.author)
     ]),
     // Some libraries import Node modules but don't use them in the browser.
