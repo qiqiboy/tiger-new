@@ -50,13 +50,13 @@ paths.pageEntries
     });
 
 var webpackConfig = {
-    devtool: 'eval',
+    devtool: 'cheap-module-source-map',
     entry: Object.assign(paths.entries, {
         vendor: [
+            require.resolve('./polyfills'),
             require.resolve('react-hot-loader/patch'),
             require.resolve('react-dev-utils/webpackHotDevClient'),
-            require.resolve('react-error-overlay'),
-            require.resolve('./polyfills')
+            require.resolve('react-error-overlay')
         ].concat(pkg.vendor || [])
     }),
     output: {
@@ -135,7 +135,7 @@ var webpackConfig = {
                 }
             }, {
                 test: /\.(txt|htm)$/,
-                loader: 'raw-loader',
+                loader: 'raw-loader'
             }
         ]
     },
@@ -153,6 +153,7 @@ var webpackConfig = {
         new webpack.BannerPlugin('@author ' + pkg.author)
     ]),
     node: {
+        dgram: 'empty',
         fs: 'empty',
         net: 'empty',
         tls: 'empty'
