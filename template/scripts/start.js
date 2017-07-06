@@ -21,6 +21,7 @@ var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 var openBrowser = require('react-dev-utils/openBrowser');
 var errorOverlayMiddleware = require('react-error-overlay/middleware');
 var inquirer = require('react-dev-utils/inquirer');
+var getProcessForPort = require('react-dev-utils/getProcessForPort');
 var config = require('./config/webpack.config.dev');
 var paths = require('./config/paths');
 
@@ -271,11 +272,12 @@ detect(DEFAULT_PORT).then(port => {
     }
 
     clearConsole();
+    var existingProcess = getProcessForPort(DEFAULT_PORT);
     var question = [{
         name: 'shouldChangePort',
         type: 'confirm',
-        message: '端口被占用： ' + chalk.yellow(DEFAULT_PORT + '，') +
-            '要换一个端口运行本程序吗？',
+        message: '端口（' + chalk.yellow(DEFAULT_PORT) + '）被占用，可能的程序是： \n  ' + existingProcess + '\n' +
+            '  要换一个端口运行本程序吗？',
         default: true
     }];
 
