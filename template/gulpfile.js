@@ -9,6 +9,7 @@ var plumber = require('gulp-plumber');
 var rimrafSync = require('rimraf').sync;
 var notify = require("gulp-notify");
 var livereload = require('gulp-livereload');
+var ora = require('ora');
 var _ = require('lodash');
 var execSync = require('child_process').execSync;
 
@@ -99,6 +100,7 @@ gulp.task('cdn', function() {
     var exitsNum = 0;
     var uploadNum = 0;
     var files = [];
+    var spinner = ora('开始上传').start();
 
     return gulp.src(paths.appBuild + '/static/**/*')
         .pipe(plumber({
@@ -108,7 +110,7 @@ gulp.task('cdn', function() {
             if (file._contents) {
                 if (oldStaticConfig[path.join(file.relative)]) {
                     exitsNum++;
-                    console.log(gutil.colors.green('已存在：' + file.relative));
+                    spinner.succeed(gutil.colors.green('已存在：' + file.relative));
                 } else {
                     files.push(file);
                 }
@@ -131,7 +133,7 @@ gulp.task('cdn', function() {
                                     failNum++;
                                     error = true;
                                     gutil.beep();
-                                    console.log(gutil.colors.red('上传失败(' + err.message + ')：' + file.relative));
+                                    spinner.fail(gutil.colors.red('上传失败(' + err.message + ')：' + file.relative));
                                     this.emit('end');
                                 }
                             }))
@@ -145,7 +147,7 @@ gulp.task('cdn', function() {
                             .pipe(one(function() {
                                 if (!error) {
                                     uploadNum++;
-                                    console.log(gutil.colors.magenta('已上传：' + file.relative));
+                                    spinner.warn(gutil.colors.yellow('已上传：' + file.relative));
                                 }
 
                                 if (uploadNum + failNum == files.length) {

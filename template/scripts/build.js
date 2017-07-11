@@ -20,6 +20,7 @@ var paths = require('./config/paths');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
+var ora = require('ora');
 var execSync = require('child_process').execSync;
 
 // Warn and crash if required files are missing
@@ -136,23 +137,25 @@ function printErrors(summary, errors) {
 
 // Create the production build and print the deployment instructions.
 function build(previousSizeMap) {
+    var packText = userDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...';
+    var spinner = ora().start();
     var startTime = Date.now();
-    var ticks = 1;
     var timer
-    var logProgress = function() {
-        process.stdout.clearLine();
-        process.stdout.cursorTo(0);
-        process.stdout.write(chalk.yellow('已耗时：' + ((Date.now() - startTime) / 1000).toFixed(3) + 's ') + (new Array(ticks).join('+')));
-        ticks++;
+    var logProgress = function(stop) {
+        var text = packText + '已耗时：' + ((Date.now() - startTime) / 1000).toFixed(3) + 's';
 
-        timer = setTimeout(logProgress, 400);
+        if(stop) {
+            clearTimeout(timer);
+            spinner.succeed(chalk.green(text));
+        } else {
+            spinner.text = chalk.cyan(text);
+
+            timer = setTimeout(logProgress, 100);
+        }
     };
 
-    console.log(userDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...');
-    console.log();
     webpack(config).run((err, stats) => {
-        clearTimeout(timer);
-        console.log();
+        logProgress(true); //停止
         console.log();
 
         if (err) {
@@ -165,23 +168,20 @@ function build(previousSizeMap) {
             process.exit(1);
         }
 
-        console.log(chalk.green('编译成功！'));
-        console.log();
-
-        console.log('gzip后可节省大小:');
+        spinner.succeed('gzip后可节省大小:');
         console.log();
         printFileSizes(stats, previousSizeMap);
         console.log();
 
         if (/^http/.test(config.output.publicPath) === false) {
-            console.log(chalk.green('项目打包完成，运行以下命令可即时预览：'));
+            spinner.succeed(chalk.green('项目打包完成，运行以下命令可即时预览：'));
             if (!hasInstallServe()) {
                 console.log(chalk.cyan('npm') + ' install -g serve');
             }
             console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
         } else {
             var publicPath = config.output.publicPath;
-            console.log('项目打包完成，请确保资源已上传到：' + chalk.green(publicPath) + '.');
+            spinner.succeed('项目打包完成，请确保资源已上传到：' + chalk.green(publicPath) + '.');
         }
         console.log();
     });
