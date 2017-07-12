@@ -11,8 +11,8 @@ var path = require('path');
 var fs = require('fs');
 var chalk = require('chalk');
 var webpack = require('webpack');
-var childProcess = require('child_process');
 var address = require('address');
+var ora = require('ora');
 var WebpackDevServer = require('webpack-dev-server');
 var detect = require('detect-port');
 var clearConsole = require('react-dev-utils/clearConsole');
@@ -24,42 +24,24 @@ var inquirer = require('react-dev-utils/inquirer');
 var getProcessForPort = require('react-dev-utils/getProcessForPort');
 var config = require('./config/webpack.config.dev');
 var paths = require('./config/paths');
+var pkg = require(paths.appPackageJson);
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
     process.exit(1);
 }
 
-var child = childProcess.exec('gulp watch', function(error, stdout, stderr) {
-    if (error) {
-        console.log(error.stack);
-        console.log('Erro Code: ' + error.code);
-        console.log('Error Signal: ' + error.signal);
-
-        process.exit(0);
-    }
-
-    console.log('Results: \n' + stdout);
-
-    if (stderr.length) {
-        console.log('Errors: ' + stderr);
-    }
-});
-
-child.on('exit', function(code) {
-    console.log('Child_Process Completed with code: ' + code);
-});
-
 // Tools like Cloud9 rely on this.
 var DEFAULT_PORT = parseInt(process.env.PORT) || 3000;
 var compiler;
-var handleCompile;
+
+var spinner = ora('webpack启动中...').start();
 
 function setupCompiler(host, port, protocol) {
     try {
-        compiler = webpack(config, handleCompile);
+        compiler = webpack(config);
     } catch (err) {
-        console.log(chalk.red('编译失败'));
+        spinner.fail(chalk.red('编译失败'));
         console.log();
         console.log(err.message || err);
         console.log();
@@ -68,40 +50,32 @@ function setupCompiler(host, port, protocol) {
 
     compiler.plugin('invalid', function() {
         clearConsole();
-        console.log('重新编译...');
+        spinner.text = chalk.cyan('重新编译...');
     });
 
-    // "done" event fires when Webpack has finished recompiling the bundle.
-    // Whether or not you have warnings or errors, you will get this event.
     compiler.plugin('done', function(stats) {
         clearConsole();
 
-        // We have switched off the default Webpack output in WebpackDevServer
-        // options so we are going to "massage" the warnings and errors and present
-        // them in a readable focused way.
         var messages = formatWebpackMessages(stats.toJson({}, true));
         if (!messages.errors.length && !messages.warnings.length) {
-            console.log(chalk.green('编译通过！'));
+            spinner.succeed(chalk.green('编译通过！'));
             console.log();
-            console.log('应用已启动:');
+            spinner.succeed(chalk.green('应用(' + pkg.name + ')已启动:'));
             console.log();
             console.log('本地：' + chalk.cyan(protocol + '://' + host + ':' + port + '/'));
             console.log('远程：' + chalk.cyan(protocol + '://' + address.ip() + ':' + port + '/'));
-            console.log();
         }
 
         // If errors exist, only show errors.
         if (messages.errors.length) {
-            console.log(chalk.red('编译失败！！'));
+            spinner.fail(chalk.red('编译失败！！'));
             console.log();
             console.log(messages.errors.join('\n\n'));
-            console.log();
-            return;
         }
 
         // Show warnings if no errors were found.
         if (messages.warnings.length) {
-            console.log(chalk.yellow('编译有警告产生：'));
+            spinner.warn(chalk.yellow('编译有警告产生：'));
             console.log();
             console.log(messages.warnings.join('\n\n'));
             console.log();
@@ -117,8 +91,11 @@ function setupCompiler(host, port, protocol) {
                 chalk.cyan('// eslint-disable-next-line') +
                 ' 添加到产生警告的代码行上方'
             );
-            console.log();
         }
+
+        console.log();
+        spinner.text = chalk.cyan('webpack运行中...');
+        spinner.render().start();
     });
 }
 
@@ -209,7 +186,6 @@ function prepareProxy(proxy) {
 }
 
 function runDevServer(host, port, protocol) {
-    var pkg = require(paths.appPackageJson);
     var devServer = new WebpackDevServer(compiler, {
         headers: {
             'Access-Control-Allow-Origin': '*',
@@ -245,8 +221,7 @@ function runDevServer(host, port, protocol) {
         }
 
         clearConsole();
-        console.log(chalk.cyan('正在启动服务...'));
-        console.log();
+        spinner.text = chalk.cyan('正在启动测试服务器...');
         openBrowser(protocol + '://' + host + ':' + port + '/');
     });
 
@@ -281,12 +256,14 @@ detect(DEFAULT_PORT).then(port => {
         default: true
     }];
 
+    spinner.stop();
     inquirer.prompt(question).then(({ shouldChangePort }) => {
         if (shouldChangePort) {
+            spinner.start();
             run(port);
         } else {
-            console.log();
-            console.log('请关闭占用' + chalk.yellow(DEFAULT_PORT) + '的程序后再运行。');
+            clearConsole();
+            spinner.fail('请关闭占用' + chalk.yellow(DEFAULT_PORT) + '的程序后再运行。');
             console.log();
             process.exit(0);
         }

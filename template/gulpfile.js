@@ -6,11 +6,8 @@ var path = require('path');
 var fs = require('fs-extra');
 var lodash = require('lodash');
 var plumber = require('gulp-plumber');
-var rimrafSync = require('rimraf').sync;
 var notify = require("gulp-notify");
-var livereload = require('gulp-livereload');
 var ora = require('ora');
-var _ = require('lodash');
 var execSync = require('child_process').execSync;
 
 var paths = require('./scripts/config/paths');
@@ -63,37 +60,11 @@ function one(callback) {
     });
 }
 
-function sleep(seconds) {
-    return through.obj(function(file, enc, cb) {
-        setTimeout(function() {
-            cb(null, file);
-        }, seconds * 1000)
-    })
-}
-
 function removeFileNameHash(fileName) {
     var pipes = fileName.split('.');
     pipes.splice(-2, 1);
     return pipes.join('.');
 }
-
-gulp.task('watch', function() {
-    livereload.listen();
-
-    gulp.watch(paths.appPublic + '/*.html', ['html']);
-});
-
-gulp.task('html', function() {
-    return gulp.src(paths.appPublic + '/*.html')
-        .pipe(sleep(.5))
-        .pipe(livereload({
-            quiet: true
-        }))
-        .pipe(notify({
-            onLast: true,
-            message: "browser reload for html"
-        }));
-})
 
 gulp.task('cdn', function() {
     var failNum = 0;

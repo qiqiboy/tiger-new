@@ -26,7 +26,6 @@
     "fs-extra": "3.0.1",
     "glob": "7.1.2",
     "gulp": "3.9.1",
-    "gulp-livereload": "3.8.1",
     "gulp-notify": "3.0.0",
     "gulp-plumber": "1.1.0",
     "gulp-rsync": "0.0.8",
