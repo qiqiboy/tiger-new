@@ -13,11 +13,11 @@ var fs = require('fs-extra');
 var path = require('path');
 var filesize = require('filesize');
 var gzipSize = require('gzip-size').sync;
-var rimrafSync = require('rimraf').sync;
 var webpack = require('webpack');
 var config = require(userDevConfig ? './config/webpack.config.dev' : './config/webpack.config.prod');
 var paths = require('./config/paths');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
+var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
 var ora = require('ora');
@@ -80,9 +80,7 @@ recursive(paths.appBuild, (err, fileNames) => {
             return memo;
         }, {});
 
-    // Remove all content but keep the directory so that
-    // if you're in it, you don't end up in Trash
-    rimrafSync(paths.appBuild + '/*');
+    fs.emptyDirSync(paths.appBuild);
 
     // Start the webpack build
     build(previousSizeMap);
@@ -125,16 +123,6 @@ function printFileSizes(stats, previousSizeMap) {
     });
 }
 
-// Print out errors
-function printErrors(summary, errors) {
-    console.log(chalk.red(summary));
-    console.log();
-    errors.forEach(err => {
-        console.log(err.message || err);
-        console.log();
-    });
-}
-
 // Create the production build and print the deployment instructions.
 function build(previousSizeMap) {
     var packText = userDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...';
@@ -158,14 +146,43 @@ function build(previousSizeMap) {
         logProgress(true); //停止
         console.log();
 
-        if (err) {
-            printErrors('编译失败！', [err]);
+        if(err) {
+            spinner.fail(chalk.red('编译失败！'));
+            console.log((err.message || err));
             process.exit(1);
         }
 
-        if (stats.compilation.errors.length) {
-            printErrors('编译失败！', stats.compilation.errors);
+        const messages = formatWebpackMessages(stats.toJson({}, true));
+
+        // If errors exist, only show errors.
+        if (messages.errors.length) {
+            spinner.fail(chalk.red('编译失败！！'));
+            console.log();
+            console.log(messages.errors.join('\n\n'));
+
             process.exit(1);
+        }
+
+        // Show warnings if no errors were found.
+        if (messages.warnings.length) {
+            spinner.warn(chalk.yellow('编译有警告产生：'));
+            console.log();
+            console.log(messages.warnings.join('\n\n'));
+            console.log();
+
+            // Teach some ESLint tricks.
+            console.log(
+                '搜索相关' +
+                chalk.underline(chalk.yellow('关键词')) +
+                '以了解更多关于警告产生的原因.'
+            );
+            console.log(
+                '如果要忽略警告, 可以将 ' +
+                chalk.cyan('// eslint-disable-next-line') +
+                ' 添加到产生警告的代码行上方'
+            );
+            console.log();
+            console.log();
         }
 
         spinner.succeed('gzip后可节省大小:');
