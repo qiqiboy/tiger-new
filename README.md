@@ -24,7 +24,12 @@
     $ npm install tiger-new -g
 
 ## 使用
+
+#### 创建新项目
     $ tiger-new <项目名|路径>
+
+#### 升级老项目
+    $ tiger-new <项目名|路径> --upgrade
 
 例如：
 

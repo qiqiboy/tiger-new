@@ -3,6 +3,9 @@
 'use strict';
 
 var chalk = require('chalk');
+var ora = require('ora');
+
+var spinner = ora();
 
 var currentNodeVersion = process.versions.node
 if (currentNodeVersion.split('.')[0] < 4) {
@@ -23,6 +26,7 @@ var path = require('path');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
 var semver = require('semver');
+var appUpgrade = require('./upgrade');
 
 var ownPath = __dirname;
 var oldPath = process.cwd();
@@ -33,13 +37,14 @@ var program = commander
     .version(require('./package.json').version)
     .arguments('<project-directory>')
     .usage(chalk.green('<project-directory>') + ' [options]')
+    .option('-u, --upgrade', '升级项目到tiger-new最新构建版本')
     .action(function(name) {
         projectName = name;
     })
     .parse(process.argv);
 
 if (typeof projectName === 'undefined') {
-    console.error('请指定要创建的项目目录名:');
+    console.error('请指定要' + (program.upgrade ? '升级' : '创建') + '的项目目录名:');
     console.log('  ' + chalk.cyan(program.name()) + chalk.green(' <项目目录>'));
     console.log();
     console.log('例如:');
@@ -48,84 +53,88 @@ if (typeof projectName === 'undefined') {
     process.exit(1);
 }
 
-inquirer
-    .prompt([{
-        name: 'version',
-        type: 'input',
-        message: '请输入项目版本号:',
-        default: '1.0.0'
-    }, {
-        name: 'useCdn',
-        type: 'confirm',
-        message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
-        default: false
-    }])
-    .then(function(answers) {
-        var questions = [{
-                name: 'author',
-                type: 'input',
-                message: '请输入项目所属者（组织）的联系邮箱:',
-                default: 'imqiqiboy@gmail.com'
-            },
-            {
-                name: 'libs',
-                type: 'list',
-                choices: [
-                    { name: '无框架依赖', value: 0 },
-                    { name: 'jquery 项目', value: 1 },
-                    { name: 'react 项目', value: 2 },
-                    { name: 'jquery + react 项目', value: 3 }
-                ],
-                message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
-                default: 3
-            },
-            {
-                name: 'proxy',
-                type: 'input',
-                message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
-                validate: function(input) {
-                    return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+if (program.upgrade) {
+    appUpgrade(projectName);
+} else {
+    inquirer
+        .prompt([{
+            name: 'version',
+            type: 'input',
+            message: '请输入项目版本号:',
+            default: '1.0.0'
+        }, {
+            name: 'useCdn',
+            type: 'confirm',
+            message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
+            default: false
+        }])
+        .then(function(answers) {
+            var questions = [{
+                    name: 'author',
+                    type: 'input',
+                    message: '请输入项目所属者（组织）的联系邮箱:',
+                    default: 'imqiqiboy@gmail.com'
+                },
+                {
+                    name: 'libs',
+                    type: 'list',
+                    choices: [
+                        { name: '无框架依赖', value: 0 },
+                        { name: 'jquery 项目', value: 1 },
+                        { name: 'react 项目', value: 2 },
+                        { name: 'jquery + react 项目', value: 3 }
+                    ],
+                    message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
+                    default: 3
+                },
+                {
+                    name: 'proxy',
+                    type: 'input',
+                    message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
+                    validate: function(input) {
+                        return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+                    }
+                },
+                {
+                    name: 'isSpa',
+                    type: 'confirm',
+                    message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
+                    default: false
                 }
-            },
-            {
-                name: 'isSpa',
-                type: 'confirm',
-                message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
-                default: false
+            ];
+
+            if (answers.useCdn) {
+                questions.unshift({
+                    name: 'host',
+                    type: 'input',
+                    message: '请输入cdn服务器host地址:',
+                    default: 'https://static.example.com',
+                    validate: function(input) {
+                        return /^http/.test(input) ? true : '请输入一个服务器地址';
+                    }
+                }, {
+                    name: 'pathname',
+                    type: 'input',
+                    message: '请输入项目在cdn服务器上的存储文件夹名:',
+                    default: '/spa-' + path.basename(projectName),
+                    validate: function(input) {
+                        return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
+                    }
+                });
             }
-        ];
 
-        if (answers.useCdn) {
-            questions.unshift({
-                name: 'host',
-                type: 'input',
-                message: '请输入cdn服务器host地址:',
-                default: 'https://static.example.com',
-                validate: function(input) {
-                    return /^http/.test(input) ? true : '请输入一个服务器地址';
-                }
-            }, {
-                name: 'pathname',
-                type: 'input',
-                message: '请输入项目在cdn服务器上的存储文件夹名:',
-                default: '/spa-' + path.basename(projectName),
-                validate: function(input) {
-                    return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
-                }
-            });
-        }
+            return inquirer
+                .prompt(questions)
+                .then(function(answers_rest) {
+                    return Object.assign(answers, answers_rest);
+                });
+        })
+        .then(function(answers) {
+            projectCustom = answers;
 
-        return inquirer
-            .prompt(questions)
-            .then(function(answers_rest) {
-                return Object.assign(answers, answers_rest);
-            });
-    })
-    .then(function(answers) {
-        projectCustom = answers;
-
-        createApp(projectName);
-    });
+            createApp(projectName);
+        });
+}
 
 function createApp(name) {
     var root = path.resolve(name);
@@ -148,8 +157,11 @@ function createApp(name) {
 
     fs.ensureDirSync(name);
     if (!isSafeToCreateProjectIn(root)) {
-        console.log('该文件夹（' + chalk.green(name) + '）已经存在，且存在导致冲突的文件.');
-        console.log('请使用一个新的文件夹名。');
+        spinner.fail('该文件夹（' + chalk.green(name) + '）已经存在，且存在导致冲突的文件.');
+        console.log('  请使用一个新的文件夹名，或者使用升级命令将项目构建方式升级到最新版本：');
+        console.log();
+        console.log(chalk.green('   tiger-new ' + name + ' --upgrade'));
+        console.log();
         process.exit(1);
     }
 
@@ -186,7 +198,7 @@ function createApp(name) {
         }
     };
 
-    if(projectCustom.useCdn) {
+    if (projectCustom.useCdn) {
         packageJson.cdn = {
             host: projectCustom.host,
             path: '/' + projectCustom.pathname.replace(/^\//, '')
@@ -292,7 +304,7 @@ function run(appPath, appName) {
                 }
 
                 console.log();
-                console.log('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(appPath));
+                spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(appPath));
                 console.log('在该项目，你可以运行以下几个命令：');
                 console.log();
                 console.log(chalk.cyan('  npm start'));
