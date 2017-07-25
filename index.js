@@ -200,10 +200,13 @@ function createApp(name) {
 
     if (projectCustom.useCdn) {
         packageJson.cdn = {
+            server: 'static:/data0/webservice/static',
             host: projectCustom.host,
-            path: '/' + projectCustom.pathname.replace(/^\//, '')
+            path: '/' + projectCustom.pathname.replace(/^\//g, '')
         }
-        packageJson.scripts.pack += ' && gulp cdn';
+
+        packageJson.scripts.cdn = "node scripts/cdn.js";
+        packageJson.scripts.pack += ' && npm run cdn';
     }
 
     fs.writeFileSync(
