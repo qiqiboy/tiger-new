@@ -33,7 +33,7 @@ if (userDevConfig) {
     config.output.publicPath = './';
 }
 
-function hasInstallServe(){
+function hasInstallServe() {
     try {
         execSync('serve --version', {
             stdio: 'ignore'
@@ -135,7 +135,7 @@ function build(previousSizeMap) {
     var logProgress = function(stop) {
         var text = packText + '已耗时：' + ((Date.now() - startTime) / 1000).toFixed(3) + 's';
 
-        if(stop) {
+        if (stop) {
             clearTimeout(timer);
             spinner.succeed(chalk.green(text));
         } else {
@@ -149,7 +149,7 @@ function build(previousSizeMap) {
         logProgress(true); //停止
         console.log();
 
-        if(err) {
+        if (err) {
             spinner.fail(chalk.red('编译失败！'));
             console.log((err.message || err));
             process.exit(1);
@@ -214,8 +214,12 @@ function copyPublicFolder() {
         dereference: true,
         filter: file => {
             var relative = path.relative(paths.appPublic, file);
-            var dirname = path.relative(paths.appPublic, path.dirname(file));
-            return !paths.pageEntries.find(name => name + '.html' === relative) && dirname !== 'layout';
+            var basename = path.basename(file);
+            var isDirectory = fs.statSync(file).isDirectory();
+
+            return isDirectory ?
+                basename !== 'layout' : //layout目录不复制
+                !paths.pageEntries.find(name => name + '.html' === relative);
         }
     });
 }
