@@ -146,7 +146,7 @@ var webpackConfig = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
-        new webpack.DefinePlugin(env),
+        new webpack.EnvironmentPlugin(env),
         new CaseSensitivePathsPlugin(),
         new WatchMissingNodeModulesPlugin(paths.appNodeModules),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),

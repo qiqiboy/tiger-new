@@ -10,6 +10,7 @@ var ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 var eslintFormatter = require('react-dev-utils/eslintFormatter');
 var ImageminPlugin = require('imagemin-webpack-plugin').default;
 var WebpackChunkHash = require("webpack-chunk-hash");
+var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var InlineChunkManifestHtmlWebpackPlugin = require('inline-chunk-manifest-html-webpack-plugin');
 var paths = require('./paths');
 var getClientEnvironment = require('./env');
@@ -34,7 +35,7 @@ var env = getClientEnvironment(publicUrl);
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
-if (env['process.env'].NODE_ENV !== '"production"') {
+if (env.NODE_ENV !== 'production') {
     throw new Error('Production builds must have NODE_ENV=production.');
 }
 
@@ -187,18 +188,22 @@ var webpackConfig = {
                 //quality: '95-100'
             }
         }),
-        new webpack.DefinePlugin(env),
+        new webpack.optimize.ModuleConcatenationPlugin(),
+        new webpack.EnvironmentPlugin(env),
         // This helps ensure the builds are consistent if source hasn't changed:
         new webpack.optimize.OccurrenceOrderPlugin(),
         // Minify the code.
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                comparisons: false,
-                warnings: false
-            },
-            output: {
-                comments: false,
-                ascii_only: true
+        new UglifyJSPlugin({
+            uglifyOptions: {
+                compress: {
+                    comparisons: false,
+                    warnings: false
+                },
+                output: {
+                    comments: false,
+                    ascii_only: true,
+                    beautify: false
+                }
             }
         }),
         new ExtractTextPlugin({

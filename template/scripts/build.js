@@ -16,6 +16,7 @@ var gzipSize = require('gzip-size').sync;
 var webpack = require('webpack');
 var config = require(userDevConfig ? './config/webpack.config.dev' : './config/webpack.config.prod');
 var paths = require('./config/paths');
+var clearConsole = require('react-dev-utils/clearConsole');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 var recursive = require('recursive-readdir');
@@ -79,6 +80,8 @@ recursive(paths.appBuild, (err, fileNames) => {
             memo[key] = gzipSize(contents);
             return memo;
         }, {});
+
+    clearConsole();
 
     fs.emptyDirSync(paths.appBuild);
 
