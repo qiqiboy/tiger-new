@@ -6,7 +6,6 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
-var ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 var eslintFormatter = require('react-dev-utils/eslintFormatter');
 var DirectoryNamedWebpackPlugin = require("directory-named-webpack-plugin");
 var getClientEnvironment = require('./env');
@@ -75,7 +74,6 @@ var webpackConfig = {
             'react-native': 'react-native-web'
         }, paths.alias),
         plugins: [
-            //new ModuleScopePlugin(paths.appSrc),
             new DirectoryNamedWebpackPlugin({
                 honorIndex: true,
                 exclude: /node_modules|libs/

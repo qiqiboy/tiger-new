@@ -6,10 +6,8 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var DirectoryNamedWebpackPlugin = require("directory-named-webpack-plugin")
 var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-var ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 var eslintFormatter = require('react-dev-utils/eslintFormatter');
 var ImageminPlugin = require('imagemin-webpack-plugin').default;
-var WebpackChunkHash = require("webpack-chunk-hash");
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var ManifestPlugin = require('webpack-manifest-plugin');
 var InlineChunkManifestHtmlWebpackPlugin = require('inline-chunk-manifest-html-webpack-plugin');
@@ -108,7 +106,6 @@ var webpackConfig = {
             'react-native': 'react-native-web'
         }, paths.alias),
         plugins: [
-            //new ModuleScopePlugin(paths.appSrc),
             new DirectoryNamedWebpackPlugin({
                 honorIndex: true,
                 exclude: /node_modules|libs/
@@ -181,9 +178,6 @@ var webpackConfig = {
             PUBLIC_URL: '.' //publicUrl
         }),
         new webpack.HashedModuleIdsPlugin(),
-        new WebpackChunkHash({
-            additionalHashContent: function(chunk) { return chunk.id; }
-        }),
         new ImageminPlugin({
             pngquant: {
                 //quality: '95-100'
