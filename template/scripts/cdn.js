@@ -12,8 +12,6 @@ var throttleDelay = 0;
 var spinner;
 
 var staticFileName = 'static.config.json';
-var manifestPath = path.join(paths.appBuild, 'manifest.json');
-var manifestConfig = lodash.invert(getStaticConfig(manifestPath));
 var staticConfigFile = path.resolve(paths.root, staticFileName);
 var oldStaticConfig = lodash.invert(getStaticConfig(staticConfigFile));
 var newStaticConfig = {};
@@ -60,7 +58,7 @@ function runCDN() {
             return false;
         }
 
-        newStaticConfig[/js$|css$/.test(relative) === false && manifestConfig[relative] || removeFileNameHash(relative)] = relative;
+        newStaticConfig[/js$|css$/.test(relative) ? removeFileNameHash(relative) : relative] = relative;
 
         //已经存在
         if (oldStaticConfig[relative]) {
@@ -85,7 +83,6 @@ function runCDN() {
 
             if (!failNum) {
                 fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 4));
-                fs.removeSync(manifestPath);
                 console.log(chalk.blue("配置文件已经更新: " + staticConfigFile));
                 console.log();
                 console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));

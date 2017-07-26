@@ -9,7 +9,6 @@ var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var eslintFormatter = require('react-dev-utils/eslintFormatter');
 var ImageminPlugin = require('imagemin-webpack-plugin').default;
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-var ManifestPlugin = require('webpack-manifest-plugin');
 var InlineChunkManifestHtmlWebpackPlugin = require('inline-chunk-manifest-html-webpack-plugin');
 var paths = require('./paths');
 var getClientEnvironment = require('./env');
@@ -185,8 +184,6 @@ var webpackConfig = {
         }),
         new webpack.optimize.ModuleConcatenationPlugin(),
         new webpack.EnvironmentPlugin(env),
-        // This helps ensure the builds are consistent if source hasn't changed:
-        new webpack.optimize.OccurrenceOrderPlugin(),
         // Minify the code.
         new UglifyJSPlugin({
             uglifyOptions: {
@@ -204,9 +201,6 @@ var webpackConfig = {
         new ExtractTextPlugin({
             filename: 'static/css/[name].[contenthash:8].css',
             allChunks: true
-        }),
-        new ManifestPlugin({
-            fileName: 'manifest.json'
         }),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.BannerPlugin('@author ' + pkg.author)
