@@ -26,16 +26,59 @@ var config = require('./config/webpack.config.dev');
 var paths = require('./config/paths');
 var pkg = require(paths.appPackageJson);
 
+var spinner = ora('webpack启动中...').start();
+var DEFAULT_PORT = parseInt(process.env.PORT) || 3000;
+var compiler;
+
+require('check-dependencies')({}, function(result) {
+    if (result.status) {
+        spinner.stop();
+        result.error.forEach(function(err) {
+            console.log(err);
+        });
+        console.log();
+        spinner.warn(chalk.yellow('你当前安装的依赖版本和要求的不一致，请按照下面命令操作重新安装依赖：'));
+        console.log();
+        console.log(chalk.green('   rm -rf node_modules'));
+        console.log(chalk.green('   ' + (paths.cnpm ? 'cnpm' : 'npm') + ' install'));
+        process.exit();
+    } else {
+        detect(DEFAULT_PORT).then(port => {
+            if (port === DEFAULT_PORT) {
+                run(port);
+                return;
+            }
+
+            clearConsole();
+            var existingProcess = getProcessForPort(DEFAULT_PORT);
+            var question = [{
+                name: 'shouldChangePort',
+                type: 'confirm',
+                message: '端口（' + chalk.yellow(DEFAULT_PORT) + '）被占用，可能的程序是： \n  ' + existingProcess + '\n' +
+                    '  要换一个端口运行本程序吗？',
+                default: true
+            }];
+
+            spinner.stop();
+            inquirer.prompt(question).then(({ shouldChangePort }) => {
+                if (shouldChangePort) {
+                    spinner.start();
+                    run(port);
+                } else {
+                    clearConsole();
+                    spinner.fail('请关闭占用' + chalk.yellow(DEFAULT_PORT) + '的程序后再运行。');
+                    console.log();
+                    process.exit(0);
+                }
+            });
+        });
+    }
+});
+
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
     process.exit(1);
 }
-
-// Tools like Cloud9 rely on this.
-var DEFAULT_PORT = parseInt(process.env.PORT) || 3000;
-var compiler;
-
-var spinner = ora('webpack启动中...').start();
 
 function setupCompiler(host, port, protocol) {
     try {
@@ -239,33 +282,3 @@ function run(port) {
     setupCompiler(host, port, protocol);
     runDevServer(host, port, protocol);
 }
-
-detect(DEFAULT_PORT).then(port => {
-    if (port === DEFAULT_PORT) {
-        run(port);
-        return;
-    }
-
-    clearConsole();
-    var existingProcess = getProcessForPort(DEFAULT_PORT);
-    var question = [{
-        name: 'shouldChangePort',
-        type: 'confirm',
-        message: '端口（' + chalk.yellow(DEFAULT_PORT) + '）被占用，可能的程序是： \n  ' + existingProcess + '\n' +
-            '  要换一个端口运行本程序吗？',
-        default: true
-    }];
-
-    spinner.stop();
-    inquirer.prompt(question).then(({ shouldChangePort }) => {
-        if (shouldChangePort) {
-            spinner.start();
-            run(port);
-        } else {
-            clearConsole();
-            spinner.fail('请关闭占用' + chalk.yellow(DEFAULT_PORT) + '的程序后再运行。');
-            console.log();
-            process.exit(0);
-        }
-    });
-});

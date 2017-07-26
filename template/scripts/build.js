@@ -22,7 +22,44 @@ var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
 var ora = require('ora');
-var execSync = require('child_process').execSync;
+
+var spinner = ora('webpack启动中...').start();
+
+require('check-dependencies')({}, function(result) {
+    if (result.status) {
+        spinner.stop();
+        result.error.forEach(function(err) {
+            console.log(err);
+        });
+        console.log();
+        spinner.warn(chalk.yellow('你当前安装的依赖版本和要求的不一致，请按照下面命令操作重新安装依赖：'));
+        console.log();
+        console.log(chalk.green('   rm -rf node_modules'));
+        console.log(chalk.green('   ' + (paths.cnpm ? 'cnpm' : 'npm') + ' install'));
+        process.exit();
+    } else {
+        recursive(paths.appBuild, (err, fileNames) => {
+            var previousSizeMap = (fileNames || [])
+                .filter(fileName => /\.(js|css)$/.test(fileName))
+                .reduce((memo, fileName) => {
+                    var contents = fs.readFileSync(fileName);
+                    var key = removeFileNameHash(fileName);
+                    memo[key] = gzipSize(contents);
+                    return memo;
+                }, {});
+
+            clearConsole();
+
+            fs.emptyDirSync(paths.appBuild);
+
+            // Start the webpack build
+            build(previousSizeMap);
+
+            // Merge with the public folder
+            copyPublicFolder();
+        });
+    }
+});
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -31,17 +68,6 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 
 if (userDevConfig) {
     config.output.publicPath = './';
-}
-
-function hasInstallServe() {
-    try {
-        execSync('serve --version', {
-            stdio: 'ignore'
-        });
-        return true;
-    } catch (e) {
-        return false;
-    }
 }
 
 // Input: /User/dan/app/build/static/js/main.82be8.js
@@ -68,29 +94,6 @@ function getDifferenceLabel(currentSize, previousSize) {
         return '';
     }
 }
-
-// First, read the current file sizes in build directory.
-// This lets us display how much they changed later.
-recursive(paths.appBuild, (err, fileNames) => {
-    var previousSizeMap = (fileNames || [])
-        .filter(fileName => /\.(js|css)$/.test(fileName))
-        .reduce((memo, fileName) => {
-            var contents = fs.readFileSync(fileName);
-            var key = removeFileNameHash(fileName);
-            memo[key] = gzipSize(contents);
-            return memo;
-        }, {});
-
-    clearConsole();
-
-    fs.emptyDirSync(paths.appBuild);
-
-    // Start the webpack build
-    build(previousSizeMap);
-
-    // Merge with the public folder
-    copyPublicFolder();
-});
 
 // Print a detailed summary of build files.
 function printFileSizes(stats, previousSizeMap) {
@@ -129,7 +132,6 @@ function printFileSizes(stats, previousSizeMap) {
 // Create the production build and print the deployment instructions.
 function build(previousSizeMap) {
     var packText = userDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...';
-    var spinner = ora().start();
     var startTime = Date.now();
     var timer
     var logProgress = function(stop) {
@@ -195,7 +197,7 @@ function build(previousSizeMap) {
 
         if (/^http/.test(config.output.publicPath) === false) {
             spinner.succeed(chalk.green('项目打包完成，运行以下命令可即时预览：'));
-            if (!hasInstallServe()) {
+            if (!paths.serve) {
                 console.log(chalk.cyan('npm') + ' install -g serve');
             }
             console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));

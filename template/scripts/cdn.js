@@ -4,7 +4,6 @@ var Rsync = require('rsync');
 var chalk = require('chalk');
 var lodash = require('lodash');
 var glob = require('glob');
-var execSync = require('child_process').execSync;
 var paths = require('./config/paths');
 var ora = require('ora');
 var pkg = require(paths.appPackageJson);
@@ -17,17 +16,6 @@ var oldStaticConfig = lodash.invert(getStaticConfig(staticConfigFile));
 var newStaticConfig = {};
 
 runCDN();
-
-function hasInstallServe() {
-    try {
-        execSync('serve --version', {
-            stdio: 'ignore'
-        });
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
 
 function getStaticConfig(path) {
     try {
@@ -86,7 +74,7 @@ function runCDN() {
                 console.log(chalk.blue("配置文件已经更新: " + staticConfigFile));
                 console.log();
                 console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
-                if (!hasInstallServe()) {
+                if (!paths.serve) {
                     console.log(chalk.cyan('npm') + ' install -g serve');
                 }
                 console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));

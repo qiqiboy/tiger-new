@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var glob = require('glob');
+var execSync = require('child_process').execSync;
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
@@ -46,5 +47,20 @@ module.exports = {
     entries: entries,
     pageEntries: glob.sync(resolveApp('public/!(_)*.html')).map(function(file){
         return path.basename(file, '.html');
-    })
+    }),
+    //一些命令检测
+    serve: hasInstall('serve'),
+    cnpm: hasInstall('cnpm'),
+    yarn: hasInstall('yarn')
 };
+
+function hasInstall(command) {
+    try {
+        execSync(command + ' --version', {
+            stdio: 'ignore'
+        });
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
