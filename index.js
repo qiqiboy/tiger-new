@@ -4,17 +4,16 @@
 
 var chalk = require('chalk');
 var ora = require('ora');
+var semver = require('semver');
 
 var spinner = ora();
 
 var currentNodeVersion = process.versions.node
-if (currentNodeVersion.split('.')[0] < 4) {
-    console.error(
-        chalk.red(
-            '你当前node版本为 ' + currentNodeVersion + '。\n' +
-            '该项目要求node版本必须 >= 4.0 。\n' +
-            '请升级你的node！'
-        )
+if (semver.lt(currentNodeVersion, '4.0.0')) {
+    spinner.fail(
+            '你当前node版本为 ' + chalk.red(currentNodeVersion) + '。\n' +
+            '  该项目要求node版本必须 ' + chalk.cyan('>= 4.0.0') + ' 。\n' +
+            '  请升级你的node！'
     );
     process.exit(1);
 }
@@ -25,7 +24,6 @@ var fs = require('fs-extra');
 var path = require('path');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
-var semver = require('semver');
 var appUpgrade = require('./upgrade');
 
 var ownPath = __dirname;
@@ -44,7 +42,7 @@ var program = commander
     .parse(process.argv);
 
 if (typeof projectName === 'undefined') {
-    console.error('请指定要' + (program.upgrade ? '升级' : '创建') + '的项目目录名:');
+    spinner.fail('请指定要' + (program.upgrade ? '升级' : '创建') + '的项目目录名:');
     console.log('  ' + chalk.cyan(program.name()) + chalk.green(' <项目目录>'));
     console.log();
     console.log('例如:');
@@ -55,13 +53,23 @@ if (typeof projectName === 'undefined') {
 
 if (program.upgrade) {
     appUpgrade(projectName);
+} else if (!isSafeToCreateProjectIn(path.resolve(projectName))) {
+    spinner.fail('该文件夹（' + chalk.green(projectName) + '）已经存在，且存在导致冲突的文件.');
+    console.log('  请使用一个新的文件夹名，或者使用升级命令将项目构建方式升级到最新版本：');
+    console.log();
+    console.log('   ' + chalk.cyan(program.name()) + ' ' + chalk.green(projectName) + chalk.cyan(' --upgrade'));
+    console.log();
+    process.exit(1);
 } else {
     inquirer
         .prompt([{
             name: 'version',
             type: 'input',
             message: '请输入项目版本号:',
-            default: '1.0.0'
+            default: '1.0.0',
+            validate: function(input){
+                return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号'
+            }
         }, {
             name: 'useCdn',
             type: 'confirm',
@@ -156,14 +164,6 @@ function createApp(name) {
     pkgVendor.push('./static/css/vendor');
 
     fs.ensureDirSync(name);
-    if (!isSafeToCreateProjectIn(root)) {
-        spinner.fail('该文件夹（' + chalk.green(name) + '）已经存在，且存在导致冲突的文件.');
-        console.log('  请使用一个新的文件夹名，或者使用升级命令将项目构建方式升级到最新版本：');
-        console.log();
-        console.log(chalk.green('   tiger-new ' + name + ' --upgrade'));
-        console.log();
-        process.exit(1);
-    }
 
     console.log(
         '即将在 ' + chalk.green(root) + ' 下创建新的开发项目'
@@ -333,7 +333,7 @@ function isSafeToCreateProjectIn(root) {
     var validFiles = [
         '.DS_Store', 'Thumbs.db', '.git', '.gitignore', '.idea', 'README.md', 'LICENSE'
     ];
-    return fs.readdirSync(root)
+    return !fs.existsSync(root) || fs.readdirSync(root)
         .every(function(file) {
             return validFiles.indexOf(file) >= 0;
         });
