@@ -48,7 +48,7 @@
     "sw-precache-webpack-plugin": "0.11.4",
     "uglifyjs-webpack-plugin": "1.0.0-beta.2",
     "url-loader": "0.5.9",
-    "webpack": "3.3.0",
+    "webpack": "3.4.0",
     "webpack-dev-server": "2.6.1"
   },
   "dependencies": {
