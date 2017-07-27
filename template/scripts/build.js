@@ -19,25 +19,15 @@ var paths = require('./config/paths');
 var clearConsole = require('react-dev-utils/clearConsole');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+var checkMissDependencies = require('./config/checkMissDependencies');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
 var ora = require('ora');
 
 var spinner = ora('webpack启动中...').start();
 
-require('check-dependencies')({}, function(result) {
-    if (result.status) {
-        spinner.stop();
-        result.error.forEach(function(err) {
-            console.log(err);
-        });
-        console.log();
-        spinner.warn(chalk.yellow('你当前安装的依赖版本和要求的不一致，请按照下面命令操作重新安装依赖：'));
-        console.log();
-        console.log(chalk.green('   rm -rf node_modules'));
-        console.log(chalk.green('   ' + (paths.cnpm ? 'cnpm' : 'npm') + ' install'));
-        process.exit();
-    } else {
+checkMissDependencies(spinner)
+    .then(function() {
         recursive(paths.appBuild, (err, fileNames) => {
             var previousSizeMap = (fileNames || [])
                 .filter(fileName => /\.(js|css)$/.test(fileName))
@@ -58,8 +48,9 @@ require('check-dependencies')({}, function(result) {
             // Merge with the public folder
             copyPublicFolder();
         });
-    }
-});
+    }, function() {
+        process.exit(1);
+    });
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {

@@ -22,6 +22,7 @@ var openBrowser = require('react-dev-utils/openBrowser');
 var errorOverlayMiddleware = require('react-error-overlay/middleware');
 var inquirer = require('react-dev-utils/inquirer');
 var getProcessForPort = require('react-dev-utils/getProcessForPort');
+var checkMissDependencies = require('./config/checkMissDependencies');
 var config = require('./config/webpack.config.dev');
 var paths = require('./config/paths');
 var pkg = require(paths.appPackageJson);
@@ -30,19 +31,8 @@ var spinner = ora('webpack启动中...').start();
 var DEFAULT_PORT = parseInt(process.env.PORT) || 3000;
 var compiler;
 
-require('check-dependencies')({}, function(result) {
-    if (result.status) {
-        spinner.stop();
-        result.error.forEach(function(err) {
-            console.log(err);
-        });
-        console.log();
-        spinner.warn(chalk.yellow('你当前安装的依赖版本和要求的不一致，请按照下面命令操作重新安装依赖：'));
-        console.log();
-        console.log(chalk.green('   rm -rf node_modules'));
-        console.log(chalk.green('   ' + (paths.cnpm ? 'cnpm' : 'npm') + ' install'));
-        process.exit();
-    } else {
+checkMissDependencies(spinner)
+    .then(function() {
         detect(DEFAULT_PORT).then(port => {
             if (port === DEFAULT_PORT) {
                 run(port);
@@ -72,8 +62,9 @@ require('check-dependencies')({}, function(result) {
                 }
             });
         });
-    }
-});
+    }, function() {
+        process.exit(1);
+    });
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -271,6 +262,7 @@ function runDevServer(host, port, protocol) {
     ['SIGINT', 'SIGTERM'].forEach(function(sig) {
         process.on(sig, function() {
             devServer.close();
+            spinner.stop();
             process.exit();
         });
     });
