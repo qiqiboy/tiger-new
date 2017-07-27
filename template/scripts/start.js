@@ -63,7 +63,7 @@ checkMissDependencies(spinner)
             });
         });
     }, function() {
-        process.exit(1);
+        process.exit(0);
     });
 
 // Warn and crash if required files are missing
