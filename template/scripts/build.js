@@ -49,7 +49,7 @@ checkMissDependencies(spinner)
             copyPublicFolder();
         });
     }, function() {
-        process.exit(1);
+        process.kill(process.pid, 'SIGINT');
     });
 
 // Warn and crash if required files are missing

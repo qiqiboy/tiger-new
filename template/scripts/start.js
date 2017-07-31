@@ -63,7 +63,7 @@ checkMissDependencies(spinner)
             });
         });
     }, function() {
-        process.exit(0);
+        process.kill(process.pid, 'SIGINT');
     });
 
 // Warn and crash if required files are missing
