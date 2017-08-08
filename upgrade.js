@@ -106,7 +106,7 @@ function saveDevDependencies(root, package, currentDevDependencies, newDevDepend
 
     if (package.cdn) {
         package.scripts.cdn = "node scripts/cdn.js";
-        package.scripts.pack = "npm run build & npm run cdn";
+        package.scripts.pack = "npm run build && npm run cdn";
     }
 
     fs.writeFileSync(
