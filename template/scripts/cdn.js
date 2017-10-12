@@ -79,7 +79,7 @@ function runCDN() {
                 }
                 console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
             } else {
-                console.log(chalk.red("文件未全部上传，请单独运行") + chalk.green(' gulp cdn ') + chalk.red("命令!"));
+                console.log(chalk.red("文件未全部上传，请单独运行") + chalk.green(' npm run cdn ') + chalk.red("命令!"));
             }
 
             console.log();
@@ -99,7 +99,7 @@ function createRsync(file) {
                 .destination(path.join(pkg.cdn.server || 'static:/data0/webservice/static', pkg.cdn.path))
                 .execute(function(error, code, cmd) {
                     if (error) {
-                        resolve(error);
+                        resolve(false);
                         spinner.fail(chalk.red('上传失败(' + error + ')：' + relative));
                     } else {
                         resolve(true);
