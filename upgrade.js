@@ -150,6 +150,10 @@ function install(callback) {
     child.on('close', function(code) {
         callback(code, command, args);
     });
+
+    process.on('exit', function() {
+        child.kill();
+    });
 }
 
 

@@ -11,9 +11,9 @@ var spinner = ora();
 var currentNodeVersion = process.versions.node
 if (semver.lt(currentNodeVersion, '4.0.0')) {
     spinner.fail(
-            '你当前node版本为 ' + chalk.red(currentNodeVersion) + '。\n' +
-            '  该项目要求node版本必须 ' + chalk.cyan('>= 4.0.0') + ' 。\n' +
-            '  请升级你的node！'
+        '你当前node版本为 ' + chalk.red(currentNodeVersion) + '。\n' +
+        '  该项目要求node版本必须 ' + chalk.cyan('>= 4.0.0') + ' 。\n' +
+        '  请升级你的node！'
     );
     process.exit(1);
 }
@@ -67,7 +67,7 @@ if (program.upgrade) {
             type: 'input',
             message: '请输入项目版本号:',
             default: '1.0.0',
-            validate: function(input){
+            validate: function(input) {
                 return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号'
             }
         }, {
@@ -251,6 +251,10 @@ function install(packageToInstall, saveDev, callback) {
     child.on('close', function(code) {
         callback(code, command, args);
     });
+
+    process.on('exit', function() {
+        child.kill();
+    });
 }
 
 function run(appPath, appName) {
@@ -270,7 +274,7 @@ function run(appPath, appName) {
         fs.copySync(templatePath, appPath);
     }
 
-    fs.move(path.join(appPath, 'gitignore'), path.join(appPath, '.gitignore'), [], function(err) {
+    fs.move(path.join(appPath, 'gitignore'), path.join(appPath, '.gitignore'), function(err) {
         if (err) {
             // Append if there's already a `.gitignore` file there
             if (err.code === 'EEXIST') {
@@ -280,6 +284,18 @@ function run(appPath, appName) {
             } else {
                 throw err;
             }
+        }
+    });
+
+    // for ternjs config
+    fs.move(path.join(appPath, 'tern-project'), path.join(appPath, '.tern-project'), { overwrite: true }, function(err) {
+        if (err) {
+            spinner.fail('create ternjs config error!');
+        }
+    });
+    fs.move(path.join(appPath, 'tern-webpack-config.js'), path.join(appPath, '.tern-webpack-config.js'), { overwrite: true }, function(err) {
+        if (err) {
+            spinner.fail('create ternjs config error!');
         }
     });
 
