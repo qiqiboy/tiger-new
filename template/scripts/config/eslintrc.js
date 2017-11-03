@@ -8,7 +8,6 @@ module.exports = {
         "amd": true
     },
     "rules": {
-        "react/no-deprecated": 0,
         "react/jsx-no-target-blank": 0,
         "eqeqeq": 0,
         "radix": 0,

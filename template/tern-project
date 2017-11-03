@@ -8,13 +8,12 @@
     "angular"
   ],
   "plugins": {
-      "angular": {},
-      "node": {},
-	  "es_modules": {},
-      "commonjs": {},
-      "webpack": {
-        "configPath": "./.tern-webpack-config.js"
-      }
+    "angular": {},
+    "node": {},
+    "es_modules": {},
+    "commonjs": {},
+    "webpack": {
+      "configPath": "./.tern-webpack-config.js"
+    }
   }
 }
-

@@ -11,3 +11,12 @@ require('classlist-polyfill');
 // Object.assign() is commonly used with React.
 // It will use the native implementation if it's present and isn't buggy.
 Object.assign = require('object-assign');
+
+// requestAnimationFrame
+require('raf-dom').polyfill();
+
+// ES6
+require('core-js/es6/map');
+require('core-js/es6/set');
+require('core-js/es6/array');
+require('core-js/es6/string');

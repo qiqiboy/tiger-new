@@ -100,7 +100,7 @@ var webpackConfig = {
     },
     resolve: {
         modules: ['node_modules', paths.appNodeModules, paths.root].concat(paths.nodePaths),
-        extensions: ['.js', '.json', '.jsx'],
+        extensions: ['.js', '.json', '.jsx', '.mjs'],
         alias: Object.assign({
             'react-native': 'react-native-web'
         }, paths.alias),
@@ -116,7 +116,7 @@ var webpackConfig = {
         strictExportPresence: true,
         rules: [ // nothing
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(js|jsx|mjs)$/,
                 enforce: 'pre',
                 use: [{
                     options: {
@@ -127,44 +127,46 @@ var webpackConfig = {
                 include: paths.appSrc
             },
             {
-                exclude: [/\.json$/],
-                loader: 'file-loader',
-                options: {
-                    name: 'static/images/[name].[hash:8].[ext]'
-                }
-            }, {
-                test: /\.html$/,
-                loader: 'html-loader',
-                options: {
-                    interpolate: 'require',
-                    root: paths.staticSrc,
-                    attrs: ['img:src', 'img:data-src', 'video:src', 'source:src', 'audio:src', 'script:src', 'link:href']
-                }
-            }, {
-                test: /\.(js|jsx)$/,
-                include: [paths.appSrc, paths.staticSrc],
-                loader: 'babel-loader',
-                options: {
-                    compact: true
-                }
-            }, {
-                test: /\.css$/,
-                loader: getCssRule()
-            }, {
-                test: /\.s[ac]ss$/,
-                loader: getCssRule('sass-loader')
-            }, {
-                test: /\.less$/,
-                loader: getCssRule('less-loader')
-            }, {
-                test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
-                loader: 'file-loader',
-                query: {
-                    name: 'static/media/[name].[hash:8].[ext]'
-                }
-            }, {
-                test: /\.(txt|htm)$/,
-                loader: 'raw-loader'
+                oneOf: [{
+                    test: /\.html$/,
+                    loader: 'html-loader',
+                    options: {
+                        interpolate: 'require',
+                        root: paths.staticSrc,
+                        attrs: ['img:src', 'img:data-src', 'video:src', 'source:src', 'audio:src', 'script:src', 'link:href']
+                    }
+                }, {
+                    test: /\.(js|jsx|mjs)$/,
+                    include: [paths.appSrc, paths.staticSrc],
+                    loader: 'babel-loader',
+                    options: {
+                        compact: true
+                    }
+                }, {
+                    test: /\.css$/,
+                    loader: getCssRule()
+                }, {
+                    test: /\.s[ac]ss$/,
+                    loader: getCssRule('sass-loader')
+                }, {
+                    test: /\.less$/,
+                    loader: getCssRule('less-loader')
+                }, {
+                    test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
+                    loader: 'file-loader',
+                    query: {
+                        name: 'static/media/[name].[hash:8].[ext]'
+                    }
+                }, {
+                    test: /\.(txt|htm)$/,
+                    loader: 'raw-loader'
+                }, {
+                    exclude: [/\.(js|jsx|mjs)$/, /\.(txt|htm)$/, /\.json$/],
+                    loader: 'file-loader',
+                    options: {
+                        name: 'static/images/[name].[hash:8].[ext]'
+                    }
+                }]
             }
         ]
     },
@@ -214,11 +216,6 @@ var webpackConfig = {
         tls: 'empty'
     }
 };
-
-var excludeLoader = webpackConfig.module.rules[1];
-excludeLoader.exclude = excludeLoader.exclude.concat(webpackConfig.module.rules.slice(2).map(function(config) {
-    return config.test;
-}));
 
 function getCssRule(extraRule) {
     var defaultRule = [{

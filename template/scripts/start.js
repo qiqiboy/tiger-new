@@ -19,7 +19,7 @@ var clearConsole = require('react-dev-utils/clearConsole');
 var checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 var formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 var openBrowser = require('react-dev-utils/openBrowser');
-var errorOverlayMiddleware = require('react-error-overlay/middleware');
+var errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 var inquirer = require('react-dev-utils/inquirer');
 var getProcessForPort = require('react-dev-utils/getProcessForPort');
 var checkMissDependencies = require('./config/checkMissDependencies');
@@ -243,13 +243,13 @@ function runDevServer(host, port, protocol) {
             disableDotRule: true,
         },
         proxy: prepareProxy(pkg.proxy),
-        setup: function(app) {
+        before: function(app) {
             app.use(errorOverlayMiddleware());
         }
     });
 
     // Launch WebpackDevServer.
-    devServer.listen(port, (err, result) => {
+    devServer.listen(port, host, function(err, result) {
         if (err) {
             return console.log(err);
         }
