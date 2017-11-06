@@ -45,6 +45,7 @@ module.exports = {
         //"no-invalid-this": 1,
         "no-global-assign": 2,
         "no-multi-spaces": [2, {
+            "ignoreEOLComments": true,
             "exceptions": {
                 "VariableDeclarator": true,
                 "ImportDeclaration": true

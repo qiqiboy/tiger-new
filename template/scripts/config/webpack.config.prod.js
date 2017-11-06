@@ -188,10 +188,13 @@ var webpackConfig = {
         new webpack.EnvironmentPlugin(env),
         // Minify the code.
         new UglifyJSPlugin({
+            cache: true,
+            parallel: true,
             uglifyOptions: {
                 compress: {
                     comparisons: false,
-                    warnings: false
+                    warnings: false,
+                    unused: false
                 },
                 output: {
                     comments: false,
