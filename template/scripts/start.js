@@ -72,6 +72,10 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 }
 
 function setupCompiler(host, port, protocol) {
+    if (host === '0.0.0.0' || host === '::') {
+        host = 'localhost';
+    }
+
     try {
         compiler = webpack(config);
     } catch (err) {
@@ -256,6 +260,10 @@ function runDevServer(host, port, protocol) {
 
         clearConsole();
         spinner.text = chalk.cyan('正在启动测试服务器...');
+
+        if (host === '0.0.0.0' || host === '::') {
+            host = 'localhost';
+        }
         openBrowser(protocol + '://' + host + ':' + port + '/');
     });
 
@@ -270,7 +278,7 @@ function runDevServer(host, port, protocol) {
 
 function run(port) {
     var protocol = process.env.HTTPS === 'true' ? "https" : "http";
-    var host = process.env.HOST || 'localhost';
+    var host = process.env.HOST || '0.0.0.0';
     setupCompiler(host, port, protocol);
     runDevServer(host, port, protocol);
 }
