@@ -49,7 +49,9 @@ checkMissDependencies(spinner)
             copyPublicFolder();
         });
     }, function() {
-        process.kill(process.pid, 'SIGINT');
+        console.log();
+        console.log();
+        process.exit(1);
     });
 
 // Warn and crash if required files are missing
@@ -179,6 +181,11 @@ function build(previousSizeMap) {
             );
             console.log();
             console.log();
+            spinner.fail(chalk.red('请处理所有的错误和警告后再build代码！'));
+
+            console.log();
+            console.log();
+            process.exit(1);
         }
 
         spinner.succeed('gzip后可节省大小:');
