@@ -195,7 +195,6 @@ function createApp(name) {
             pack: 'npm run build',
             count: 'node scripts/count.js',
         },
-        'pre-commit': ['precommit'],
         babel: {
             presets: ['react-app'],
         },
