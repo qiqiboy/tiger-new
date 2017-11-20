@@ -22,7 +22,11 @@ module.exports = {
         "padded-blocks": [1, "never"],
         "one-var-declaration-per-line": [1, "initializations"],
         "space-in-parens": [1, "never"],
-        "space-before-function-paren": [1, "never"],
+        "space-before-function-paren": [1, {
+            "anonymous": "never",
+            "named": "never",
+            "asyncArrow": "always"
+        }],
         "space-unary-ops": 2,
         "space-infix-ops": 1,
         "no-multiple-empty-lines": [1, {

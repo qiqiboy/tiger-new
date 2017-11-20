@@ -101,6 +101,7 @@ function appUpgrade(projectName) {
 
                     if (answers.addPrettier) {
                         package.scripts.precommit = 'lint-staged';
+                        package['pre-commit'] = ['precommit'];
                         package.prettier = {
                             printWidth: 120,
                             tabWidth: 4,
