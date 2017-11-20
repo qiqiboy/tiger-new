@@ -105,7 +105,7 @@ function appUpgrade(projectName) {
                             printWidth: 120,
                             tabWidth: 4,
                             parser: 'babylon',
-                            trailingComma: 'all',
+                            trailingComma: 'none',
                             jsxBracketSameLine: true,
                             semi: true,
                             singleQuote: true,
@@ -159,7 +159,7 @@ function appUpgrade(projectName) {
                         console.log();
                         spinner.succeed(
                             '项目升级成功！但是你可能需要重新手动安装确实的依赖。\n  运行 ' +
-                                chalk.green((shouldUseCnpm() ? 'cnpm' : 'npm') + ' install'),
+                                chalk.green((shouldUseCnpm() ? 'cnpm' : 'npm') + ' install')
                         );
                     }
                 });

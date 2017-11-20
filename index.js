@@ -17,7 +17,7 @@ if (semver.lt(currentNodeVersion, '4.0.0')) {
             '  该项目要求node版本必须 ' +
             chalk.cyan('>= 4.0.0') +
             ' 。\n' +
-            '  请升级你的node！',
+            '  请升级你的node！'
     );
     process.exit(1);
 }
@@ -140,7 +140,7 @@ if (program.upgrade) {
                                 ? '文件夹名不能包含 空格、/ 等其它字符'
                                 : true;
                         },
-                    },
+                    }
                 );
             }
 
@@ -205,7 +205,7 @@ function createApp(name) {
             printWidth: 120,
             tabWidth: 4,
             parser: 'babylon',
-            trailingComma: 'all',
+            trailingComma: 'none',
             jsxBracketSameLine: true,
             semi: true,
             singleQuote: true,
@@ -322,7 +322,7 @@ function run(appPath, appName) {
 
     // for ternjs config
     fs.move(path.join(appPath, 'tern-project'), path.join(appPath, '.tern-project'), { overwrite: true }, function(
-        err,
+        err
     ) {
         if (err) {
             spinner.fail('create ternjs config error!');
@@ -336,7 +336,7 @@ function run(appPath, appName) {
             if (err) {
                 spinner.fail('create ternjs config error!');
             }
-        },
+        }
     );
 
     var templateDependenciesPath = path.join(ownPath, 'dependencies.json');
@@ -383,9 +383,9 @@ function run(appPath, appName) {
                         console.log();
                         console.log('运行下面的命令切换到项目目录开始工作:');
                         console.log(chalk.green('  cd ' + path.relative(oldPath, appPath)));
-                    },
+                    }
                 );
-            },
+            }
         );
     }
 }
