@@ -74,14 +74,14 @@ if (program.upgrade) {
                 default: '1.0.0',
                 validate: function(input) {
                     return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号';
-                },
+                }
             },
             {
                 name: 'useCdn',
                 type: 'confirm',
                 message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
-                default: false,
-            },
+                default: false
+            }
         ])
         .then(function(answers) {
             var questions = [
@@ -89,7 +89,7 @@ if (program.upgrade) {
                     name: 'author',
                     type: 'input',
                     message: '请输入项目所属者（组织）的联系邮箱:',
-                    default: 'imqiqiboy@gmail.com',
+                    default: 'imqiqiboy@gmail.com'
                 },
                 {
                     name: 'libs',
@@ -98,10 +98,10 @@ if (program.upgrade) {
                         { name: '无框架依赖', value: 0 },
                         { name: 'jquery 项目', value: 1 },
                         { name: 'react 项目', value: 2 },
-                        { name: 'jquery + react 项目', value: 3 },
+                        { name: 'jquery + react 项目', value: 3 }
                     ],
                     message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
-                    default: 3,
+                    default: 3
                 },
                 {
                     name: 'proxy',
@@ -109,14 +109,20 @@ if (program.upgrade) {
                     message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
                     validate: function(input) {
                         return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
-                    },
+                    }
                 },
                 {
                     name: 'isSpa',
                     type: 'confirm',
                     message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
-                    default: false,
+                    default: false
                 },
+                {
+                    name: 'enableSW',
+                    type: 'confirm',
+                    message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
+                    default: false
+                }
             ];
 
             if (answers.useCdn) {
@@ -128,7 +134,7 @@ if (program.upgrade) {
                         default: 'https://static.example.com',
                         validate: function(input) {
                             return /^http/.test(input) ? true : '请输入一个服务器地址';
-                        },
+                        }
                     },
                     {
                         name: 'pathname',
@@ -139,7 +145,7 @@ if (program.upgrade) {
                             return /\s|\//.test(input.replace(/^\//, ''))
                                 ? '文件夹名不能包含 空格、/ 等其它字符'
                                 : true;
-                        },
+                        }
                     }
                 );
             }
@@ -172,6 +178,10 @@ function createApp(name) {
             break;
     }
 
+    if (projectCustom.enableSW) {
+        pkgVendor.push('utils/serviceWorker/register');
+    }
+
     pkgVendor.push('./static/css/vendor');
 
     fs.ensureDirSync(name);
@@ -193,13 +203,13 @@ function createApp(name) {
             build: 'node scripts/build.js',
             'build:dev': 'node scripts/build.js --dev',
             pack: 'npm run build',
-            count: 'node scripts/count.js',
+            count: 'node scripts/count.js'
         },
         babel: {
-            presets: ['react-app'],
+            presets: ['react-app']
         },
         eslintConfig: {
-            extends: ['react-app', './scripts/config/eslintrc.js'],
+            extends: ['react-app', './scripts/config/eslintrc.js']
         },
         prettier: {
             printWidth: 120,
@@ -214,34 +224,34 @@ function createApp(name) {
                     files: '*.json',
                     options: {
                         parser: 'json',
-                        tabWidth: 2,
-                    },
+                        tabWidth: 2
+                    }
                 },
                 {
                     files: '*.{css,sass,scss,less}',
                     options: {
                         parser: 'postcss',
-                        tabWidth: 4,
-                    },
+                        tabWidth: 4
+                    }
                 },
                 {
                     files: '*.ts',
                     options: {
-                        parser: 'typescript',
-                    },
-                },
-            ],
+                        parser: 'typescript'
+                    }
+                }
+            ]
         },
         'lint-staged': {
-            '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add'],
-        },
+            '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
+        }
     };
 
     if (projectCustom.useCdn) {
         packageJson.cdn = {
             server: 'static:/data0/webservice/static',
             host: projectCustom.host,
-            path: '/' + projectCustom.pathname.replace(/^\//g, ''),
+            path: '/' + projectCustom.pathname.replace(/^\//g, '')
         };
 
         packageJson.scripts.cdn = 'node scripts/cdn.js';
@@ -261,7 +271,7 @@ function createApp(name) {
 function shouldUseCnpm() {
     try {
         execSync('cnpm --version', {
-            stdio: 'ignore',
+            stdio: 'ignore'
         });
         return true;
     } catch (e) {
@@ -281,7 +291,7 @@ function install(packageToInstall, saveDev, callback) {
     args = ['install', saveDev ? '--save-dev' : '--save', '--save-exact'].concat(packageToInstall);
 
     var child = spawn(command, args, {
-        stdio: 'inherit',
+        stdio: 'inherit'
     });
 
     child.on('close', function(code) {

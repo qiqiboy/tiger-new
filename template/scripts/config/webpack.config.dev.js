@@ -7,7 +7,7 @@ var CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 var eslintFormatter = require('react-dev-utils/eslintFormatter');
-var DirectoryNamedWebpackPlugin = require("directory-named-webpack-plugin");
+var DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
 var getClientEnvironment = require('./env');
 var paths = require('./paths');
 var pkg = require(paths.appPackageJson);
@@ -24,29 +24,30 @@ var injects = [
 
 var matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.jsx?)?\s*-->/g;
 //console.log(paths);process.exit();
-paths.pageEntries
-    .forEach(function(name) {
-        var chunks = ['vendor'];
-        var file = path.resolve(paths.appPublic, name + '.html');
+paths.pageEntries.forEach(function(name) {
+    var chunks = ['vendor'];
+    var file = path.resolve(paths.appPublic, name + '.html');
 
-        if (paths.entries[name]) {
-            chunks.push(name);
-        }
+    if (paths.entries[name]) {
+        chunks.push(name);
+    }
 
-        var contents = fs.readFileSync(file);
-        var matches;
+    var contents = fs.readFileSync(file);
+    var matches;
 
-        while ((matches = matchScriptStylePattern.exec(contents))) {
-            chunks.push(matches[1]);
-        }
+    while ((matches = matchScriptStylePattern.exec(contents))) {
+        chunks.push(matches[1]);
+    }
 
-        injects.push(new HtmlWebpackPlugin({
+    injects.push(
+        new HtmlWebpackPlugin({
             chunks: chunks,
             filename: name + '.html',
             template: file,
             inject: true
-        }));
-    });
+        })
+    );
+});
 
 var webpackConfig = {
     devtool: 'cheap-module-source-map',
@@ -64,15 +65,17 @@ var webpackConfig = {
         filename: 'static/js/[name].[hash:8].js',
         chunkFilename: 'static/js/[name].bundle.[hash:8].js',
         publicPath: publicPath,
-        devtoolModuleFilenameTemplate: info =>
-            path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')
+        devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')
     },
     resolve: {
         modules: ['node_modules', paths.appNodeModules, paths.root].concat(paths.nodePaths),
         extensions: ['.js', '.json', '.jsx', '.mjs'],
-        alias: Object.assign({
-            'react-native': 'react-native-web'
-        }, paths.alias),
+        alias: Object.assign(
+            {
+                'react-native': 'react-native-web'
+            },
+            paths.alias
+        ),
         plugins: [
             new DirectoryNamedWebpackPlugin({
                 honorIndex: true,
@@ -83,59 +86,79 @@ var webpackConfig = {
 
     module: {
         strictExportPresence: true,
-        rules: [ // nothing
+        rules: [
+            // nothing
             {
                 test: /\.(js|jsx)$/,
                 enforce: 'pre',
-                use: [{
-                    options: {
-                        formatter: eslintFormatter,
-                    },
-                    loader: 'eslint-loader',
-                }, ],
+                use: [
+                    {
+                        options: {
+                            formatter: eslintFormatter
+                        },
+                        loader: 'eslint-loader'
+                    }
+                ],
                 include: paths.appSrc
             },
             {
-                oneOf: [{
-                    test: /\.html$/,
-                    loader: 'html-loader',
-                    options: {
-                        interpolate: 'require',
-                        root: paths.staticSrc,
-                        attrs: ['img:src', 'img:data-src', 'video:src', 'source:src', 'audio:src', 'script:src', 'link:href']
+                oneOf: [
+                    {
+                        test: /\.html$/,
+                        loader: 'html-loader',
+                        options: {
+                            interpolate: 'require',
+                            root: paths.staticSrc,
+                            attrs: [
+                                'img:src',
+                                'img:data-src',
+                                'video:src',
+                                'source:src',
+                                'audio:src',
+                                'script:src',
+                                'link:href'
+                            ]
+                        }
+                    },
+                    {
+                        test: /\.(js|jsx|mjs)$/,
+                        include: [paths.appSrc, paths.staticSrc],
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true
+                        }
+                    },
+                    {
+                        test: /\.css$/,
+                        use: getCssRule()
+                    },
+                    {
+                        test: /\.s[ac]ss$/,
+                        use: getCssRule('sass-loader')
+                    },
+                    {
+                        test: /\.less$/,
+                        use: getCssRule('less-loader')
+                    },
+                    {
+                        test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
+                        loader: 'file',
+                        query: {
+                            name: 'static/media/[name].[hash:8].[ext]'
+                        }
+                    },
+                    {
+                        test: /\.(txt|htm)$/,
+                        loader: 'raw-loader'
+                    },
+                    {
+                        exclude: [/\.(js|jsx|mjs)$/, /\.(txt|htm)$/, /\.json$/],
+                        loader: 'file-loader',
+                        options: {
+                            name: 'static/images/[name].[hash:8].[ext]'
+                        }
                     }
-                }, {
-                    test: /\.(js|jsx|mjs)$/,
-                    include: [paths.appSrc, paths.staticSrc],
-                    loader: 'babel-loader',
-                    options: {
-                        cacheDirectory: true
-                    }
-                }, {
-                    test: /\.css$/,
-                    use: getCssRule()
-                }, {
-                    test: /\.s[ac]ss$/,
-                    use: getCssRule('sass-loader')
-                }, {
-                    test: /\.less$/,
-                    use: getCssRule('less-loader')
-                }, {
-                    test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
-                    loader: 'file',
-                    query: {
-                        name: 'static/media/[name].[hash:8].[ext]'
-                    }
-                }, {
-                    test: /\.(txt|htm)$/,
-                    loader: 'raw-loader'
-                }, {
-                    exclude: [/\.(js|jsx|mjs)$/, /\.(txt|htm)$/, /\.json$/],
-                    loader: 'file-loader',
-                    options: {
-                        name: 'static/images/[name].[hash:8].[ext]'
-                    }
-                }]
+                ]
             }
         ]
     },
@@ -159,7 +182,7 @@ var webpackConfig = {
         tls: 'empty'
     },
     performance: {
-        hints: false,
+        hints: false
     }
 };
 
@@ -169,7 +192,7 @@ function getCssRule(extraRule) {
         {
             loader: 'css-loader',
             options: {
-                importLoaders: extraRule ? 2 : 1,
+                importLoaders: extraRule ? 2 : 1
             }
         },
         {
@@ -184,9 +207,9 @@ function getCssRule(extraRule) {
                             'last 4 versions',
                             'iOS 7',
                             'Firefox ESR',
-                            'not ie < 9', // React doesn't support IE8 anyway
+                            'not ie < 9' // React doesn't support IE8 anyway
                         ],
-                        flexbox: 'no-2009',
+                        flexbox: 'no-2009'
                     })
                 ]
             }
