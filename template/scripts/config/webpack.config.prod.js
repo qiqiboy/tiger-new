@@ -26,11 +26,14 @@ function ensureSlash(path, needsSlash) {
     }
 }
 
-var cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : '.';
+var relativeRoot = pkg.noRewrite ? './' : '/';
+var cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
 var publicPath = ensureSlash(cdnUrl, true);
 var publicUrl = ensureSlash(cdnUrl, false);
 // Get environment variables to inject into our app.
 var env = getClientEnvironment(publicUrl);
+
+env.SPA = !pkg.noRewrite;
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
@@ -253,10 +256,10 @@ var webpackConfig = {
 
             mergeStaticsConfig: true,
             staticFileGlobs: 'build/*.html',
-            stripPrefix: 'build',
+            stripPrefix: 'build/',
 
             // For unknown URLs, fallback to the index page
-            navigateFallback: '/index.html',
+            navigateFallback: relativeRoot + 'index.html',
             // Ignores URLs starting from /__ (useful for Firebase):
             // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
             navigateFallbackWhitelist: [/^(?!\/__).*/],
