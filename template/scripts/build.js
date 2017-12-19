@@ -26,8 +26,8 @@ var ora = require('ora');
 
 var spinner = ora('webpack启动中...').start();
 
-checkMissDependencies(spinner)
-    .then(function() {
+checkMissDependencies(spinner).then(
+    function() {
         recursive(paths.appBuild, (err, fileNames) => {
             var previousSizeMap = (fileNames || [])
                 .filter(fileName => /\.(js|css)$/.test(fileName))
@@ -48,11 +48,13 @@ checkMissDependencies(spinner)
             // Merge with the public folder
             copyPublicFolder();
         });
-    }, function() {
+    },
+    function() {
         console.log();
         console.log();
         process.exit(1);
-    });
+    }
+);
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -66,9 +68,7 @@ if (userDevConfig) {
 // Input: /User/dan/app/build/static/js/main.82be8.js
 // Output: /static/js/main.js
 function removeFileNameHash(fileName) {
-    return fileName
-        .replace(paths.appBuild, '')
-        .replace(/\/?(.*)(\.\w+)(\.js|\.css)/, (match, p1, p2, p3) => p1 + p3);
+    return fileName.replace(paths.appBuild, '').replace(/\/?(.*)(\.\w+)(\.js|\.css)/, (match, p1, p2, p3) => p1 + p3);
 }
 
 // Input: 1024, 2048
@@ -90,8 +90,9 @@ function getDifferenceLabel(currentSize, previousSize) {
 
 // Print a detailed summary of build files.
 function printFileSizes(stats, previousSizeMap) {
-    var assets = stats.toJson().assets
-        .filter(asset => /\.(js|css)$/.test(asset.name))
+    var assets = stats
+        .toJson()
+        .assets.filter(asset => /\.(js|css)$/.test(asset.name))
         .map(asset => {
             var fileContents = fs.readFileSync(paths.appBuild + '/' + asset.name);
             var size = gzipSize(fileContents);
@@ -105,9 +106,7 @@ function printFileSizes(stats, previousSizeMap) {
             };
         });
     assets.sort((a, b) => b.size - a.size);
-    var longestSizeLabelLength = Math.max.apply(null,
-        assets.map(a => stripAnsi(a.sizeLabel).length)
-    );
+    var longestSizeLabelLength = Math.max.apply(null, assets.map(a => stripAnsi(a.sizeLabel).length));
     assets.forEach(asset => {
         var sizeLabel = asset.sizeLabel;
         var sizeLength = stripAnsi(sizeLabel).length;
@@ -115,10 +114,7 @@ function printFileSizes(stats, previousSizeMap) {
             var rightPadding = ' '.repeat(longestSizeLabelLength - sizeLength);
             sizeLabel += rightPadding;
         }
-        console.log(
-            '  ' + sizeLabel +
-            '  ' + chalk.dim(asset.folder + path.sep) + chalk.cyan(asset.name)
-        );
+        console.log('  ' + sizeLabel + '  ' + chalk.dim(asset.folder + path.sep) + chalk.cyan(asset.name));
     });
 }
 
@@ -126,7 +122,7 @@ function printFileSizes(stats, previousSizeMap) {
 function build(previousSizeMap) {
     var packText = userDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...';
     var startTime = Date.now();
-    var timer
+    var timer;
     var logProgress = function(stop) {
         var text = packText + '已耗时：' + ((Date.now() - startTime) / 1000).toFixed(3) + 's';
 
@@ -146,7 +142,7 @@ function build(previousSizeMap) {
 
         if (err) {
             spinner.fail(chalk.red('编译失败！'));
-            console.log((err.message || err));
+            console.log(err.message || err);
             process.exit(1);
         }
 
@@ -169,15 +165,9 @@ function build(previousSizeMap) {
             console.log();
 
             // Teach some ESLint tricks.
+            console.log('搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
             console.log(
-                '搜索相关' +
-                chalk.underline(chalk.yellow('关键词')) +
-                '以了解更多关于警告产生的原因.'
-            );
-            console.log(
-                '如果要忽略警告, 可以将 ' +
-                chalk.cyan('// eslint-disable-next-line') +
-                ' 添加到产生警告的代码行上方'
+                '如果要忽略警告, 可以将 ' + chalk.cyan('// eslint-disable-next-line') + ' 添加到产生警告的代码行上方'
             );
             console.log();
             console.log();
@@ -217,9 +207,9 @@ function copyPublicFolder() {
             var basename = path.basename(file);
             var isDirectory = fs.statSync(file).isDirectory();
 
-            return isDirectory ?
-                basename !== 'layout' : //layout目录不复制
-                !paths.pageEntries.find(name => name + '.html' === relative);
+            return isDirectory
+                ? basename !== 'layout' //layout目录不复制
+                : !paths.pageEntries.find(name => name + '.html' === relative);
         }
     });
 }

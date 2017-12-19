@@ -3,9 +3,7 @@ import img from 'static/images/cat.jpg';
 
 class ImgDemo extends Component {
     render() {
-        return (
-            <img src={img} width="200" alt="" />
-        );
+        return <img src={img} width="200" alt="" />;
     }
 }
 

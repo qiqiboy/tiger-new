@@ -13,7 +13,7 @@ class ModalContainer extends Component {
 
         return (
             <div className={classes.join(' ')} ref="container">
-                {(!MyComponent || isValidElement(MyComponent)) ? MyComponent : <MyComponent {...this.props} />}
+                {!MyComponent || isValidElement(MyComponent) ? MyComponent : <MyComponent {...this.props} />}
             </div>
         );
     }
@@ -28,7 +28,7 @@ class ModalContainer extends Component {
                 ev.preventDefault();
             }
         }
-    }
+    };
 
     getEvents() {
         let events = ['touchmove', 'mousewheel', 'DOMMouseScroll'];
@@ -42,15 +42,13 @@ class ModalContainer extends Component {
     componentDidMount() {
         const element = this.refs.container.parentNode;
 
-        this.getEvents().forEach(event =>
-            element.addEventListener(event, this.eventHandler, false));
+        this.getEvents().forEach(event => element.addEventListener(event, this.eventHandler, false));
     }
 
     componentWillUnmount() {
         const element = this.refs.container.parentNode;
 
-        this.getEvents().forEach(event =>
-            element.removeEventListener(event, this.eventHandler, false));
+        this.getEvents().forEach(event => element.removeEventListener(event, this.eventHandler, false));
     }
 
     static propTypes = {
@@ -60,7 +58,7 @@ class ModalContainer extends Component {
         size: PropTypes.string.isRequired,
         backdrop: PropTypes.oneOf([true, false, 'static']),
         animation: PropTypes.oneOf(['fade', 'slide', 'zoom', false, true])
-    }
+    };
 }
 
 export default ModalContainer;

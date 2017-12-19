@@ -1,48 +1,48 @@
 @import 'static/css/modules/variable';
 
-.react-app{
-    h3{
+.react-app {
+    h3 {
         font-size: 16px;
     }
-    .my-img{
+    .my-img {
         display: block;
         margin: 0 auto;
         width: 160px;
         border-radius: 100%;
-        box-shadow: 0 0 0 3px red,  0 0 5px 6px yellow;
+        box-shadow: 0 0 0 3px red, 0 0 5px 6px yellow;
     }
-    nav{
-        button{
+    nav {
+        button {
             border: 0;
             background: #ccc;
             outline: 0;
             cursor: pointer;
-            &.current{
+            &.current {
                 background-color: $color-success;
             }
         }
     }
-    .form{
-        margin: 20px 0 ;
+    .form {
+        margin: 20px 0;
     }
-    .form-group{
+    .form-group {
         margin-bottom: 10px;
-        .ef-error-tip{
+        .ef-error-tip {
             color: $color-danger;
         }
     }
-    .form-control{
+    .form-control {
         border: 1px solid #aaa;
         border-radius: 4px;
         width: 400px;
         height: 35px;
         max-width: 100%;
         padding: 8px 10px;
-        &.ef-invalid{
+        &.ef-invalid {
             border-color: $color-danger;
         }
     }
-    textarea.form-control{
+    textarea.form-control {
         height: auto;
     }
 }

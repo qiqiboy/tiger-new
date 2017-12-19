@@ -15,14 +15,19 @@ function checkMiss(spinner) {
                 });
                 console.log();
                 inquirer
-                    .prompt([{
-                        name: 'reInstall',
-                        type: 'confirm',
-                        message: '你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n' +
-                            chalk.dim('1. 删除 node_modules 目录.') + '\n' +
-                            chalk.dim('2. 重新运行 npm install 安装所有依赖项.') + '\n',
-                        default: true
-                    }])
+                    .prompt([
+                        {
+                            name: 'reInstall',
+                            type: 'confirm',
+                            message:
+                                '你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n' +
+                                chalk.dim('1. 删除 node_modules 目录.') +
+                                '\n' +
+                                chalk.dim('2. 重新运行 npm install 安装所有依赖项.') +
+                                '\n',
+                            default: true
+                        }
+                    ])
                     .then(function(answers) {
                         if (answers.reInstall) {
                             spinner.text = '删除 node_modules 目录中 ...';
@@ -36,7 +41,6 @@ function checkMiss(spinner) {
                                 spinner.succeed('项目依赖已全部更新到最新版！可以继续运行项目！');
                                 reject();
                             });
-
                         } else {
                             console.log();
                             spinner.warn(chalk.yellow('你需要按照下面命令操作后才能继续：'));

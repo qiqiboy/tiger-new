@@ -31,8 +31,8 @@ var spinner = ora('webpack启动中...').start();
 var DEFAULT_PORT = parseInt(process.env.PORT) || 3000;
 var compiler;
 
-checkMissDependencies(spinner)
-    .then(function() {
+checkMissDependencies(spinner).then(
+    function() {
         detect(DEFAULT_PORT).then(port => {
             if (port === DEFAULT_PORT) {
                 run(port);
@@ -41,13 +41,20 @@ checkMissDependencies(spinner)
 
             clearConsole();
             var existingProcess = getProcessForPort(DEFAULT_PORT);
-            var question = [{
-                name: 'shouldChangePort',
-                type: 'confirm',
-                message: '端口（' + chalk.yellow(DEFAULT_PORT) + '）被占用，可能的程序是： \n  ' + existingProcess + '\n' +
-                    '  要换一个端口运行本程序吗？',
-                default: true
-            }];
+            var question = [
+                {
+                    name: 'shouldChangePort',
+                    type: 'confirm',
+                    message:
+                        '端口（' +
+                        chalk.yellow(DEFAULT_PORT) +
+                        '）被占用，可能的程序是： \n  ' +
+                        existingProcess +
+                        '\n' +
+                        '  要换一个端口运行本程序吗？',
+                    default: true
+                }
+            ];
 
             spinner.stop();
             inquirer.prompt(question).then(({ shouldChangePort }) => {
@@ -62,9 +69,11 @@ checkMissDependencies(spinner)
                 }
             });
         });
-    }, function() {
+    },
+    function() {
         process.kill(process.pid, 'SIGINT');
-    });
+    }
+);
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -119,15 +128,9 @@ function setupCompiler(host, port, protocol) {
             console.log();
 
             // Teach some ESLint tricks.
+            console.log('搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
             console.log(
-                '搜索相关' +
-                chalk.underline(chalk.yellow('关键词')) +
-                '以了解更多关于警告产生的原因.'
-            );
-            console.log(
-                '如果要忽略警告, 可以将 ' +
-                chalk.cyan('// eslint-disable-next-line') +
-                ' 添加到产生警告的代码行上方'
+                '如果要忽略警告, 可以将 ' + chalk.cyan('// eslint-disable-next-line') + ' 添加到产生警告的代码行上方'
             );
         }
 
@@ -143,12 +146,19 @@ function onProxyError(proxy) {
     return function(err, req, res) {
         var host = req.headers && req.headers.host;
         console.log(
-            chalk.red('代理错误：') + '无法将 ' + chalk.cyan(req.url) +
-            ' 的请求从 ' + chalk.cyan(host) + ' 转发到 ' + chalk.cyan(proxy) + '.'
+            chalk.red('代理错误：') +
+                '无法将 ' +
+                chalk.cyan(req.url) +
+                ' 的请求从 ' +
+                chalk.cyan(host) +
+                ' 转发到 ' +
+                chalk.cyan(proxy) +
+                '.'
         );
         console.log(
             '点击 https://nodejs.org/api/errors.html#errors_common_system_errors 查看更多信息 (' +
-            chalk.cyan(err.code) + ').'
+                chalk.cyan(err.code) +
+                ').'
         );
         console.log();
 
@@ -157,10 +167,8 @@ function onProxyError(proxy) {
         if (res.writeHead && !res.headersSent) {
             res.writeHead(500);
         }
-        res.end('代理错误： 无法将 ' + req.url + ' 的请求从 ' +
-            host + ' 转发到 ' + proxy + ' (' + err.code + ').'
-        );
-    }
+        res.end('代理错误： 无法将 ' + req.url + ' 的请求从 ' + host + ' 转发到 ' + proxy + ' (' + err.code + ').');
+    };
 }
 
 function mayProxy(pathname) {
@@ -171,55 +179,55 @@ function mayProxy(pathname) {
 function prepareProxy(proxy) {
     if (proxy) {
         if (typeof proxy === 'object') {
-            return Object.keys(proxy)
-                .map(function(path) {
-                    var opt = typeof proxy[path] === 'object' ? proxy[path] : {
-                        target: proxy[path]
-                    };
-                    var target = opt.target;
+            return Object.keys(proxy).map(function(path) {
+                var opt =
+                    typeof proxy[path] === 'object'
+                        ? proxy[path]
+                        : {
+                              target: proxy[path]
+                          };
+                var target = opt.target;
 
-                    return Object.assign({}, opt, {
-                        context: function(pathname) {
-                            return mayProxy(pathname) && pathname.match(path);
-                        },
-                        onProxyReq: proxyReq => {
-                            if (proxyReq.getHeader('origin')) {
-                                proxyReq.setHeader('origin', target);
-                            }
-                        },
-                        onError: onProxyError(target)
-                    });
+                return Object.assign({}, opt, {
+                    context: function(pathname) {
+                        return mayProxy(pathname) && pathname.match(path);
+                    },
+                    onProxyReq: proxyReq => {
+                        if (proxyReq.getHeader('origin')) {
+                            proxyReq.setHeader('origin', target);
+                        }
+                    },
+                    onError: onProxyError(target)
                 });
+            });
         }
 
         if (!/^http(s)?:\/\//.test(proxy)) {
             console.log(chalk.red('proxy 只能是一个 http:// 或者 https:// 开头的字符串或者一个object配置'));
-            console.log(chalk.red('当前 proxy 的类型是 "' + (typeof proxy) + '"。'));
+            console.log(chalk.red('当前 proxy 的类型是 "' + typeof proxy + '"。'));
             console.log(chalk.red('你可以从 package.json 中移除它，或者设置一个字符串地址（目标服务器）'));
             process.exit(1);
         }
 
-        return [{
-            target: proxy,
-            logLevel: 'silent',
-            context: function(pathname, req) {
-                return (
-                    mayProxy(pathname) &&
-                    req.headers.accept &&
-                    req.headers.accept.indexOf('text/html') === -1
-                );
-            },
-            onProxyReq: function(proxyReq, req, res) {
-                if (proxyReq.getHeader('origin')) {
-                    proxyReq.setHeader('origin', proxy);
-                }
-            },
-            onError: onProxyError(proxy),
-            secure: false,
-            changeOrigin: true,
-            ws: true,
-            xfwd: true
-        }];
+        return [
+            {
+                target: proxy,
+                logLevel: 'silent',
+                context: function(pathname, req) {
+                    return mayProxy(pathname) && req.headers.accept && req.headers.accept.indexOf('text/html') === -1;
+                },
+                onProxyReq: function(proxyReq, req, res) {
+                    if (proxyReq.getHeader('origin')) {
+                        proxyReq.setHeader('origin', proxy);
+                    }
+                },
+                onError: onProxyError(proxy),
+                secure: false,
+                changeOrigin: true,
+                ws: true,
+                xfwd: true
+            }
+        ];
     }
 }
 
@@ -237,15 +245,17 @@ function runDevServer(host, port, protocol) {
         watchOptions: {
             ignored: /node_modules/
         },
-        https: protocol === "https",
+        https: protocol === 'https',
         host: host,
         overlay: false,
         disableHostCheck: true,
         compress: true,
         watchContentBase: true,
-        historyApiFallback: pkg.noRewrite ? false : {
-            disableDotRule: true,
-        },
+        historyApiFallback: pkg.noRewrite
+            ? false
+            : {
+                  disableDotRule: true
+              },
         proxy: prepareProxy(pkg.proxy),
         before: function(app) {
             app.use(errorOverlayMiddleware());
@@ -277,7 +287,7 @@ function runDevServer(host, port, protocol) {
 }
 
 function run(port) {
-    var protocol = process.env.HTTPS === 'true' ? "https" : "http";
+    var protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     var host = process.env.HOST || '0.0.0.0';
     setupCompiler(host, port, protocol);
     runDevServer(host, port, protocol);

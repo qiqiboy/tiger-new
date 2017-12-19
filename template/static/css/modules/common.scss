@@ -1,5 +1,7 @@
 @import './variable';
-html, body, #wrap{
+html,
+body,
+#wrap {
     height: 100%;
 }
 html {
@@ -12,42 +14,45 @@ html {
     box-sizing: inherit;
 }
 
-.wrapper{
-    width:100%;
+.wrapper {
+    width: 100%;
 }
-.main{
+.main {
     width: $width-large;
     margin: 0 auto;
-    @include screen-md{
+    @include screen-md {
         width: 100%;
         padding: 0 15px;
     }
 }
-.clearfix{
-    &:after{
-        content:"";
-        display:block;
-        height:0;
-        font-size:0;
-        clear:both;
+.clearfix {
+    &:after {
+        content: '';
+        display: block;
+        height: 0;
+        font-size: 0;
+        clear: both;
     }
 }
-.alignleft{
-    float:left;
+.alignleft {
+    float: left;
 }
-.alignright{
-    float:right;
+.alignright {
+    float: right;
 }
-.aligncenter{
+.aligncenter {
     margin-right: auto;
     margin-left: auto;
     display: block;
 }
-.none{
+.none {
     display: none;
     overflow: hidden;
 }
-input,button,select,textarea {
+input,
+button,
+select,
+textarea {
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;

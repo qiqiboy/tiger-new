@@ -44,8 +44,8 @@ function appUpgrade(projectName) {
                     '\n' +
                     chalk.dim('2. 覆盖原来的构建配置目录 /scripts') +
                     '\n',
-                default: true,
-            },
+                default: true
+            }
         ])
         .then(answers => {
             if (answers.upgrade) {
@@ -59,7 +59,7 @@ function appUpgrade(projectName) {
                             '新配置下gulpfile.js已经废弃，是否需要删除它？\n' +
                             chalk.dim('如果你的项目有使用gulp进行其它的操作，请谨慎删除。') +
                             '\n',
-                        default: false,
+                        default: false
                     });
                 }
 
@@ -71,7 +71,7 @@ function appUpgrade(projectName) {
                             '是否需要支持Prettier自动格式化代码？\n' +
                             chalk.dim('你可以在代码提交git前，手动运行 npm run precommit 来运行prettier。') +
                             '\n',
-                        default: true,
+                        default: true
                     });
                 }
 
@@ -82,7 +82,7 @@ function appUpgrade(projectName) {
                         '由于安装以及升级了部分依赖，为了保证项目正常运行，需要重新安装所有依赖，请确认是否继续？\n' +
                         chalk.dim('该操作将会： 1. 删除 node_modules 目录; 2. 重新运行 npm install 命令') +
                         '\n',
-                    default: false,
+                    default: false
                 });
 
                 inquirer.prompt(questions).then(answers => {
@@ -113,31 +113,17 @@ function appUpgrade(projectName) {
                                 {
                                     files: '*.json',
                                     options: {
-                                        parser: 'json',
-                                        tabWidth: 2,
-                                    },
-                                },
-                                {
-                                    files: '*.{css,sass,scss,less}',
-                                    options: {
-                                        parser: 'postcss',
-                                        tabWidth: 4,
-                                    },
-                                },
-                                {
-                                    files: '*.ts',
-                                    options: {
-                                        parser: 'typescript',
-                                    },
-                                },
-                            ],
+                                        tabWidth: 2
+                                    }
+                                }
+                            ]
                         };
 
                         package['lint-staged'] = {
                             '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': [
                                 'node_modules/.bin/prettier --write',
-                                'git add',
-                            ],
+                                'git add'
+                            ]
                         };
                     }
 
@@ -180,14 +166,14 @@ function saveDevDependencies(root, package, currentDevDependencies, newDevDepend
 
 function copyScripts(root) {
     fs.copySync(path.resolve(ownPath, 'template/scripts'), path.resolve(root, 'scripts'), {
-        overwrite: true,
+        overwrite: true
     });
 }
 
 function shouldUseCnpm() {
     try {
         execSync('cnpm --version', {
-            stdio: 'ignore',
+            stdio: 'ignore'
         });
         return true;
     } catch (e) {
@@ -207,7 +193,7 @@ function install(callback) {
     args = ['install'];
 
     var child = spawn(command, args, {
-        stdio: 'inherit',
+        stdio: 'inherit'
     });
 
     child.on('close', function(code) {

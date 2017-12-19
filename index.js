@@ -223,21 +223,7 @@ function createApp(name) {
                 {
                     files: '*.json',
                     options: {
-                        parser: 'json',
                         tabWidth: 2
-                    }
-                },
-                {
-                    files: '*.{css,sass,scss,less}',
-                    options: {
-                        parser: 'postcss',
-                        tabWidth: 4
-                    }
-                },
-                {
-                    files: '*.ts',
-                    options: {
-                        parser: 'typescript'
                     }
                 }
             ]

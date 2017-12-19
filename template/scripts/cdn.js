@@ -38,52 +38,62 @@ function runCDN() {
 
     var exitsNum = 0;
     var allFiles = glob.sync(path.join(paths.appBuild, 'static/**/*'));
-    var allSyncPromises = allFiles.filter(function(file) {
-        var relative = path.relative(paths.appBuild, file);
+    var allSyncPromises = allFiles
+        .filter(function(file) {
+            var relative = path.relative(paths.appBuild, file);
 
-        //文件夹不处理
-        if (fs.statSync(file).isDirectory()) {
-            return false;
-        }
-
-        newStaticConfig[/js$|css$/.test(relative) ? removeFileNameHash(relative) : relative] = relative;
-
-        //已经存在
-        if (oldStaticConfig[relative]) {
-            spinner.succeed(chalk.green('已存在：' + relative));
-            exitsNum++;
-            return false;
-        }
-
-        return true;
-    }).map(createRsync);
-
-    Promise.all(allSyncPromises)
-        .then(function(rets) {
-            var uploadNum = rets.filter(Boolean).length;
-            var failNum = rets.length - uploadNum;
-
-            console.log();
-            console.log(chalk[failNum ? 'red' : 'cyan']('+++++++++++++++++++++++++++++++\n 文件上传完毕(' + chalk.blue(pkg.cdn.path) +
-                ') \n ' + chalk.magenta('成功: ' + uploadNum) + ' \n ' +
-                chalk.red('失败: ' + failNum) + ' \n ' + chalk.green('重复: ' + exitsNum) +
-                '\n+++++++++++++++++++++++++++++++'));
-
-            if (!failNum) {
-                fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 4));
-                console.log(chalk.blue("配置文件已经更新: " + staticConfigFile));
-                console.log();
-                console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
-                if (!paths.serve) {
-                    console.log(chalk.cyan('npm') + ' install -g serve');
-                }
-                console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
-            } else {
-                console.log(chalk.red("文件未全部上传，请单独运行") + chalk.green(' npm run cdn ') + chalk.red("命令!"));
+            //文件夹不处理
+            if (fs.statSync(file).isDirectory()) {
+                return false;
             }
 
+            newStaticConfig[/js$|css$/.test(relative) ? removeFileNameHash(relative) : relative] = relative;
+
+            //已经存在
+            if (oldStaticConfig[relative]) {
+                spinner.succeed(chalk.green('已存在：' + relative));
+                exitsNum++;
+                return false;
+            }
+
+            return true;
+        })
+        .map(createRsync);
+
+    Promise.all(allSyncPromises).then(function(rets) {
+        var uploadNum = rets.filter(Boolean).length;
+        var failNum = rets.length - uploadNum;
+
+        console.log();
+        console.log(
+            chalk[failNum ? 'red' : 'cyan'](
+                '+++++++++++++++++++++++++++++++\n 文件上传完毕(' +
+                    chalk.blue(pkg.cdn.path) +
+                    ') \n ' +
+                    chalk.magenta('成功: ' + uploadNum) +
+                    ' \n ' +
+                    chalk.red('失败: ' + failNum) +
+                    ' \n ' +
+                    chalk.green('重复: ' + exitsNum) +
+                    '\n+++++++++++++++++++++++++++++++'
+            )
+        );
+
+        if (!failNum) {
+            fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 4));
+            console.log(chalk.blue('配置文件已经更新: ' + staticConfigFile));
             console.log();
-        });
+            console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
+            if (!paths.serve) {
+                console.log(chalk.cyan('npm') + ' install -g serve');
+            }
+            console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
+        } else {
+            console.log(chalk.red('文件未全部上传，请单独运行') + chalk.green(' npm run cdn ') + chalk.red('命令!'));
+        }
+
+        console.log();
+    });
 }
 
 function createRsync(file) {

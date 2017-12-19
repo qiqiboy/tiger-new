@@ -1,31 +1,31 @@
 @import './modules/variable';
 
-.section{
-    .title{
+.section {
+    .title {
         border-left: 4px solid #aaa;
         padding: 5px 0 5px 10px;
         background-color: #eee;
     }
 }
-.content{
-    > p:first-child:first-letter{
+.content {
+    > p:first-child:first-letter {
         font-weight: bold;
         font-size: 24px;
     }
-    p{
+    p {
         margin: 1em 0;
     }
-    .text-primary{
+    .text-primary {
         color: $color-danger;
         background: $color-info;
     }
-    .code{
+    .code {
         background-color: #eee;
         padding: 10px;
         color: #777;
         overflow-x: auto;
     }
-    img{
+    img {
         vertical-align: top;
     }
 }

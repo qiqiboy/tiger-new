@@ -1,7 +1,7 @@
 @import './variable';
-.site-header{
+.site-header {
     background-color: #000;
-    .logo{
+    .logo {
         float: left;
         margin: 0;
         padding: 5px 0;
@@ -9,21 +9,21 @@
         font-weight: normal;
         font-size: 16px;
         line-height: 40px;
-        img{
+        img {
             width: 40px;
             float: left;
             margin-right: 10px;
         }
     }
-    .menu{
+    .menu {
         float: right;
-        a{
+        a {
             color: #fff;
             text-decoration: none;
             line-height: 50px;
             display: inline-block;
             padding: 0 20px;
-            &:hover{
+            &:hover {
                 background-color: #777;
             }
         }

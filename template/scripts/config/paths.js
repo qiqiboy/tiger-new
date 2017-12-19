@@ -18,17 +18,16 @@ var nodePaths = (process.env.NODE_PATH || '')
 
 var entries = {};
 
-glob.sync(resolveApp('app/!(_)*.js?(x)'))
-    .forEach(function(file){
-        var basename = path.basename(file).replace(/\.jsx?$/, '');
-        entries[basename] = file;
-    });
+glob.sync(resolveApp('app/!(_)*.js?(x)')).forEach(function(file) {
+    var basename = path.basename(file).replace(/\.jsx?$/, '');
+    entries[basename] = file;
+});
 
 var alias = {
     components: resolveApp('app/components'),
     modules: resolveApp('app/modules'),
     utils: resolveApp('app/utils')
-}
+};
 
 // config after eject: we're in ./config/
 module.exports = {
@@ -45,7 +44,7 @@ module.exports = {
     nodePaths: nodePaths,
     alias: alias,
     entries: entries,
-    pageEntries: glob.sync(resolveApp('public/!(_)*.html')).map(function(file){
+    pageEntries: glob.sync(resolveApp('public/!(_)*.html')).map(function(file) {
         return path.basename(file, '.html');
     }),
     //一些命令检测
