@@ -165,9 +165,7 @@ var webpackConfig = {
     },
 
     plugins: injects.concat([
-        new InterpolateHtmlPlugin({
-            PUBLIC_URL: publicUrl
-        }),
+        new InterpolateHtmlPlugin(env),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin(),
         new webpack.EnvironmentPlugin(env),

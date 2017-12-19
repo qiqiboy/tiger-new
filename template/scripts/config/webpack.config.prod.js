@@ -26,7 +26,7 @@ function ensureSlash(path, needsSlash) {
     }
 }
 
-var relativeRoot = pkg.noRewrite ? './' : '/';
+var relativeRoot = pkg.noRewrite ? '.' : '';
 var cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
 var publicPath = ensureSlash(cdnUrl, true);
 var publicUrl = ensureSlash(cdnUrl, false);
@@ -201,9 +201,7 @@ var webpackConfig = {
         new InlineChunkManifestHtmlWebpackPlugin({
             dropAsset: true
         }),
-        new InterpolateHtmlPlugin({
-            PUBLIC_URL: '.' //publicUrl
-        }),
+        new InterpolateHtmlPlugin(env),
         new webpack.HashedModuleIdsPlugin(),
         new ImageminPlugin({
             pngquant: {
@@ -256,7 +254,7 @@ var webpackConfig = {
             stripPrefix: 'build/',
 
             // For unknown URLs, fallback to the index page
-            navigateFallback: relativeRoot + 'index.html',
+            navigateFallback: relativeRoot + '/index.html',
             // Ignores URLs starting from /__ (useful for Firebase):
             // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
             navigateFallbackWhitelist: [/^(?!\/__).*/],
