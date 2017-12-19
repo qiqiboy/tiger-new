@@ -60,6 +60,7 @@ var webpackConfig = {
         ].concat(pkg.vendor || [])
     }),
     output: {
+        crossOriginLoading: 'anonymous',
         path: paths.appBuild,
         pathinfo: true,
         filename: 'static/js/[name].[hash:8].js',

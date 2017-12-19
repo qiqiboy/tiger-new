@@ -94,6 +94,7 @@ var webpackConfig = {
         vendor: [require.resolve('./polyfills')].concat(pkg.vendor || [])
     }),
     output: {
+        crossOriginLoading: 'anonymous',
         path: paths.appBuild,
         filename: 'static/js/[name].[chunkhash:8].js',
         chunkFilename: 'static/js/[name].chunk.[chunkhash:8].js',
