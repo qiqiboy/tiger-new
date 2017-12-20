@@ -1,33 +1,39 @@
-// In production, we register a service worker to serve assets from local cache.
+// 在生产环境，注册SW来利用本地缓存来处理静态资源
 
-// This lets the app load faster on subsequent visits in production, and gives
-// it offline capabilities. However, it also means that developers (and users)
-// will only see deployed updates on the "N+1" visit to a page, since previously
-// cached resources are updated in the background.
+// 该功能将会赋予app离线访问的能力
+// 但是离线访问只能在N+1次访问后才可以，即如果初次访问，离线功能将不会生效
 
-// To learn more about the benefits of this model, read https://goo.gl/KwvDNy.
-// This link also includes instructions on opting out of this behavior.
+import './style.scss';
 
 const isLocalhost = Boolean(
     window.location.hostname === 'localhost' ||
-        // [::1] is the IPv6 localhost address.
+        // [::1] IPv6
         window.location.hostname === '[::1]' ||
-        // 127.0.0.1/8 is considered localhost for IPv4.
+        // 127.0.0.1/8 IPv4
         window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
 );
 
+// 注册
 export default function register() {
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             const swUrl = process.env.SPA ? `/service-worker.js` : `./service-worker.js`;
 
             if (isLocalhost) {
-                // This is running on localhost. Lets check if a service worker still exists or not.
+                // 本地环境，检查SW是否还在，因为本地可能多个项目，前后会运行在同一个端口，彼此间是否开启sw会相互产生影响
                 checkValidServiceWorker(swUrl);
             } else {
-                // Is not local host. Just register service worker
                 registerValidSW(swUrl);
             }
+        });
+    }
+}
+
+// 清理
+export function unregister() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.unregister();
         });
     }
 }
@@ -41,15 +47,12 @@ function registerValidSW(swUrl) {
                 installingWorker.onstatechange = () => {
                     if (installingWorker.state === 'installed') {
                         if (navigator.serviceWorker.controller) {
-                            // At this point, the old content will have been purged and
-                            // the fresh content will have been added to the cache.
-                            // It's the perfect time to display a "New content is
-                            // available; please refresh." message in your web app.
+                            // 内容有更新，由于是异步的，所以我们需要提示用户刷新页面
+                            // 为了更好的体验，所以我们不直接做 location.reload()
+                            createNotification();
                             console.log('New content is available; please refresh.');
                         } else {
-                            // At this point, everything has been precached.
-                            // It's the perfect time to display a
-                            // "Content is cached for offline use." message.
+                            // 初次访问安装
                             console.log('Content is cached for offline use.');
                         }
                     }
@@ -62,19 +65,18 @@ function registerValidSW(swUrl) {
 }
 
 function checkValidServiceWorker(swUrl) {
-    // Check if the service worker can be found. If it can't reload the page.
     fetch(swUrl)
         .then(response => {
-            // Ensure service worker exists, and that we really are getting a JS file.
+            // 如果链接有效，则会返回标准js文件内容
             if (response.status === 404 || response.headers.get('content-type').indexOf('javascript') === -1) {
-                // No service worker found. Probably a different app. Reload the page.
+                // SW文件不存在，则意味着可能此时运行了其它项目，所以我们清除掉SW，并刷新页面
                 navigator.serviceWorker.ready.then(registration => {
                     registration.unregister().then(() => {
                         window.location.reload();
                     });
                 });
             } else {
-                // Service worker found. Proceed as normal.
+                // SW存在，就继续执行注册
                 registerValidSW(swUrl);
             }
         })
@@ -83,10 +85,9 @@ function checkValidServiceWorker(swUrl) {
         });
 }
 
-export function unregister() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(registration => {
-            registration.unregister();
-        });
-    }
+function createNotification() {
+    document.body.insertAdjacentHTML('afterBegin', `<div class="sw-reload-notification">
+        <p>页面有新的内容更新</p>
+        <button class="sw-reload" onclick="window.location.reload()">立即刷新</button>
+    </div>`);
 }
