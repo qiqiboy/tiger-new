@@ -29,6 +29,8 @@ const Dialog = (content, config = {}) => {
 
     return modal.open({
         size: 'dialog',
+        windowClass: config.windowClass,
+        windowTopClass: config.windowTopClass,
         backdrop: config.backdrop || 'static',
         animation: config.animation || 'slide',
         component: modalProps => <DialogContainer {...propsConfig} {...modalProps} />

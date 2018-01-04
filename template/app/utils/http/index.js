@@ -33,10 +33,12 @@ function dataSerializer(data) {
 
 axios.interceptors.request.use(config => {
     if (!config.timeout) {
-        config.timeout = 20 * 1000;
+        config.timeout = 60 * 1000;
     }
 
-    config.url += (/\?/.test(config.url) ? '&' : '?') + '_s=' + Date.now();
+    if (config.autoTimestamp !== false) {
+        config.url += (/\?/.test(config.url) ? '&' : '?') + '_s=' + Date.now();
+    }
 
     if (!config.useJson && (config.method == 'post' || config.method == 'put')) {
         config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
