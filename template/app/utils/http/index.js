@@ -63,7 +63,7 @@ axios.interceptors.response.use(
         return response;
     },
     respError => {
-        const response = respError.response;
+        const response = respError.response || {};
         let error_msg, error_code;
 
         //请求超时
