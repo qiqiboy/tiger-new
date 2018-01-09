@@ -25,7 +25,7 @@ function checkMiss(spinner) {
                                 '\n' +
                                 chalk.dim('2. 重新运行 npm install 安装所有依赖项.') +
                                 '\n',
-                            default: true
+                            default: false
                         }
                     ])
                     .then(function(answers) {
@@ -34,13 +34,8 @@ function checkMiss(spinner) {
                             spinner.start();
                             rmNodeModules();
                             spinner.succeed('删除 node_modules 目录成功！');
-
-                            install(function() {
-                                console.log();
-                                console.log();
-                                spinner.succeed('项目依赖已全部更新到最新版！可以继续运行项目！');
-                                reject();
-                            });
+                            console.log('请运行下面的命令重新安装依赖：');
+                            console.log(chalk.green('   ' + (paths.cnpm ? 'cnpm' : 'npm') + ' install'));
                         } else {
                             console.log();
                             spinner.warn(chalk.yellow('你需要按照下面命令操作后才能继续：'));
@@ -48,9 +43,9 @@ function checkMiss(spinner) {
                             console.log();
                             console.log(chalk.green('   rm -rf node_modules'));
                             console.log(chalk.green('   ' + (paths.cnpm ? 'cnpm' : 'npm') + ' install'));
-
-                            reject();
                         }
+
+                        reject();
                     });
             } else {
                 resolve();
