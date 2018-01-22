@@ -1,5 +1,6 @@
 /*eslint no-invalid-this: 0 */
-import React, { isValidElement, Component, PropTypes } from 'react';
+import React, { isValidElement, Component } from 'react';
+import PropTypes from 'prop-types';
 
 class ModalContainer extends Component {
     render() {
@@ -62,3 +63,4 @@ class ModalContainer extends Component {
 }
 
 export default ModalContainer;
+
