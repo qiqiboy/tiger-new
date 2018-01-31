@@ -1,7 +1,6 @@
 import * as apis from './apis';
-import pkg from '../../../package.json';
 
-const HOST = process.env.NODE_ENV === 'production' ? pkg.proxy : '';
+const HOST = '';
 
 const fixApi = cfg => {
     const apis = {};

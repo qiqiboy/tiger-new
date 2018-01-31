@@ -32,7 +32,7 @@ class ModalContainer extends Component {
     };
 
     getEvents() {
-        let events = ['touchmove', 'mousewheel', 'DOMMouseScroll'];
+        let events = [];
         if (this.props.backdrop != 'static') {
             events.push('click');
         }
@@ -63,4 +63,3 @@ class ModalContainer extends Component {
 }
 
 export default ModalContainer;
-
