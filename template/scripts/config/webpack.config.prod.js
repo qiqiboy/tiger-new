@@ -312,7 +312,8 @@ function getCssRule(extraRule) {
 
     return ExtractTextPlugin.extract({
         fallback: 'style-loader',
-        use: defaultRule
+        use: defaultRule,
+        publicPath: pkg.cdn ? undefined : '../../'
     });
 }
 
