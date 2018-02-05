@@ -70,8 +70,11 @@ axios.interceptors.response.use(
         if (respError.code === 'ECONNABORTED') {
             error_code = 504;
             error_msg = '网络请求超时（' + respError.config.timeout + 'ms），请确认网络正常并重试';
+        } else if (typeof response.data === 'object') {
+            error_code = response.data.error_code || response.status;
+            error_msg = response.data.error_msg;
         } else {
-            error_code = response.status || -1;
+            error_code = response.status;
             error_msg = response.statusText;
         }
 
