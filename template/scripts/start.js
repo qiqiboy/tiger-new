@@ -109,8 +109,11 @@ function setupCompiler(host, port, protocol) {
             console.log();
             spinner.succeed(chalk.green('应用(' + pkg.name + ')已启动:'));
             console.log();
-            console.log('本地：' + chalk.cyan(protocol + '://' + host + ':' + port + '/'));
-            console.log('远程：' + chalk.cyan(protocol + '://' + address.ip() + ':' + port + '/'));
+            console.log('本地：' + chalk.cyan(protocol + '://' + host + chalk.bold(':' + port) + '/'));
+
+            if (host === 'localhost') {
+                console.log('远程：' + chalk.cyan(protocol + '://' + address.ip() + chalk.bold(':' + port) + '/'));
+            }
         }
 
         // If errors exist, only show errors.
