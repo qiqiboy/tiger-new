@@ -23,6 +23,7 @@ var checkMissDependencies = require('./config/checkMissDependencies');
 var recursive = require('recursive-readdir');
 var stripAnsi = require('strip-ansi');
 var ora = require('ora');
+var pkg = require(paths.appPackageJson);
 
 var spinner = ora('webpack启动中...').start();
 
@@ -62,7 +63,8 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 }
 
 if (userDevConfig) {
-    config.output.publicPath = './';
+    process.env.NODE_ENV = 'development';
+    config.output.publicPath = pkg.noRewrite ? './' : '/';
 }
 
 // Input: /User/dan/app/build/static/js/main.82be8.js
@@ -185,6 +187,7 @@ function build(previousSizeMap) {
 
         if (/^http/.test(config.output.publicPath) === false) {
             spinner.succeed(chalk.green('项目打包完成，运行以下命令可即时预览：'));
+            console.log();
             if (!paths.serve) {
                 console.log(chalk.cyan('npm') + ' install -g serve');
             }
