@@ -53,9 +53,6 @@ export const open = (settings = {}) => {
         animationElements.push(elements[0]);
     }
 
-    let bodyStyle = document.body.style;
-    let original_overflow = bodyStyle.overflow;
-
     let withResolve, withReject, instance, destroying;
 
     //销毁组件
@@ -72,7 +69,7 @@ export const open = (settings = {}) => {
 
             elements.forEach(element => document.body.removeChild(element));
 
-            bodyStyle.overflow = original_overflow;
+            document.body.classList.remove('body-modal-opened');
 
             let i = 0,
                 len = modalInstances.length;
@@ -96,7 +93,7 @@ export const open = (settings = {}) => {
         destroy();
     };
 
-    bodyStyle.overflow = 'hidden';
+    document.body.classList.add('body-modal-opened');
 
     function render(component, onComplete) {
         if (destroying) {
