@@ -23,6 +23,9 @@
 * webpack 升级到 2.x
 * webpack-dev-server 的升级，带来更好的 proxy 支持
 
+## FAQ
+* [好像不支持decorators特性，如何支持？](https://github.com/qiqiboy/tiger-new/issues/4#issuecomment-377101352)
+
 ## 安装
 
     $ npm install tiger-new -g
