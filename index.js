@@ -88,8 +88,10 @@ if (program.upgrade) {
                 {
                     name: 'author',
                     type: 'input',
-                    message: '请输入项目所属者（组织）的联系邮箱:',
-                    default: 'imqiqiboy@gmail.com'
+                    message: '请输入项目所属者（组织）的名字或邮箱:',
+                    validate: function(input) {
+                        return !!input || '该字段不能为空';
+                    } 
                 },
                 {
                     name: 'libs',
