@@ -1,4 +1,3 @@
-@import './variable';
 html,
 body,
 #wrap {
@@ -14,41 +13,6 @@ html {
     box-sizing: inherit;
 }
 
-.wrapper {
-    width: 100%;
-}
-.main {
-    width: $width-large;
-    margin: 0 auto;
-    @include screen-md {
-        width: 100%;
-        padding: 0 15px;
-    }
-}
-.clearfix {
-    &:after {
-        content: '';
-        display: block;
-        height: 0;
-        font-size: 0;
-        clear: both;
-    }
-}
-.alignleft {
-    float: left;
-}
-.alignright {
-    float: right;
-}
-.aligncenter {
-    margin-right: auto;
-    margin-left: auto;
-    display: block;
-}
-.none {
-    display: none;
-    overflow: hidden;
-}
 input,
 button,
 select,
@@ -59,9 +23,40 @@ textarea {
 }
 
 body {
-    background: $bg;
-    color: $color;
-    line-height: 1.6;
-    font-size: 14px;
-    font-family: $fonts;
+    background: $body-bg;
+    color: $gray-dark;
+    line-height: $line-height-base;
+    font-size: $font-size-base;
+    font-family: $font-family-base;
+}
+
+// Links
+
+a {
+    color: $link-color;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: $link-hover-color;
+        text-decoration: $link-hover-decoration;
+    }
+}
+
+// Images
+
+img {
+    vertical-align: middle;
+}
+
+// Responsive images (ensure images don't scale beyond their parents)
+.img-responsive {
+    display: block;
+    max-width: 100%; // Part 1: Set a maximum relative to the parent
+    height: auto;
+}
+
+// Rounded corners
+.img-rounded {
+    border-radius: $border-radius-large;
 }

@@ -1,0 +1,15 @@
+@import './mixins/base';
+@import './mixins/buttons';
+@import './mixins/forms';
+@import './mixins/reactive';
+
+// 如果是移动端页面，需要使用 rem，可以取消下面一行注释
+// @import './modules/rem';
+@import './modules/common';
+@import './modules/buttons';
+@import './modules/forms';
+@import './modules/button-groups';
+@import './modules/input-groups';
+@import './modules/type';
+@import './modules/badges';
+@import './modules/labels';

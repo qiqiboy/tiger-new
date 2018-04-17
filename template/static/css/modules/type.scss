@@ -1,0 +1,324 @@
+// h1 ~ h6
+$h-fs-list: (
+    $font-size-h1,
+    $font-size-h2,
+    $font-size-h3,
+    $font-size-h4,
+    $font-size-h5,
+    $font-size-h6
+);
+@for $i from 1 through 6 {
+    h#{$i} {
+        font-size: nth($h-fs-list, $i);
+        @if $i < 4 {
+            margin-top: $line-height-computed;
+        } @else {
+            margin-top: $line-height-computed / 2;
+        }
+        margin-bottom: ($line-height-computed / 2);
+        font-weight: bold;
+        line-height: 1.1;
+        color: inherit;
+
+        small,
+        .small {
+            font-weight: normal;
+            line-height: $line-height-base * 0.8;
+            color: $gray-light;
+            @if $i < 4 {
+                font-size: 65%;
+            } @else {
+                font-size: 75%;
+            }
+        }
+    }
+}
+
+// Body text
+p {
+    margin: 0 0 ($line-height-computed / 2);
+}
+
+.lead {
+    margin-bottom: $line-height-computed;
+    font-size: floor(($font-size-base * 1.15));
+    font-weight: 300;
+    line-height: 1.4;
+
+    @media (min-width: $screen-sm) {
+        font-size: ($font-size-base * 1.5);
+    }
+}
+
+// Emphasis & misc
+// -------------------------
+
+// Ex: (12px small font / 14px base font) * 100% = about 85%
+small,
+.small {
+    font-size: floor((100% * $font-size-small / $font-size-base));
+}
+
+mark,
+.mark {
+    background-color: $state-warning-bg;
+    padding: 0.2em;
+}
+
+// Alignment
+@each $align in left, right, center, justify {
+    .text-#{$align} {
+        text-align: $align;
+    }
+}
+.text-nowrap {
+    white-space: nowrap;
+}
+.text-overflow {
+    @include text-overflow;
+}
+
+// Transformation
+@each $align in lowercase, uppercase, capitalize {
+    .text-#{$align} {
+        text-transform: $align;
+    }
+}
+
+// Contextual colors
+.text-muted {
+    color: $gray-light;
+}
+
+@mixin text-emphasis-variant($parent, $color) {
+    #{$parent} {
+        color: $color;
+    }
+    a#{$parent}:hover,
+    a#{$parent}:focus {
+        color: darken($color, 10%);
+    }
+}
+
+@include text-emphasis-variant('.text-primary', $brand-primary);
+@include text-emphasis-variant('.text-success', $state-success-text);
+@include text-emphasis-variant('.text-info', $state-info-text);
+@include text-emphasis-variant('.text-warning', $state-warning-text);
+@include text-emphasis-variant('.text-danger', $state-danger-text);
+
+// Contextual backgrounds
+// For now we'll leave these alongside the text classes until v4 when we can
+// safely shift things around (per SemVer rules).
+.bg-primary {
+    // Given the contrast here, this is the only class to have its color inverted
+    // automatically.
+    color: #fff;
+}
+@mixin bg-variant($parent, $color) {
+    #{$parent} {
+        background-color: $color;
+    }
+    a#{$parent}:hover,
+    a#{$parent}:focus {
+        background-color: darken($color, 10%);
+    }
+}
+@include bg-variant('.bg-primary', $brand-primary);
+@include bg-variant('.bg-success', $state-success-bg);
+@include bg-variant('.bg-info', $state-info-bg);
+@include bg-variant('.bg-warning', $state-warning-bg);
+@include bg-variant('.bg-danger', $state-danger-bg);
+
+// Lists
+// -------------------------
+
+// Unordered and Ordered lists
+ul,
+ol {
+    margin-top: 0;
+    margin-bottom: ($line-height-computed / 2);
+    ul,
+    ol {
+        margin-bottom: 0;
+    }
+}
+
+// List options
+
+// [converter] extracted from `.list-unstyled` for libsass compatibility
+@mixin list-unstyled {
+    padding-left: 0;
+    list-style: none;
+}
+// [converter] extracted as `@mixin list-unstyled` for libsass compatibility
+.list-unstyled {
+    @include list-unstyled;
+}
+
+// Inline turns list items into inline-block
+.list-inline {
+    @include list-unstyled;
+    margin-left: -5px;
+
+    > li {
+        display: inline-block;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+// Description Lists
+dl {
+    margin-top: 0; // Remove browser default
+    margin-bottom: $line-height-computed;
+}
+dt,
+dd {
+    line-height: $line-height-base;
+}
+dt {
+    font-weight: bold;
+}
+dd {
+    margin-left: 0; // Undo browser default
+}
+
+.dl-horizontal {
+    dd {
+        @include clearfix; // Clear the floated `dt` if an empty `dd` is present
+    }
+
+    $dl-horizontal-offset: 200px;
+
+    @media (min-width: $screen-md) {
+        dt {
+            float: left;
+            width: ($dl-horizontal-offset - 20);
+            clear: left;
+            text-align: right;
+            @include text-overflow;
+        }
+        dd {
+            margin-left: $dl-horizontal-offset;
+        }
+    }
+}
+
+// Blockquotes
+blockquote {
+    padding: ($line-height-computed / 2) $line-height-computed;
+    margin: 0 0 $line-height-computed;
+    border-left: 5px solid $brand-warning;
+
+    p,
+    ul,
+    ol {
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+// Opposite alignment of blockquote
+//
+// Heads up: `blockquote.pull-right` has been deprecated as of v3.1.0.
+.blockquote-reverse,
+blockquote.pull-right {
+    padding-right: 15px;
+    padding-left: 0;
+    border-right: 5px solid $brand-warning;
+    border-left: 0;
+    text-align: right;
+
+    // Account for citation
+    footer,
+    small,
+    .small {
+        &:before {
+            content: '';
+        }
+        &:after {
+            content: '\00A0 \2014'; // nbsp, em dash
+        }
+    }
+}
+
+// Addresses
+address {
+    margin-bottom: $line-height-computed;
+    font-style: normal;
+    line-height: $line-height-base;
+}
+
+//code
+code,
+pre {
+    font-family: $font-family-monospace;
+}
+
+// Inline code
+code {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: $code-color;
+    background-color: $code-bg;
+    border-radius: $border-radius-base;
+}
+// Blocks of code
+pre {
+    display: block;
+    padding: (($line-height-computed - 1) / 2);
+    margin: 0 0 ($line-height-computed / 2);
+    font-size: ($font-size-base - 1); // 14px to 13px
+    line-height: $line-height-base;
+    word-break: break-all;
+    word-wrap: break-word;
+    color: $pre-color;
+    background-color: $pre-bg;
+    border: 1px solid $pre-border-color;
+    border-radius: $border-radius-base;
+
+    // Account for some code outputs that place code tags in pre tags
+    code {
+        padding: 0;
+        font-size: inherit;
+        color: inherit;
+        white-space: pre-wrap;
+        background-color: transparent;
+        border-radius: 0;
+    }
+}
+
+.clearfix {
+    @include clearfix;
+}
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.pull-right {
+    float: right !important;
+}
+.pull-left {
+    float: left !important;
+}
+
+.show {
+    display: block !important;
+}
+.invisible {
+    visibility: hidden;
+}
+.text-hide {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+}
+
+.none,
+.hidden {
+    display: none !important;
+}

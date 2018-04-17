@@ -11,9 +11,10 @@ const effectConfig = {
         enter: 'zoom',
         leave: 'zoomOut'
     }
-}
+};
 
-const supportAnimation = 'AnimationEvent' in window || 'WebKitAnimationEvent' in window || 'MozAnimationEvent' in window;
+const supportAnimation =
+    'AnimationEvent' in window || 'WebKitAnimationEvent' in window || 'MozAnimationEvent' in window;
 
 const prefixer = 'modal-animation-';
 
@@ -30,10 +31,10 @@ const bindOnce = (element, events, handler) => {
         eventsArray.forEach(eventName => element.removeEventListener(eventName, onceHanler, false));
         handler(e);
         executed = true;
-    }
+    };
 
     eventsArray.forEach(eventName => element.addEventListener(eventName, onceHanler, false));
-}
+};
 
 const makeAnimation = (elements = [], type = 'enter', animation = 'fade', duration = 600) => {
     return new Promise(resolve => {
@@ -43,9 +44,13 @@ const makeAnimation = (elements = [], type = 'enter', animation = 'fade', durati
             bindOnce(elements[0], animationendEvents, () => {
                 resolve();
 
-                setTimeout(() => elements.forEach((element, index) => {
-                    element.classList.remove(prefixer + effectConfig[index + 1 == elements.length ? animation : 'fade'][type]);
-                }));
+                setTimeout(() =>
+                    elements.forEach((element, index) => {
+                        element.classList.remove(
+                            prefixer + effectConfig[index + 1 == elements.length ? animation : 'fade'][type]
+                        );
+                    })
+                );
             });
 
             setTimeout(resolve, duration);
@@ -54,6 +59,6 @@ const makeAnimation = (elements = [], type = 'enter', animation = 'fade', durati
             });
         }
     });
-}
+};
 
 export default makeAnimation;

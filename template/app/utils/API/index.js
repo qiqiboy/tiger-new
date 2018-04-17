@@ -1,29 +1,38 @@
-import * as apis from './apis';
+import path from 'path';
 
-const HOST = '';
+const isDev = process.env.NODE_ENV === 'development';
+const apiCtx = require.context('./apis', false, /\.js$/);
 
-const fixApi = cfg => {
-    const apis = {};
+export default apiCtx.keys().reduce((exports, file) => {
+    exports[path.basename(file, '.js')] = enhanced(apiCtx(file));
 
-    Object.keys(cfg).forEach(namespace => {
-        let path = cfg[namespace];
+    return exports;
+}, {});
 
-        apis[namespace] =
-            typeof path == 'object'
-                ? fixApi(path)
-                : (...args) => {
-                      let index = 0;
-                      return (
-                          HOST +
-                          path.replace(/{[^{}]*}/g, match => {
-                              let data = args[index++];
-                              return data == null ? match : data;
-                          })
-                      );
-                  };
-    });
+function enhanced(config) {
+    const host = isDev ? config.HOST[0] : config.HOST[1];
+    const createAPI = API =>
+        Object.keys(API).reduce((result, key) => {
+            const pathname = API[key];
 
-    return apis;
-};
+            result[key] =
+                typeof pathname === 'string'
+                    ? (...args) => {
+                          let index = 0;
 
-export default fixApi(apis);
+                          return (
+                              host +
+                              pathname.replace(/:[^/]+/gi, match => {
+                                  const arg = args[index++];
+
+                                  return arg === undefined ? match : arg;
+                              })
+                          );
+                      }
+                    : createAPI(pathname);
+
+            return result;
+        }, {});
+
+    return createAPI(config.API);
+}
