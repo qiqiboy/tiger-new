@@ -1,0 +1,65 @@
+.loading-container {
+    $size: 40px;
+    $color: #ffe100;
+    .circle {
+        margin: 0 auto;
+        border: 3px solid $color;
+        border-radius: 100%;
+        width: $size;
+        height: $size;
+        position: relative;
+        transform: rotate(180deg);
+
+        &:before,
+        &:after {
+            position: absolute;
+            content: '';
+            background-color: $color;
+            width: 3px;
+            border-radius: 3px;
+            top: 16px;
+            left: 16px;
+            transform-origin: center 2px;
+            margin: -1px 0 0 -1px;
+        }
+        &:before {
+            height: ($size / 2 * 3 /4);
+            animation: loading-rotate 1.25s linear infinite;
+        }
+        &:after {
+            height: ($size / 4);
+            animation: loading-rotate 15s linear infinite;
+        }
+    }
+    .loading-text {
+        margin-top: 10px;
+        font-size: 13px;
+        text-align: center;
+        color: #888;
+    }
+}
+
+.global-loading {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    .loading-container {
+        position: absolute;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@keyframes loading-rotate {
+    from {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

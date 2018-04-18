@@ -1,0 +1,15 @@
+.error-box {
+    text-align: center;
+    padding: 15px;
+    .icon {
+        display: block;
+        margin: 10px auto;
+    }
+    .texts {
+        color: #666;
+    }
+    .btn-block {
+        max-width: 300px;
+        margin: 10px auto;
+    }
+}
