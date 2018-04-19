@@ -12,6 +12,7 @@ class Button extends Component {
         active: PropTypes.bool.isRequired,
         size: PropTypes.oneOf(['lg', 'md', 'sm', 'sx']).isRequired,
         link: PropTypes.bool.isRequired,
+        href: PropTypes.string,
         type: PropTypes.oneOf(['primary', 'danger', 'success', 'danger', 'info', 'default', 'warning']),
         isLoading: PropTypes.bool.isRequired
     };
@@ -39,8 +40,11 @@ class Button extends Component {
             children,
             ...restProps
         } = this.props;
+
+        const Base = typeof this.props.href === 'string' ? 'a' : 'button';
+
         return (
-            <button
+            <Base
                 {...restProps}
                 className={classlist(className, 'btn', 'btn-' + size, {
                     ['btn-' + type]: !!type,
@@ -55,7 +59,7 @@ class Button extends Component {
                     <span className="spin" />
                 </Fade>
                 {children}
-            </button>
+            </Base>
         );
     }
 }
