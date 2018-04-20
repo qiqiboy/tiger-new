@@ -24,7 +24,8 @@
 * webpack-dev-server 的升级，带来更好的 proxy 支持
 
 ## FAQ
-* [好像不支持decorators特性，如何支持？](https://github.com/qiqiboy/tiger-new/issues/4#issuecomment-377101352)
+* ~~[好像不支持decorators特性，如何支持？](https://github.com/qiqiboy/tiger-new/issues/4#issuecomment-377101352)~~
+ 从`v2.9.4`开始，生成项目时支持选择是否需要支持装饰器特性。
 
 ## 安装
 

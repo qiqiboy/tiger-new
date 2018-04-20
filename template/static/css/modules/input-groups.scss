@@ -165,16 +165,25 @@
     }
 }
 
-
 // some fix
 .input-group {
     .form-group {
         margin: 0;
         display: table-cell;
         width: 100%;
-        > .form-control {
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
+        &:first-child,
+        &:last-child {
+            .form-control {
+                border-radius: $input-border-radius;
+            }
+        }
+        &:first-child:not(:last-child) .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        &:last-child:not(:first-child) .form-control {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
         }
     }
     .captcha-field {

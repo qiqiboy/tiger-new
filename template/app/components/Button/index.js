@@ -14,11 +14,13 @@ class Button extends Component {
         link: PropTypes.bool.isRequired,
         href: PropTypes.string,
         type: PropTypes.oneOf(['primary', 'danger', 'success', 'danger', 'info', 'default', 'warning']),
-        isLoading: PropTypes.bool.isRequired
+        isLoading: PropTypes.bool.isRequired,
+        loading: PropTypes.bool.isRequired
     };
 
     static defaultProps = {
         isLoading: false,
+        loading: false,
         disabled: false,
         block: false,
         active: false,

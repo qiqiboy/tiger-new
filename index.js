@@ -91,7 +91,7 @@ if (program.upgrade) {
                     message: '请输入项目所属者（组织）的名字或邮箱:',
                     validate: function(input) {
                         return !!input || '该字段不能为空';
-                    } 
+                    }
                 },
                 {
                     name: 'libs',
@@ -104,6 +104,12 @@ if (program.upgrade) {
                     ],
                     message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
                     default: 3
+                },
+                {
+                    name: 'supportDecorator',
+                    type: 'confirm',
+                    message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
+                    default: false
                 },
                 {
                     name: 'proxy',
@@ -208,7 +214,8 @@ function createApp(name) {
             count: 'node scripts/count.js'
         },
         babel: {
-            presets: ['react-app']
+            presets: ['react-app'],
+            plugins: ['react-hot-loader/babel']
         },
         eslintConfig: {
             extends: ['react-app', './scripts/config/eslintrc.js']
@@ -234,6 +241,10 @@ function createApp(name) {
             '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
         }
     };
+
+    if (projectCustom.supportDecorator) {
+        packageJson.babel.plugins.push('transform-decorators-legacy');
+    }
 
     if (projectCustom.useCdn) {
         packageJson.cdn = {

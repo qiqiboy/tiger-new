@@ -54,7 +54,6 @@ var webpackConfig = {
     entry: Object.assign(paths.entries, {
         vendor: [
             require.resolve('./polyfills'),
-            require.resolve('react-hot-loader/patch'),
             require.resolve('react-dev-utils/webpackHotDevClient'),
             require.resolve('react-error-overlay')
         ].concat(pkg.vendor || [])

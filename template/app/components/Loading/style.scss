@@ -46,11 +46,15 @@
     left: 0;
     width: 100%;
     height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
     .loading-container {
         position: absolute;
         top: 30%;
         left: 50%;
         transform: translate(-50%, -50%);
+    }
+    .circle {
+        background-color: #b35151;
     }
 }
 
