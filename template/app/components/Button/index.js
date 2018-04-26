@@ -10,7 +10,7 @@ class Button extends Component {
         disabled: PropTypes.bool.isRequired,
         block: PropTypes.bool.isRequired,
         active: PropTypes.bool.isRequired,
-        size: PropTypes.oneOf(['lg', 'md', 'sm', 'sx']).isRequired,
+        size: PropTypes.oneOf(['lg', 'md', 'sm', 'xs']).isRequired,
         link: PropTypes.bool.isRequired,
         href: PropTypes.string,
         type: PropTypes.oneOf(['primary', 'danger', 'success', 'danger', 'info', 'default', 'warning']),

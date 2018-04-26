@@ -79,54 +79,57 @@ axios.interceptors.response.use(response => {
 function createError(responseError) {
     let error_code, error_msg, response;
 
-    if (responseError.response) {
-        response = responseError.response;
-        if (responseError.code === 'ECONNABORTED') {
-            error_code = 504;
-            error_msg = '网络请求超时(' + response.config.timeout + 'ms)，请确认网络正常并重试';
-        } else {
-            error_msg = response.message;
-        }
+    if (responseError.code === 'ECONNABORTED') {
+        error_code = 504;
+        error_msg = '网络请求超时(' + responseError.config.timeout + 'ms)，请确认网络正常并重试';
     } else {
-        response = responseError;
-    }
+        error_code = responseError.code;
+        error_msg = responseError.message;
+        response = responseError.response || responseError;
 
-    //接口的返回内容
-    let body = response.data;
+        //接口的返回内容
+        let body = response.data;
 
-    if (typeof body === 'object') {
-        //有的接口错误描述还被包了一层，所以也尝试解析
-        const realBody = body.data;
-        if (typeof realBody === 'object') {
-            const msg =
-                realBody.error_msg ||
-                realBody.error_message ||
-                realBody.error_description ||
-                realBody.message ||
-                realBody.description;
-            const code = realBody.error_code || realBody.code;
+        if (typeof body === 'object') {
+            //有的接口错误描述还被包了一层，所以也尝试解析
+            const realBody = body.data;
+            if (typeof realBody === 'object') {
+                const msg =
+                    realBody.error_msg ||
+                    realBody.error_message ||
+                    realBody.error_description ||
+                    realBody.message ||
+                    realBody.msg ||
+                    realBody.description;
+                const code = realBody.error_code || realBody.code;
 
-            if (msg) {
-                error_msg = msg;
+                if (msg) {
+                    error_msg = msg;
+                }
+
+                if (code) {
+                    error_code = code;
+                }
             }
 
-            if (code) {
-                error_code = code;
-            }
-        }
+            //如果error_msg error_code有任何一个还没有取到
+            if (!error_msg || !error_code) {
+                const msg =
+                    body.error_msg ||
+                    body.error_message ||
+                    body.error_description ||
+                    body.message ||
+                    body.msg ||
+                    body.description;
+                const code = body.error_code || body.code;
 
-        //如果error_msg error_code有任何一个还没有取到
-        if (!error_msg || !error_code) {
-            const msg =
-                body.error_msg || body.error_message || body.error_description || body.message || body.description;
-            const code = body.error_code || body.code;
+                if (!error_msg) {
+                    error_msg = msg;
+                }
 
-            if (!error_msg) {
-                error_msg = msg;
-            }
-
-            if (!error_code) {
-                error_code = code;
+                if (!error_code) {
+                    error_code = code;
+                }
             }
         }
     }
