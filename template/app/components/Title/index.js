@@ -9,7 +9,7 @@ class Title extends Component {
     }
 
     componentWillUnmount() {
-        document.title = this.preTitle;
+        //document.title = this.preTitle;
     }
 
     render() {
