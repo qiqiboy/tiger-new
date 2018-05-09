@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Portal from 'components/Portal';
+import classlist from 'utils/classlist';
 import './style.scss';
 
 class Loading extends Component {
     _render() {
         return (
-            <div className="loading-container">
+            <div className={classlist('loading-container', this.props.className)}>
                 <div className="circle" />
                 {typeof this.props.children === 'string' ? (
                     <div className="loading-text">{this.props.children}</div>

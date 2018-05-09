@@ -1,6 +1,7 @@
+@import '~static/css/mixins/base';
 .loading-container {
     $size: 40px;
-    $color: #ffe100;
+    $color: $brand-primary;
     .circle {
         margin: 0 auto;
         border: 3px solid $color;
@@ -54,7 +55,7 @@
         transform: translate(-50%, -50%);
     }
     .circle {
-        background-color: #b35151;
+        background-color: rgba(0, 0, 0, 0.6);
     }
 }
 
