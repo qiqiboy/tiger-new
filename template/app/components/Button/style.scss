@@ -6,7 +6,6 @@
         vertical-align: middle;
         width: $font-size-base;
         height: $font-size-base;
-        border-color: $btn-default-color;
         margin-right: 0.3em;
         position: relative;
         &:after {
@@ -14,7 +13,7 @@
             position: absolute;
             content: '';
             border: 2px solid;
-            border-right: transparent;
+            border-right-color: transparent;
             width: 100%;
             height: 100%;
             top: 0;
@@ -31,16 +30,6 @@
 .btn-sx .spin {
     width: $font-size-small;
     height: $font-size-small;
-}
-
-.btn-primary,
-.btn-danger,
-.btn-info,
-.btn-success,
-.btn-warning {
-    .spin {
-        border-color: $btn-primary-color;
-    }
 }
 
 @keyframes loading-rotate {

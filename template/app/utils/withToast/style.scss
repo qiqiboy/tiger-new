@@ -1,0 +1,13 @@
+.gloabl-error-toast {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    top: 30%;
+    left: 50%;
+    max-width: 80%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    text-align: center;
+}

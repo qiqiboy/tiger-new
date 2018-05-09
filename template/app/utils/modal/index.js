@@ -53,7 +53,7 @@ export const open = (settings = {}) => {
         animationElements.push(elements[0]);
     }
 
-    let withResolve, withReject, instance, destroying;
+    let withResolve, withReject, instance, destroying, prevScrollTop;
 
     //销毁组件
     const destroy = () => {
@@ -70,6 +70,7 @@ export const open = (settings = {}) => {
             elements.forEach(element => document.body.removeChild(element));
 
             document.body.classList.remove('body-modal-opened');
+            window.scrollTo(0, prevScrollTop);
 
             let i = 0,
                 len = modalInstances.length;
@@ -93,6 +94,7 @@ export const open = (settings = {}) => {
         destroy();
     };
 
+    prevScrollTop = window.scrollY;
     document.body.classList.add('body-modal-opened');
 
     function render(component, onComplete) {

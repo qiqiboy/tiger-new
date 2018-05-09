@@ -5,14 +5,14 @@ export default axios;
 
 const ERROR_MSG = {
     /* 网络类异常 */
-    0: '请求未发出',
-    401: '你还未登录',
-    403: '你没有权限访问该页面',
-    413: '上传文件太大',
+    OFF_LINE: '抱歉，您貌似还没连接到网络，请检查网络连接',
+    401: '抱歉，您貌似还没有登录',
+    403: '抱歉，您没有权限访问该页面',
+    413: '抱歉，您上传文件太大',
 
-    404: '接口不存在',
-    500: '服务器错误',
-    503: '服务器错误'
+    404: '抱歉，您访问的接口地址貌似不存在',
+    500: '抱歉，当前服务器异常，请稍后再试',
+    503: '抱歉，当前服务器异常，请稍后再试'
 };
 
 function dataSerializer(data) {
@@ -52,7 +52,8 @@ axios.interceptors.request.use(config => {
     //请求添加token头
     /* if (!config.noToken) {
      *     config.headers.Authorization = 'Bearer YOUR_TOKEN';
-     * } */
+     * }
+     */
 
     return config;
 });
@@ -77,27 +78,24 @@ axios.interceptors.response.use(response => {
  * @return {promise}
  */
 function createError(responseError) {
-    let error_code, error_msg, response;
+    let error_code,
+        error_msg,
+        response = {};
 
-    if (responseError.code === 'ECONNABORTED') {
-        error_code = 504;
-        error_msg = '网络请求超时(' + responseError.config.timeout + 'ms)，请确认网络正常并重试';
-    } else {
-        error_code = responseError.code;
-        error_msg = responseError.message;
+    //请求已经发送，并且服务器有返回
+    if (responseError.response || responseError.status) {
         response = responseError.response || responseError;
-
         //接口的返回内容
         let body = response.data;
 
-        if (typeof body === 'object') {
+        if (body && typeof body === 'object') {
             //有的接口错误描述还被包了一层，所以也尝试解析
             const realBody = body.data;
-            if (typeof realBody === 'object') {
+            if (realBody && typeof realBody === 'object') {
                 const msg =
                     realBody.error_msg ||
-                    realBody.error_message ||
                     realBody.error_description ||
+                    realBody.error_message ||
                     realBody.message ||
                     realBody.msg ||
                     realBody.description;
@@ -116,8 +114,8 @@ function createError(responseError) {
             if (!error_msg || !error_code) {
                 const msg =
                     body.error_msg ||
-                    body.error_message ||
                     body.error_description ||
+                    body.error_message ||
                     body.message ||
                     body.msg ||
                     body.description;
@@ -132,14 +130,29 @@ function createError(responseError) {
                 }
             }
         }
+
+        if (!error_code) {
+            error_code = response.status;
+        }
+    } else if (responseError.request) {
+        //请求已发送但是没有收到服务器响应
+        if ('onLine' in navigator && navigator.onLine === false) {
+            error_code = 'OFF_LINE';
+        } else if (responseError.code === 'ECONNABORTED') {
+            error_code = 504;
+            error_msg = '网络请求超时(' + responseError.config.timeout + 'ms)，请确认网络正常并重试';
+        }
+    } else {
+        //请求未发出
+        error_msg = responseError.message;
     }
 
     if (!error_code) {
-        error_code = response.status || -1;
+        error_code = -1;
     }
 
     if (!error_msg) {
-        error_msg = ERROR_MSG[error_code] || `请求异常(${error_code})`;
+        error_msg = ERROR_MSG[error_code] || response.statusText || `抱歉，当前请求异常(${error_code})`;
     }
 
     const error = new Error(error_msg);
