@@ -1,5 +1,4 @@
 /**
- * @author qiqiboy@tigerbrokrs.com
  * @desc 对URL的重新封装，增加了merge方法
  *      文档参考：http://nodejs.cn/api/url.html#url_legacy_url_api
  */
