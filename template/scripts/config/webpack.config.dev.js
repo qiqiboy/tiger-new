@@ -122,7 +122,7 @@ var webpackConfig = {
                     },
                     {
                         test: /\.(js|jsx|mjs)$/,
-                        include: [paths.appSrc, paths.staticSrc],
+                        include: paths.appSrc,
                         loader: 'babel-loader',
                         options: {
                             cacheDirectory: true
