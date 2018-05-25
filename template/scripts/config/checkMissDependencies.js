@@ -22,7 +22,7 @@ function checkMiss(spinner) {
                             message:
                                 '你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n' +
                                 chalk.dim('重新运行 npm install 安装所有依赖项.'),
-                            default: false
+                            default: true
                         }
                     ])
                     .then(function(answers) {

@@ -63,9 +63,10 @@
     "normalize.css": "5.0.0",
     "prop-types": "15.6.0",
     "react": "16.2.0",
+    "react-animated-router": "0.1.11",
     "react-awesome-snippets": "latest",
     "react-dom": "16.2.0",
-    "react-easyform": "0.2.4",
+    "react-formutil": "0.1.1",
     "react-router-dom": "4.2.2",
     "react-transition-group": "2.3.0"
   }
