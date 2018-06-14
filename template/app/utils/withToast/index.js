@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Fade } from 'components/Transition';
 import Portal from 'components/Portal';
+import Loading from 'components/Loading';
 import './style.scss';
 
 /**
@@ -13,10 +14,11 @@ export default function(WrappedComponent) {
     return class extends Component {
         state = {
             showToast: false,
+            showToastLoading: false,
             errorMsg: null
         };
 
-        showToast = error =>
+        showToast = (error, timeout = 1500) =>
             new Promise(resolve => {
                 const errorMsg = typeof error === 'string' ? error : error.message;
 
@@ -36,18 +38,42 @@ export default function(WrappedComponent) {
                             },
                             resolve
                         ),
-                    1500
+                    timeout
                 );
             });
 
+        showToastLoading = (loadingText = null) => {
+            this.setState({
+                loadingText,
+                showToastLoading: true
+            });
+        };
+
+        hideToastLoading = () =>
+            this.setState({
+                showToastLoading: false
+            });
+
         render() {
-            const { showToast, errorMsg } = this.state;
+            const { showToast, showToastLoading, errorMsg, loadingText } = this.state;
             return (
                 <Fragment>
-                    <WrappedComponent {...this.props} showToast={this.showToast} />
+                    <WrappedComponent
+                        {...this.props}
+                        showToast={this.showToast}
+                        showToastLoading={this.showToastLoading}
+                        hideToastLoading={this.hideToastLoading}
+                    />
                     <Fade in={showToast}>
                         <Portal>
                             <div className="gloabl-error-toast">{errorMsg}</div>
+                        </Portal>
+                    </Fade>
+                    <Fade in={showToastLoading}>
+                        <Portal>
+                            <div className="gloabl-loading-toast">
+                                <Loading>{loadingText}</Loading>
+                            </div>
                         </Portal>
                     </Fade>
                 </Fragment>
