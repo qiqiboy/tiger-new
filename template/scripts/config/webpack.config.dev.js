@@ -23,7 +23,7 @@ var injects = [
 ];
 
 var matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.jsx?)?\s*-->/g;
-//console.log(paths);process.exit();
+
 paths.pageEntries.forEach(function(name) {
     var chunks = ['vendor'];
     var file = path.resolve(paths.appPublic, name + '.html');

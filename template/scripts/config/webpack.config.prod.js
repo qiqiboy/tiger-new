@@ -89,7 +89,7 @@ paths.pageEntries.forEach(function(name) {
 
 var webpackConfig = {
     bail: true,
-    //devtool: 'cheap-module-source-map',
+    //devtool: 'hidden-source-map', //如果需要source map，可以取消注释。并且将下方UglifyJSPlugin的sourceMap配置打开true
     entry: Object.assign(paths.entries, {
         vendor: [require.resolve('./polyfills')].concat(pkg.vendor || [])
     }),
@@ -214,6 +214,7 @@ var webpackConfig = {
         new UglifyJSPlugin({
             cache: true,
             parallel: true,
+            sourceMap: false,
             uglifyOptions: {
                 compress: {
                     comparisons: false,

@@ -37,7 +37,7 @@ function runCDN() {
     spinner = ora('开始上传').start();
 
     var exitsNum = 0;
-    var allFiles = glob.sync(path.join(paths.appBuild, 'static/**/*'));
+    var allFiles = glob.sync(path.join(paths.appBuild, 'static/**/*')); // 如果启用了source map，又不想上传cdn，可以改为 static/**/!(*.map)
     var allSyncPromises = allFiles
         .filter(function(file) {
             var relative = path.relative(paths.appBuild, file);
