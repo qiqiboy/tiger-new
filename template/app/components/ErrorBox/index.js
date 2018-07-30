@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button';
-import Icon from '../Icon';
 import './style.scss';
 
 class ErrorBox extends Component {
@@ -10,7 +9,6 @@ class ErrorBox extends Component {
         const message = error instanceof Error ? error.message : error;
         return (
             <div className="error-box">
-                <Icon name="ring" />
                 <div className="texts">
                     {message}{' '}
                     {this.props.onClick && (

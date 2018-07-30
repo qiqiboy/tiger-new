@@ -2,6 +2,14 @@ import React from 'react';
 import modal from '../modal';
 import DialogContainer from './container';
 
+const REASON = 'DIALOG_DISMISS';
+
+window.addEventListener('unhandledrejection', ev => {
+    if (ev.reason === REASON) {
+        ev.preventDefault();
+    }
+});
+
 const btnConfig = {
     ok: {
         text: '确定',
@@ -14,7 +22,7 @@ const btnConfig = {
         text: '取消',
         className: 'btn-default',
         click: function() {
-            this.dismiss();
+            this.dismiss(REASON);
         }
     }
 };
