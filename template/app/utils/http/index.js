@@ -1,11 +1,12 @@
 //文档查看：https://github.com/mzabriskie/axios
-import axios from 'axios';
+import axios, { isCancel } from 'axios';
 
 export default axios;
 
 const ERROR_MSG = {
     /* 网络类异常 */
     OFF_LINE: '抱歉，您貌似还没连接到网络，请检查网络连接',
+    CANCEL: '抱歉，请求已取消',
     200: '抱歉，请求失败',
     401: '抱歉，您貌似还没有登录',
     403: '抱歉，您没有权限访问该页面',
@@ -62,9 +63,9 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(response => {
     let data = response.data;
 
-    if (data && typeof data == 'object') {
+    if (data && typeof data === 'object') {
         if (data.is_succ === false) {
-            return createError(response);
+            return createError({ response });
         }
 
         return data;
@@ -83,55 +84,41 @@ function createError(responseError) {
         error_msg,
         response = {};
 
+    const pickError = function(data) {
+        if (data && typeof data === 'object') {
+            const msg =
+                data.error_msg ||
+                data.error_description ||
+                data.error_message ||
+                data.message ||
+                data.msg ||
+                data.description;
+            const code = data.error_code || data.code;
+
+            if (msg && !error_msg) {
+                error_msg = msg;
+            }
+
+            if (code && !error_code) {
+                error_code = code;
+            }
+        }
+    };
+
     //请求已经发送，并且服务器有返回
-    if (responseError.response || responseError.status) {
-        response = responseError.response || responseError;
+    if (responseError.response) {
+        response = responseError.response;
+
         //接口的返回内容
-        let body = response.data;
+        const body = response.data;
 
         if (body && typeof body === 'object') {
             //有的接口错误描述还被包了一层，所以也尝试解析
-            const realBody = body.data;
-            if (realBody && typeof realBody === 'object') {
-                const msg =
-                    realBody.error_msg ||
-                    realBody.error_description ||
-                    realBody.error_message ||
-                    realBody.message ||
-                    realBody.msg ||
-                    realBody.description;
-                const code = realBody.error_code || realBody.code;
-
-                if (msg) {
-                    error_msg = msg;
-                }
-
-                if (code) {
-                    error_code = code;
-                }
-            }
-
-            //如果error_msg error_code有任何一个还没有取到
-            if (!error_msg || !error_code) {
-                const msg =
-                    body.error_msg ||
-                    body.error_description ||
-                    body.error_message ||
-                    body.message ||
-                    body.msg ||
-                    body.description;
-                const code = body.error_code || body.code;
-
-                if (!error_msg) {
-                    error_msg = msg;
-                }
-
-                if (!error_code) {
-                    error_code = code;
-                }
-            }
+            pickError(body.data);
+            pickError(body);
         }
 
+        //如果依然没有取到错误code，这使用http code当作错误code
         if (!error_code) {
             error_code = response.status;
         }
@@ -146,6 +133,10 @@ function createError(responseError) {
     } else {
         //请求未发出
         error_msg = responseError.message;
+
+        if (isCancel(responseError)) {
+            error_code = 'CANCEL';
+        }
     }
 
     if (!error_code) {
