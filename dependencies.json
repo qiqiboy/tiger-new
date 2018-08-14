@@ -61,13 +61,13 @@
     "jquery": "3.1.1",
     "lodash": "4.17.4",
     "normalize.css": "5.0.0",
-    "prop-types": "15.6.0",
-    "react": "16.2.0",
+    "prop-types": "15.6.2",
+    "react": "16.4.2",
     "react-animated-router": "latest",
     "react-awesome-snippets": "latest",
-    "react-dom": "16.2.0",
+    "react-dom": "16.4.2",
     "react-formutil": "latest",
     "react-router-dom": "4.2.2",
-    "react-transition-group": "2.3.0"
+    "react-transition-group": "2.4.0"
   }
 }
