@@ -5,7 +5,7 @@ $remMinScreenWidth: 320; //最小屏幕宽度
 $remFlowStep: 5; //设定rem参考值的递增值
 
 html {
-    font-size: $remMinScreenWidth / $remMaxScreenWith * $remRootSize + px;
+    font-size: $remMinScreenWidth / $remDefaultWidth * $remRootSize + px;
 
     @for $i from 0 through (($remMaxScreenWith - $remMinScreenWidth) / $remFlowStep) {
         $remCurScreenWidth: $remMinScreenWidth + $i * $remFlowStep;
