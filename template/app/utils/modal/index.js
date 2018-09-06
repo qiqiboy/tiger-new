@@ -88,6 +88,7 @@ export const open = (settings = {}) => {
         withResolve(data);
         destroy();
     };
+
     const dismiss = err => {
         withReject(err);
         destroy();

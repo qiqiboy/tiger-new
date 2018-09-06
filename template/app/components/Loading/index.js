@@ -20,6 +20,7 @@ class Loading extends Component {
 
     render() {
         const dom = this._render();
+
         return this.props.global ? <Portal className="global-loading">{dom}</Portal> : dom;
     }
 

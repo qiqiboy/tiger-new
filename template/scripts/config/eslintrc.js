@@ -38,7 +38,6 @@ module.exports = {
             }
         ],
         semi: 0,
-        quotes: 0,
         'array-callback-return': 2,
         //"complexity": [2, 20],
         'default-case': 2,
@@ -52,7 +51,7 @@ module.exports = {
         //"no-invalid-this": 1,
         'no-global-assign': 2,
         'no-multi-spaces': [
-            2,
+            1,
             {
                 ignoreEOLComments: true,
                 exceptions: {
@@ -76,6 +75,13 @@ module.exports = {
             }
         ],
         'no-unmodified-loop-condition': 2,
-        'wrap-iife': [2, 'inside']
+        'wrap-iife': [2, 'inside'],
+        'padding-line-between-statements': [
+            1,
+            { blankLine: 'always', prev: ['cjs-import', 'import'], next: '*' },
+            { blankLine: 'always', prev: '*', next: ['return', 'class'] },
+            { blankLine: 'always', prev: ['multiline-block-like'], next: ['multiline-block-like'] },
+            { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
+        ]
     }
 };

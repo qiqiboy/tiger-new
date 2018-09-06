@@ -239,6 +239,9 @@ function createApp(name) {
         },
         'lint-staged': {
             '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
+        },
+        stylelint: {
+            extends: 'stylelint-config-recommended'
         }
     };
 

@@ -13,6 +13,7 @@ class Iframe extends Component {
 
     render() {
         const { src, onClose } = this.props;
+
         return (
             <Fragment>
                 <Flow in={this.props.in}>

@@ -56,6 +56,7 @@ export default function(WrappedComponent) {
 
         render() {
             const { showToast, showToastLoading, errorMsg, loadingText } = this.state;
+
             return (
                 <Fragment>
                     <WrappedComponent

@@ -30,6 +30,7 @@ function dataSerializer(data) {
             result.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
         }
     }
+
     return result.join('&');
 }
 

@@ -7,6 +7,7 @@ class ErrorBox extends Component {
     render() {
         const { error } = this.props;
         const message = error instanceof Error ? error.message : error;
+
         return (
             <div className="error-box">
                 <div className="texts">
