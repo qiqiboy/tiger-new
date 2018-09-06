@@ -76,12 +76,22 @@ module.exports = {
         ],
         'no-unmodified-loop-condition': 2,
         'wrap-iife': [2, 'inside'],
+        'lines-between-class-members': [1, 'always', { exceptAfterSingleLine: true }],
         'padding-line-between-statements': [
             1,
-            { blankLine: 'always', prev: ['cjs-import', 'import'], next: '*' },
-            { blankLine: 'always', prev: '*', next: ['return', 'class'] },
-            { blankLine: 'always', prev: ['multiline-block-like'], next: ['multiline-block-like'] },
+            {
+                blankLine: 'always',
+                prev: ['multiline-block-like', 'const', 'let', 'var', 'cjs-import', 'import', 'export', 'cjs-export'],
+                next: '*'
+            },
+            {
+                blankLine: 'always',
+                prev: '*',
+                next: ['multiline-block-like', 'const', 'let', 'var', 'cjs-import', 'import', 'export', 'cjs-export']
+            },
             { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
+            { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },
+            { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] }
         ]
     }
 };

@@ -73,6 +73,7 @@ export const open = (settings = {}) => {
 
             let i = 0,
                 len = modalInstances.length;
+
             for (; i < len; i++) {
                 if (modalInstances[i] === instance) {
                     modalInstances.splice(i, 1);

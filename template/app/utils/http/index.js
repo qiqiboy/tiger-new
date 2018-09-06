@@ -149,6 +149,7 @@ function createError(responseError) {
     }
 
     const error = new Error(error_msg);
+
     error.error_code = error_code;
     error.error_msg = error_msg;
     error.response = response;

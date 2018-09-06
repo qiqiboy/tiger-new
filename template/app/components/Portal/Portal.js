@@ -9,6 +9,7 @@ class Portal extends Component {
             document.body.classList.remove('portal-opened');
         }
     }
+
     render() {
         if (!this.container) {
             this.container = document.createElement('div');

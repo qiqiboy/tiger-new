@@ -25,6 +25,7 @@ export default function copyMe(text) {
     selection.addRange(range);
 
     let result;
+
     try {
         result = document.execCommand('copy');
     } catch (e) {

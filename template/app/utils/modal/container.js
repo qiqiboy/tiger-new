@@ -33,6 +33,7 @@ class ModalContainer extends Component {
 
     getEvents() {
         let events = [];
+
         if (this.props.backdrop != 'static') {
             events.push('click');
         }
