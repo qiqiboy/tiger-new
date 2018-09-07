@@ -22,8 +22,8 @@ class ModalContainer extends Component {
     eventHandler = ev => {
         const { container } = this.refs;
 
-        if (container != ev.target && !container.contains(ev.target)) {
-            if (ev.type == 'click') {
+        if (container !== ev.target && !container.contains(ev.target)) {
+            if (ev.type === 'click') {
                 this.props.dismiss();
             } else {
                 ev.preventDefault();
@@ -34,7 +34,7 @@ class ModalContainer extends Component {
     getEvents() {
         let events = [];
 
-        if (this.props.backdrop != 'static') {
+        if (this.props.backdrop !== 'static') {
             events.push('click');
         }
 

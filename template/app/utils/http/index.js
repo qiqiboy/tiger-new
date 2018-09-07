@@ -47,7 +47,7 @@ axios.interceptors.request.use(config => {
     );
 
     //增加对表单数组提交的支持
-    if (!config.useJson && (config.method == 'post' || config.method == 'put')) {
+    if (!config.useJson && (config.method === 'post' || config.method === 'put')) {
         config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
         config.transformRequest = dataSerializer;
     }

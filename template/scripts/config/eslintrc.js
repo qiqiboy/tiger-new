@@ -4,16 +4,13 @@
  * 2: error
  */
 module.exports = {
-    env: {
-        amd: true
-    },
     rules: {
         'react/jsx-no-target-blank': 0,
-        eqeqeq: 0,
+        eqeqeq: [1, 'smart'],
         radix: 0,
         'no-script-url': 0,
         'no-mixed-operators': 0,
-        'linebreak-style': [2, 'unix'],
+        'linebreak-style': [1, 'unix'],
         indent: 0,
         'no-whitespace-before-property': 2,
         'padded-blocks': [1, 'never'],
@@ -40,10 +37,10 @@ module.exports = {
         semi: 0,
         'array-callback-return': 2,
         //"complexity": [2, 20],
-        'default-case': 2,
+        'default-case': 1,
         curly: 2,
-        'dot-location': ['error', 'property'],
-        'dot-notation': 2,
+        'dot-location': [1, 'property'],
+        'dot-notation': 1,
         'no-else-return': 2,
         'guard-for-in': 2,
         'no-empty-pattern': 2,

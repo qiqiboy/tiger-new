@@ -9,6 +9,7 @@ var semver = require('semver');
 var spinner = ora();
 
 var currentNodeVersion = process.versions.node;
+
 if (semver.lt(currentNodeVersion, '4.0.0')) {
     spinner.fail(
         '你当前node版本为 ' +
@@ -238,7 +239,12 @@ function createApp(name) {
             ]
         },
         'lint-staged': {
-            '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
+            '{app,static}/**/*.{js,jsx,mjs}': [
+                'node_modules/.bin/eslint --fix',
+                'node_modules/.bin/prettier --write',
+                'git add'
+            ],
+            '{app,static}/**/*.{css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
         },
         stylelint: {
             extends: 'stylelint-config-recommended'
@@ -284,6 +290,7 @@ function shouldUseCnpm() {
 function install(packageToInstall, saveDev, callback) {
     var command;
     var args;
+
     if (shouldUseCnpm()) {
         command = 'cnpm';
     } else {
@@ -315,6 +322,7 @@ function run(appPath, appName) {
     fs.writeFileSync(path.join(appPath, 'package.json'), JSON.stringify(appPackage, null, 2));
 
     var templatePath = path.join(ownPath, 'template');
+
     if (fs.existsSync(templatePath)) {
         fs.copySync(templatePath, appPath);
     }
@@ -324,6 +332,7 @@ function run(appPath, appName) {
             // Append if there's already a `.gitignore` file there
             if (err.code === 'EEXIST') {
                 var data = fs.readFileSync(path.join(appPath, 'gitignore'));
+
                 fs.appendFileSync(path.join(appPath, '.gitignore'), data);
                 fs.unlinkSync(path.join(appPath, 'gitignore'));
             } else {
@@ -407,6 +416,7 @@ function run(appPath, appName) {
 // https://github.com/facebookincubator/create-react-app/pull/368#issuecomment-243446094
 function isSafeToCreateProjectIn(root) {
     var validFiles = ['.DS_Store', 'Thumbs.db', '.git', '.gitignore', '.idea', 'README.md', 'LICENSE'];
+
     return (
         !fs.existsSync(root) ||
         fs.readdirSync(root).every(function(file) {
