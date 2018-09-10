@@ -24,8 +24,14 @@ module.exports = {
                 asyncArrow: 'always'
             }
         ],
-        'space-unary-ops': 2,
+        'space-unary-ops': 1,
         'space-infix-ops': 1,
+        'space-before-blocks': 1,
+        'no-trailing-spaces': [1, { ignoreComments: true }],
+        'key-spacing': [1, { mode: 'strict' }],
+        'switch-colon-spacing': 1,
+        'func-call-spacing': [1, 'never'],
+        'keyword-spacing': 1,
         'no-multiple-empty-lines': [
             1,
             {

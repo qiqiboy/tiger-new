@@ -259,7 +259,7 @@ function runDevServer(host, port, protocol) {
             : {
                   disableDotRule: true
               },
-        proxy: prepareProxy(pkg.proxy),
+        proxy: prepareProxy(process.env.PROXY || pkg.proxy),
         before: function(app) {
             app.use(errorOverlayMiddleware());
         }
