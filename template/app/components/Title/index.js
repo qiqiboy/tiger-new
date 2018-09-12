@@ -5,7 +5,7 @@ class Title extends Component {
     componentDidMount() {
         this.preTitle = document.title;
 
-        document.title = this.props.title;
+        document.title = this.props.title + ' - Tiger Trade';
     }
 
     componentWillUnmount() {

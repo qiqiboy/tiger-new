@@ -13,7 +13,7 @@ class Button extends Component {
         size: PropTypes.oneOf(['lg', 'md', 'sm', 'xs']).isRequired,
         link: PropTypes.bool.isRequired,
         href: PropTypes.string,
-        type: PropTypes.oneOf(['primary', 'danger', 'success', 'danger', 'info', 'default', 'warning']),
+        type: PropTypes.oneOf(['primary', 'danger', 'success', 'info', 'default', 'warning']),
         isLoading: PropTypes.bool.isRequired,
         loading: PropTypes.bool.isRequired
     };

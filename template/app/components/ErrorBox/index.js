@@ -30,4 +30,3 @@ class ErrorBox extends Component {
 }
 
 export default ErrorBox;
-

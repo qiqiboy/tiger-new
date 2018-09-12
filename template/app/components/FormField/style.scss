@@ -1,0 +1,29 @@
+.form-group {
+    &.form-field-group {
+        position: relative;
+    }
+    > .form-field-error {
+        background-color: rgba(0, 0, 0, 0.75);
+        font-size: 12px;
+        padding: 5px;
+        position: absolute;
+        bottom: 100%;
+        margin-bottom: 11px;
+        border-radius: 3px;
+        color: #fff;
+        left: 0;
+        pointer-events: none;
+        animation: scaleIn 0.3s ease-in;
+        transform-origin: 10px bottom;
+        &:after {
+            content: '';
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.75);
+            position: absolute;
+            bottom: -16px;
+            left: 10px;
+        }
+    }
+}
