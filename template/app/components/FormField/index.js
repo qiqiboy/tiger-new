@@ -6,7 +6,7 @@ import './style.scss';
 
 //@ts-ignore
 @connect
-class FieldWithValid extends Component {
+class FormField extends Component {
     static propTypes = {
         content: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), //表单元素后方额外的内容
         label: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.func]), //表单元素前方额外的内容
@@ -45,4 +45,4 @@ class FieldWithValid extends Component {
     }
 }
 
-export default FieldWithValid;
+export default FormField;
