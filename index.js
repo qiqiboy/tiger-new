@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-'use strict';
-
 var chalk = require('chalk');
 var ora = require('ora');
 var semver = require('semver');
@@ -208,6 +206,7 @@ function createApp(name) {
         proxy: projectCustom.proxy || null,
         scripts: {
             precommit: 'lint-staged',
+            commitmsg: 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
             start: 'node scripts/start.js',
             build: 'node scripts/build.js',
             'build:dev': 'node scripts/build.js --dev',
@@ -220,6 +219,9 @@ function createApp(name) {
         },
         eslintConfig: {
             extends: ['react-app', './scripts/config/eslintrc.js']
+        },
+        commitlint: {
+            extends: ['@commitlint/config-conventional']
         },
         prettier: {
             printWidth: 120,
