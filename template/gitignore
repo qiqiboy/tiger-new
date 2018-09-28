@@ -8,3 +8,4 @@ bower_components
 /npm-debug.log
 /dump.rdb
 Thumbs.db
+buildDev

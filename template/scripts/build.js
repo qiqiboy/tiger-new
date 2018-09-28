@@ -64,6 +64,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 
 if (userDevConfig) {
     process.env.NODE_ENV = 'development';
+    config.output.path = paths.appBuild = paths.appBuildDev;
     config.output.publicPath = pkg.noRewrite ? './' : '/';
 }
 

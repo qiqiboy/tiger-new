@@ -33,6 +33,7 @@ var alias = {
 module.exports = {
     root: resolveApp(''),
     appBuild: resolveApp('build'),
+    appBuildDev: resolveApp('buildDev'),
     appPublic: resolveApp('public'),
     appHtml: resolveApp('public/index.html'),
     appIndexJs: resolveApp('app/index.js'),
