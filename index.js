@@ -205,8 +205,6 @@ function createApp(name) {
         noRewrite: !projectCustom.isSpa,
         proxy: projectCustom.proxy || null,
         scripts: {
-            precommit: 'lint-staged',
-            commitmsg: 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
             start: 'node scripts/start.js',
             build: 'node scripts/build.js',
             'build:dev': 'node scripts/build.js --dev',
@@ -217,11 +215,21 @@ function createApp(name) {
             presets: ['react-app'],
             plugins: ['react-hot-loader/babel']
         },
+        husky: {
+            hooks: {
+                'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
+                'pre-commit': 'lint-staged'
+            }
+        },
         eslintConfig: {
             extends: ['react-app', './scripts/config/eslintrc.js']
         },
         commitlint: {
-            extends: ['@commitlint/config-conventional']
+            extends: ['@commitlint/config-conventional'],
+            rules: {
+                'subject-case': [0],
+                'scope-case': [0]
+            }
         },
         prettier: {
             printWidth: 120,

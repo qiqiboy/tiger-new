@@ -67,40 +67,52 @@ function appUpgrade(projectName) {
                     questions.push({
                         name: 'addPrettier',
                         type: 'confirm',
-                        message:
-                            '是否需要支持Prettier自动格式化代码？\n' +
-                            chalk.dim('你可以在代码提交git前，手动运行 npm run precommit 来运行prettier。') +
-                            '\n',
+                        message: '是否需要支持Prettier自动格式化代码？',
                         default: true
                     });
                 }
 
-                questions.push({
-                    name: 'install',
-                    type: 'confirm',
-                    message:
-                        '由于安装以及升级了部分依赖，为了保证项目正常运行，需要重新安装所有依赖，请确认是否继续？\n' +
-                        chalk.dim('该操作将会： 1. 删除 node_modules 目录; 2. 重新运行 npm install 命令') +
-                        '\n',
-                    default: false
-                });
+                if (!package.commitlint) {
+                    questions.push({
+                        name: 'addCommitlint',
+                        type: 'confirm',
+                        message: '是否需要支持commitlint？',
+                        default: true
+                    });
+                }
+
+                if (!package.babel.plugins || package.babel.plugins.indexOf('transform-decorators-legacy') === -1) {
+                    questions.push({
+                        name: 'supportDecorator',
+                        type: 'confirm',
+                        message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
+                        default: true
+                    });
+                }
 
                 inquirer.prompt(questions).then(answers => {
                     console.log();
 
-                    saveDevDependencies(root, package, currentDevDependencies, newDevDependencies);
-                    spinner.succeed('package.json中依赖配置已更新！');
-
                     copyScripts(root);
                     spinner.succeed('scripts构建目录已更新！');
+
+                    console.log();
 
                     if (answers.rmGulpfile) {
                         fs.removeSync(gulpfile);
                         spinner.succeed('gulpfile.js 已删除！');
                     }
 
+                    if (!package.husky) {
+                        delete package.scripts.precommit;
+
+                        package.husky = {
+                            hooks: {}
+                        };
+                    }
+
                     if (answers.addPrettier) {
-                        package.scripts.precommit = 'lint-staged';
+                        package.husky.hooks['pre-commit'] = 'lint-staged';
                         package.prettier = {
                             printWidth: 120,
                             tabWidth: 4,
@@ -118,50 +130,62 @@ function appUpgrade(projectName) {
                                 }
                             ]
                         };
+                    }
 
-                        package['lint-staged'] = {
-                            '{app,static}/**/*.{js,jsx,mjs,css,scss,less,json,ts}': [
-                                'node_modules/.bin/prettier --write',
-                                'git add'
-                            ]
-                        };
+                    if (answers.addCommitlint) {
+                        package.husky.hooks['commit-msg'] = 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS';
+                    }
+
+                    if (answers.supportDecorator) {
+                        if (!package.babel.plugins) {
+                            package.babel.plugins = [];
+                        }
+                        package.babel.plugins.push('transform-decorators-legacy');
+                    }
+
+                    package.commitlint = {
+                        extends: ['@commitlint/config-conventional'],
+                        rules: {
+                            'subject-case': [0],
+                            'scope-case': [0]
+                        }
+                    };
+
+                    package['lint-staged'] = {
+                        '{app,static}/**/*.{js,jsx,mjs}': [
+                            'node_modules/.bin/eslint --fix',
+                            'node_modules/.bin/prettier --write',
+                            'git add'
+                        ],
+                        '{app,static}/**/*.{css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
+                    };
+
+                    package['stylelint'] = {
+                        extends: 'stylelint-config-recommended'
+                    };
+
+                    if (package.cdn) {
+                        package.scripts.cdn = 'node scripts/cdn.js';
+                        package.scripts.pack = 'npm run build && npm run cdn';
                     }
 
                     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
 
-                    if (answers.install) {
-                        process.chdir(root);
-                        spinner.text = '删除 node_modules ...';
-                        spinner.start();
-                        fs.removeSync(path.join(root, 'node_modules'));
-                        spinner.stop();
-                        spinner.succeed('删除 node_modules 目录成功！即将重新安装所有依赖...');
-
-                        install(function() {
+                    install(
+                        Object.keys(newDevDependencies).map(function(key) {
+                            return key + '@' + newDevDependencies[key];
+                        }),
+                        true,
+                        function() {
                             console.log();
                             spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
-                        });
-                    } else {
-                        console.log();
-                        spinner.succeed(
-                            '项目升级成功！但是你可能需要重新手动安装确实的依赖。\n  运行 ' +
-                                chalk.green((shouldUseCnpm() ? 'cnpm' : 'npm') + ' install')
-                        );
-                    }
+                        }
+                    );
                 });
             } else {
                 spinner.fail('升级已取消！');
             }
         });
-}
-
-function saveDevDependencies(root, package, currentDevDependencies, newDevDependencies) {
-    package.devDependencies = Object.assign(currentDevDependencies, newDevDependencies);
-
-    if (package.cdn) {
-        package.scripts.cdn = 'node scripts/cdn.js';
-        package.scripts.pack = 'npm run build && npm run cdn';
-    }
 }
 
 function copyScripts(root) {
@@ -181,16 +205,17 @@ function shouldUseCnpm() {
     }
 }
 
-function install(callback) {
+function install(packageToInstall, saveDev, callback) {
     var command;
     var args;
+
     if (shouldUseCnpm()) {
         command = 'cnpm';
     } else {
         command = 'npm';
     }
 
-    args = ['install'];
+    args = ['install', saveDev ? '--save-dev' : '--save', '--save-exact'].concat(packageToInstall);
 
     var child = spawn(command, args, {
         stdio: 'inherit'
