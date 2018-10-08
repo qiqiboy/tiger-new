@@ -6,6 +6,7 @@ var _ = require('lodash');
 var ora = require('ora');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
+var pkgTemp = require('./packageTemp');
 
 var spinner = ora();
 
@@ -15,6 +16,7 @@ function appUpgrade(projectName) {
     var root = path.resolve(projectName);
     var packageJson = path.resolve(root, 'package.json');
     var gulpfile = path.resolve(root, 'gulpfile.js');
+    var jsconfig = path.resolve(root, 'jsconfig.json');
 
     if (!fs.existsSync(root)) {
         spinner.fail(chalk.red(root) + ' 貌似不存在！');
@@ -86,7 +88,7 @@ function appUpgrade(projectName) {
                         name: 'supportDecorator',
                         type: 'confirm',
                         message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
-                        default: true
+                        default: false
                     });
                 }
 
@@ -96,44 +98,44 @@ function appUpgrade(projectName) {
                     copyScripts(root);
                     spinner.succeed('scripts构建目录已更新！');
 
-                    console.log();
+                    if (!fs.existsSync(jsconfig)) {
+                        fs.copySync(path.resolve(ownPath, 'template/jsconfig.json'), jsconfig, {
+                            overwrite: true
+                        });
+                        spinner.succeed('jsconfig.json已写入！');
+                    }
 
                     if (answers.rmGulpfile) {
                         fs.removeSync(gulpfile);
                         spinner.succeed('gulpfile.js 已删除！');
                     }
 
-                    if (!package.husky) {
-                        delete package.scripts.precommit;
+                    console.log();
 
+                    if (!package.husky) {
                         package.husky = {
                             hooks: {}
                         };
+
+                        if (package.scripts.precommit) {
+                            delete package.scripts.precommit;
+                            package.husky.hooks['pre-commit'] = 'lint-staged';
+                        }
+
+                        if (package.scripts.commitmsg) {
+                            delete package.scripts.commitmsg;
+                            package.husky.hooks['commit-msg'] = 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS';
+                        }
                     }
 
                     if (answers.addPrettier) {
                         package.husky.hooks['pre-commit'] = 'lint-staged';
-                        package.prettier = {
-                            printWidth: 120,
-                            tabWidth: 4,
-                            parser: 'babylon',
-                            trailingComma: 'none',
-                            jsxBracketSameLine: true,
-                            semi: true,
-                            singleQuote: true,
-                            overrides: [
-                                {
-                                    files: '*.json',
-                                    options: {
-                                        tabWidth: 2
-                                    }
-                                }
-                            ]
-                        };
+                        package.prettier = pkgTemp.prettier;
                     }
 
                     if (answers.addCommitlint) {
                         package.husky.hooks['commit-msg'] = 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS';
+                        package.commitlint = pkgTemp.commitlint;
                     }
 
                     if (answers.supportDecorator) {
@@ -143,26 +145,11 @@ function appUpgrade(projectName) {
                         package.babel.plugins.push('transform-decorators-legacy');
                     }
 
-                    package.commitlint = {
-                        extends: ['@commitlint/config-conventional'],
-                        rules: {
-                            'subject-case': [0],
-                            'scope-case': [0]
-                        }
-                    };
+                    if (!package.stylelint) {
+                        package['stylelint'] = pkgTemp['stylelint'];
+                    }
 
-                    package['lint-staged'] = {
-                        '{app,static}/**/*.{js,jsx,mjs}': [
-                            'node_modules/.bin/eslint --fix',
-                            'node_modules/.bin/prettier --write',
-                            'git add'
-                        ],
-                        '{app,static}/**/*.{css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
-                    };
-
-                    package['stylelint'] = {
-                        extends: 'stylelint-config-recommended'
-                    };
+                    package['lint-staged'] = pkgTemp['lint-staged'];
 
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
@@ -170,6 +157,8 @@ function appUpgrade(projectName) {
                     }
 
                     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
+
+                    process.chdir(root);
 
                     install(
                         Object.keys(newDevDependencies).map(function(key) {

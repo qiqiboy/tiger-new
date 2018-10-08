@@ -28,6 +28,7 @@ var path = require('path');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
 var appUpgrade = require('./upgrade');
+var pkgTemp = require('./packageTemp');
 
 var ownPath = __dirname;
 var oldPath = process.cwd();
@@ -196,70 +197,18 @@ function createApp(name) {
     console.log('即将在 ' + chalk.green(root) + ' 下创建新的开发项目');
     console.log();
 
-    var packageJson = {
-        name: appName,
-        author: projectCustom.author,
-        version: projectCustom.version,
-        private: true,
-        vendor: pkgVendor,
-        noRewrite: !projectCustom.isSpa,
-        proxy: projectCustom.proxy || null,
-        scripts: {
-            start: 'node scripts/start.js',
-            build: 'node scripts/build.js',
-            'build:dev': 'node scripts/build.js --dev',
-            pack: 'npm run build',
-            count: 'node scripts/count.js'
+    var packageJson = Object.assign(
+        {
+            name: appName,
+            author: projectCustom.author,
+            version: projectCustom.version,
+            private: true,
+            vendor: pkgVendor,
+            noRewrite: !projectCustom.isSpa,
+            proxy: projectCustom.proxy || null
         },
-        babel: {
-            presets: ['react-app'],
-            plugins: ['react-hot-loader/babel']
-        },
-        husky: {
-            hooks: {
-                'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
-                'pre-commit': 'lint-staged'
-            }
-        },
-        eslintConfig: {
-            extends: ['react-app', './scripts/config/eslintrc.js']
-        },
-        commitlint: {
-            extends: ['@commitlint/config-conventional'],
-            rules: {
-                'subject-case': [0],
-                'scope-case': [0]
-            }
-        },
-        prettier: {
-            printWidth: 120,
-            tabWidth: 4,
-            parser: 'babylon',
-            trailingComma: 'none',
-            jsxBracketSameLine: true,
-            semi: true,
-            singleQuote: true,
-            overrides: [
-                {
-                    files: '*.json',
-                    options: {
-                        tabWidth: 2
-                    }
-                }
-            ]
-        },
-        'lint-staged': {
-            '{app,static}/**/*.{js,jsx,mjs}': [
-                'node_modules/.bin/eslint --fix',
-                'node_modules/.bin/prettier --write',
-                'git add'
-            ],
-            '{app,static}/**/*.{css,scss,less,json,ts}': ['node_modules/.bin/prettier --write', 'git add']
-        },
-        stylelint: {
-            extends: 'stylelint-config-recommended'
-        }
-    };
+        pkgTemp
+    );
 
     if (projectCustom.supportDecorator) {
         packageJson.babel.plugins.push('transform-decorators-legacy');
