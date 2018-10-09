@@ -35,6 +35,7 @@ checkMissDependencies(spinner).then(
                 .reduce((memo, fileName) => {
                     var contents = fs.readFileSync(fileName);
                     var key = removeFileNameHash(fileName);
+
                     memo[key] = gzipSize(contents);
                     return memo;
                 }, {});
@@ -80,15 +81,16 @@ function getDifferenceLabel(currentSize, previousSize) {
     var FIFTY_KILOBYTES = 1024 * 50;
     var difference = currentSize - previousSize;
     var fileSize = !Number.isNaN(difference) ? filesize(difference) : 0;
+
     if (difference >= FIFTY_KILOBYTES) {
         return chalk.red('+' + fileSize);
     } else if (difference < FIFTY_KILOBYTES && difference > 0) {
         return chalk.yellow('+' + fileSize);
     } else if (difference < 0) {
         return chalk.green(fileSize);
-    } else {
-        return '';
     }
+
+    return '';
 }
 
 // Print a detailed summary of build files.
@@ -101,6 +103,7 @@ function printFileSizes(stats, previousSizeMap) {
             var size = gzipSize(fileContents);
             var previousSize = previousSizeMap[removeFileNameHash(asset.name)];
             var difference = getDifferenceLabel(size, previousSize);
+
             return {
                 folder: path.join(path.basename(paths.appBuild), path.dirname(asset.name)),
                 name: path.basename(asset.name),
@@ -108,15 +111,21 @@ function printFileSizes(stats, previousSizeMap) {
                 sizeLabel: filesize(size) + (difference ? ' (' + difference + ')' : '')
             };
         });
+
     assets.sort((a, b) => b.size - a.size);
+
     var longestSizeLabelLength = Math.max.apply(null, assets.map(a => stripAnsi(a.sizeLabel).length));
+
     assets.forEach(asset => {
         var sizeLabel = asset.sizeLabel;
         var sizeLength = stripAnsi(sizeLabel).length;
+
         if (sizeLength < longestSizeLabelLength) {
             var rightPadding = ' '.repeat(longestSizeLabelLength - sizeLength);
+
             sizeLabel += rightPadding;
         }
+
         console.log('  ' + sizeLabel + '  ' + chalk.dim(asset.folder + path.sep) + chalk.cyan(asset.name));
     });
 }
@@ -174,11 +183,14 @@ function build(previousSizeMap) {
             );
             console.log();
             console.log();
-            spinner.fail(chalk.red('请处理所有的错误和警告后再build代码！'));
 
-            console.log();
-            console.log();
-            process.exit(1);
+            if (!userDevConfig) {
+                spinner.fail(chalk.red('请处理所有的错误和警告后再build代码！'));
+
+                console.log();
+                console.log();
+                process.exit(1);
+            }
         }
 
         spinner.succeed('gzip后可节省大小:');
@@ -189,14 +201,18 @@ function build(previousSizeMap) {
         if (/^http/.test(config.output.publicPath) === false) {
             spinner.succeed(chalk.green('项目打包完成，运行以下命令可即时预览：'));
             console.log();
+
             if (!paths.serve) {
                 console.log(chalk.cyan('npm') + ' install -g serve');
             }
+
             console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
         } else {
             var publicPath = config.output.publicPath;
+
             spinner.succeed('项目打包完成，请确保资源已上传到：' + chalk.green(publicPath) + '.');
         }
+
         console.log();
     });
 

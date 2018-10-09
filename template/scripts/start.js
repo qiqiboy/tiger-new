@@ -40,6 +40,7 @@ checkMissDependencies(spinner).then(
             }
 
             clearConsole();
+
             var existingProcess = getProcessForPort(DEFAULT_PORT);
             var question = [
                 {
@@ -104,6 +105,7 @@ function setupCompiler(host, port, protocol) {
         clearConsole();
 
         var messages = formatWebpackMessages(stats.toJson({}, true));
+
         if (!messages.errors.length && !messages.warnings.length) {
             spinner.succeed(chalk.green('编译通过！'));
             console.log();
@@ -148,6 +150,7 @@ function setupCompiler(host, port, protocol) {
 function onProxyError(proxy) {
     return function(err, req, res) {
         var host = req.headers && req.headers.host;
+
         console.log(
             chalk.red('代理错误：') +
                 '无法将 ' +
@@ -170,12 +173,14 @@ function onProxyError(proxy) {
         if (res.writeHead && !res.headersSent) {
             res.writeHead(500);
         }
+
         res.end('代理错误： 无法将 ' + req.url + ' 的请求从 ' + host + ' 转发到 ' + proxy + ' (' + err.code + ').');
     };
 }
 
 function mayProxy(pathname) {
     const maybePublicPath = path.resolve(paths.appPublic, pathname.slice(1));
+
     return !fs.existsSync(maybePublicPath);
 }
 
@@ -277,6 +282,7 @@ function runDevServer(host, port, protocol) {
         if (host === '0.0.0.0' || host === '::') {
             host = 'localhost';
         }
+
         openBrowser(protocol + '://' + host + ':' + port + '/');
     });
 
@@ -292,6 +298,7 @@ function runDevServer(host, port, protocol) {
 function run(port) {
     var protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
     var host = process.env.HOST || '0.0.0.0';
+
     setupCompiler(host, port, protocol);
     runDevServer(host, port, protocol);
 }
