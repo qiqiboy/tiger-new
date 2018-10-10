@@ -29,7 +29,6 @@ module.exports = {
     prettier: {
         printWidth: 120,
         tabWidth: 4,
-        parser: 'babylon',
         trailingComma: 'none',
         jsxBracketSameLine: true,
         semi: true,
