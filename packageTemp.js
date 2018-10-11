@@ -26,6 +26,11 @@ module.exports = {
             'scope-case': [0]
         }
     },
+    config: {
+        commitizen: {
+            path: 'cz-conventional-changelog'
+        }
+    },
     prettier: {
         printWidth: 120,
         tabWidth: 4,

@@ -149,7 +149,17 @@ function appUpgrade(projectName) {
                         package['stylelint'] = pkgTemp['stylelint'];
                     }
 
-                    package['lint-staged'] = pkgTemp['lint-staged'];
+                    if (!package.config) {
+                        package.config = {};
+
+                        if (!package.config.commitizen) {
+                            package.config.commitizen = pkgTemp.config.commitizen;
+                        }
+                    }
+
+                    if (!package['lint-staged']) {
+                        package['lint-staged'] = pkgTemp['lint-staged'];
+                    }
 
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
