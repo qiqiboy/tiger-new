@@ -318,6 +318,14 @@ function run(appPath, appName) {
             }
         }
     );
+    // editorconfig
+    fs.move(path.join(appPath, 'editorconfig'), path.join(appPath, '.editorconfig'), { overwrite: true }, function(
+        err
+    ) {
+        if (err) {
+            spinner.fail('create editorconfig error!');
+        }
+    });
 
     var templateDependenciesPath = path.join(ownPath, 'dependencies.json');
 
