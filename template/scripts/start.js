@@ -123,6 +123,7 @@ function setupCompiler(host, port, protocol) {
             spinner.fail(chalk.red('编译失败！！'));
             console.log();
             console.log(messages.errors.join('\n\n'));
+            console.log();
         }
 
         // Show warnings if no errors were found.

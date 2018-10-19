@@ -15,6 +15,7 @@ module.exports = {
         'no-whitespace-before-property': 2,
         'padded-blocks': [1, 'never'],
         'one-var-declaration-per-line': [1, 'initializations'],
+        'spaced-comment': [1, 'always'],
         'space-in-parens': [1, 'never'],
         'space-before-function-paren': [
             1,

@@ -9,3 +9,4 @@ bower_components
 /dump.rdb
 Thumbs.db
 buildDev
+.vscode

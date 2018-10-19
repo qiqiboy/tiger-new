@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import Button from '../Button';
 import './style.scss';
 
-class ErrorBox extends Component {
+interface IErrorBoxProps {
+    error: React.ReactNode | Error;
+    onClick?: (ev?: React.SyntheticEvent) => void;
+}
+
+class ErrorBox extends Component<IErrorBoxProps> {
     render() {
         const { error } = this.props;
         const message = error instanceof Error ? error.message : error;
@@ -21,12 +25,6 @@ class ErrorBox extends Component {
             </div>
         );
     }
-
-    static propTypes = {
-        //是否全局
-        error: PropTypes.oneOfType([PropTypes.object, PropTypes.node]).isRequired,
-        onClick: PropTypes.func
-    };
 }
 
 export default ErrorBox;

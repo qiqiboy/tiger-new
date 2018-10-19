@@ -11,6 +11,7 @@ var ImageminPlugin = require('imagemin-webpack-plugin').default;
 var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 var InlineChunkManifestHtmlWebpackPlugin = require('inline-chunk-manifest-html-webpack-plugin');
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var paths = require('./paths');
 var getClientEnvironment = require('./env');
 var pkg = require(paths.appPackageJson);
@@ -104,7 +105,7 @@ var webpackConfig = {
     },
     resolve: {
         modules: ['node_modules', paths.appNodeModules, paths.root].concat(paths.nodePaths),
-        extensions: ['.js', '.json', '.jsx', '.mjs'],
+        extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx'],
         alias: Object.assign(
             {
                 'react-native': 'react-native-web'
@@ -162,6 +163,19 @@ var webpackConfig = {
                         options: {
                             compact: true
                         }
+                    },
+                    {
+                        test: /\.(ts|tsx)$/,
+                        include: paths.appSrc,
+                        use: [
+                            {
+                                loader: 'ts-loader',
+                                options: {
+                                    // disable type checker - we will use it in fork plugin
+                                    transpileOnly: true
+                                }
+                            }
+                        ]
                     },
                     {
                         test: /\.css$/,
@@ -232,6 +246,13 @@ var webpackConfig = {
         new ExtractTextPlugin({
             filename: 'static/css/[name].[contenthash:8].css',
             allChunks: true
+        }),
+        new ForkTsCheckerWebpackPlugin({
+            silent: true,
+            async: false,
+            watch: paths.appSrc,
+            tslint: true,
+            tsconfig: path.resolve(paths.root, 'tsconfig.local.json')
         }),
         new SWPrecacheWebpackPlugin({
             cacheId: pkg.name,

@@ -165,6 +165,7 @@ function build(previousSizeMap) {
             spinner.fail(chalk.red('编译失败！！'));
             console.log();
             console.log(messages.errors.join('\n\n'));
+            console.log();
 
             process.exit(1);
         }

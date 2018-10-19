@@ -17,6 +17,9 @@ function appUpgrade(projectName) {
     var packageJson = path.resolve(root, 'package.json');
     var gulpfile = path.resolve(root, 'gulpfile.js');
     var jsconfig = path.resolve(root, 'jsconfig.json');
+    var tsconfig = path.resolve(root, 'tsconfig.json');
+    var tsconfigLocal = path.resolve(root, 'tsconfig.local.json');
+    var tslint = path.resolve(root, 'tslint.json');
 
     if (!fs.existsSync(root)) {
         spinner.fail(chalk.red(root) + ' 貌似不存在！');
@@ -98,11 +101,26 @@ function appUpgrade(projectName) {
                     copyScripts(root);
                     spinner.succeed('scripts构建目录已更新！');
 
-                    if (!fs.existsSync(jsconfig)) {
-                        fs.copySync(path.resolve(ownPath, 'template/jsconfig.json'), jsconfig, {
+                    if (!fs.existsSync(tsconfig)) {
+                        fs.copySync(path.resolve(ownPath, 'template/tsconfig.json'), tsconfig, {
                             overwrite: true
                         });
-                        spinner.succeed('jsconfig.json已写入！');
+                        spinner.succeed('tsconfig.json已写入！');
+
+                        fs.copySync(path.resolve(ownPath, 'template/tsconfig.local.json'), tsconfigLocal, {
+                            overwrite: true
+                        });
+                        spinner.succeed('tsconfig.local.json已写入！');
+
+                        fs.copySync(path.resolve(ownPath, 'template/tslint.json'), tslint, {
+                            overwrite: true
+                        });
+                        spinner.succeed('tslint.json已写入！');
+
+                        if (fs.existsSync(jsconfig)) {
+                            fs.removeSync(jsconfig);
+                            spinner.succeed('jsconfig.json已移除！');
+                        }
                     }
 
                     if (answers.rmGulpfile) {

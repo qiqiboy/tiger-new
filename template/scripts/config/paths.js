@@ -26,7 +26,8 @@ glob.sync(resolveApp('app/!(_)*.js?(x)')).forEach(function(file) {
 var alias = {
     components: resolveApp('app/components'),
     modules: resolveApp('app/modules'),
-    utils: resolveApp('app/utils')
+    utils: resolveApp('app/utils'),
+    stores: resolveApp('app/stores')
 };
 
 // config after eject: we're in ./config/

@@ -8,6 +8,7 @@ var InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 var WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 var eslintFormatter = require('react-dev-utils/eslintFormatter');
 var DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var getClientEnvironment = require('./env');
 var paths = require('./paths');
 var pkg = require(paths.appPackageJson);
@@ -69,7 +70,7 @@ var webpackConfig = {
     },
     resolve: {
         modules: ['node_modules', paths.appNodeModules, paths.root].concat(paths.nodePaths),
-        extensions: ['.js', '.json', '.jsx', '.mjs'],
+        extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx'],
         alias: Object.assign(
             {
                 'react-native': 'react-native-web'
@@ -129,6 +130,19 @@ var webpackConfig = {
                         }
                     },
                     {
+                        test: /\.(ts|tsx)$/,
+                        include: paths.appSrc,
+                        use: [
+                            {
+                                loader: 'ts-loader',
+                                options: {
+                                    // disable type checker - we will use it in fork plugin
+                                    transpileOnly: true
+                                }
+                            }
+                        ]
+                    },
+                    {
                         test: /\.css$/,
                         use: getCssRule()
                     },
@@ -171,7 +185,13 @@ var webpackConfig = {
         new CaseSensitivePathsPlugin(),
         new WatchMissingNodeModulesPlugin(paths.appNodeModules),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new webpack.BannerPlugin('@author ' + pkg.author)
+        new webpack.BannerPlugin('@author ' + pkg.author),
+        new ForkTsCheckerWebpackPlugin({
+            async: false,
+            watch: paths.appSrc,
+            tslint: true,
+            tsconfig: path.resolve(paths.root, 'tsconfig.local.json')
+        })
     ]),
     node: {
         dgram: 'empty',

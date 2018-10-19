@@ -1,23 +1,22 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import classlist from 'utils/classlist';
 import { Fade } from '../Transition';
 import './style.scss';
 
-class Button extends Component {
-    static propTypes = {
-        className: PropTypes.string,
-        disabled: PropTypes.bool.isRequired,
-        block: PropTypes.bool.isRequired,
-        active: PropTypes.bool.isRequired,
-        size: PropTypes.oneOf(['lg', 'md', 'sm', 'xs']).isRequired,
-        link: PropTypes.bool.isRequired,
-        href: PropTypes.string,
-        type: PropTypes.oneOf(['primary', 'danger', 'success', 'info', 'default', 'warning']),
-        isLoading: PropTypes.bool.isRequired,
-        loading: PropTypes.bool.isRequired
-    };
+interface IButtonProps extends React.ButtonHTMLAttributes<any> {
+    className?: string;
+    disabled?: boolean;
+    block?: boolean;
+    active?: boolean;
+    size?: 'lg' | 'md' | 'sm' | 'xs';
+    link?: boolean;
+    href?: string;
+    type?: 'primary' | 'danger' | 'success' | 'info' | 'default' | 'warning';
+    isLoading?: boolean;
+    loading?: boolean;
+}
 
+class Button extends Component<IButtonProps> {
     static defaultProps = {
         isLoading: false,
         loading: false,
@@ -43,7 +42,7 @@ class Button extends Component {
             ...restProps
         } = this.props;
 
-        const Base = typeof this.props.href === 'string' ? 'a' : 'button';
+        const Base: string = typeof this.props.href === 'string' ? 'a' : 'button';
 
         return (
             <Base
