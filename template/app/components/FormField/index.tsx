@@ -1,5 +1,4 @@
 import React, { Component, isValidElement } from 'react';
-import PropTypes from 'prop-types';
 import ReactFormutil, { EasyField, connect } from 'react-formutil';
 import classlist from 'utils/classlist';
 import './style.scss';
@@ -17,12 +16,6 @@ interface IFormFieldProps extends ReactFormutil.EasyFieldComponentProps {
 // @ts-ignore
 @connect
 class FormField extends Component<IFormFieldProps> {
-    static propTypes = {
-        content: PropTypes.oneOfType([PropTypes.node, PropTypes.func]), // 表单元素后方额外的内容
-        label: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.func]), // 表单元素前方额外的内容
-        controlClass: PropTypes.string // 传递给表单元素的额外的className
-    };
-
     render() {
         const { $formutil, content, className, controlClass, label, ...others } = this.props;
         const { $weakErrors, $weakFocuses, $weakDirts, $weakStates } = $formutil;

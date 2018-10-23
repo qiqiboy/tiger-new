@@ -13,6 +13,7 @@ interface IError extends Error {
 
 interface IHttpConfig extends AxiosRequestConfig {
     useJson: boolean;
+    noToken: boolean;
 }
 
 interface IData {

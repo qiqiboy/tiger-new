@@ -187,6 +187,7 @@ var webpackConfig = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.BannerPlugin('@author ' + pkg.author),
         new ForkTsCheckerWebpackPlugin({
+            silent: true,
             async: false,
             watch: paths.appSrc,
             tslint: true,

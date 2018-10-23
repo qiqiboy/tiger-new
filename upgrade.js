@@ -20,6 +20,7 @@ function appUpgrade(projectName) {
     var tsconfig = path.resolve(root, 'tsconfig.json');
     var tsconfigLocal = path.resolve(root, 'tsconfig.local.json');
     var tslint = path.resolve(root, 'tslint.json');
+    var globalDeclare = path.resolve(root, 'global.d.ts');
 
     if (!fs.existsSync(root)) {
         spinner.fail(chalk.red(root) + ' 貌似不存在！');
@@ -99,33 +100,40 @@ function appUpgrade(projectName) {
                     console.log();
 
                     copyScripts(root);
-                    spinner.succeed('scripts构建目录已更新！');
+                    spinner.succeed(chalk.green('scripts构建目录已更新！'));
 
                     if (!fs.existsSync(tsconfig)) {
                         fs.copySync(path.resolve(ownPath, 'template/tsconfig.json'), tsconfig, {
                             overwrite: true
                         });
-                        spinner.succeed('tsconfig.json已写入！');
+                        spinner.succeed(chalk.green('tsconfig.json已写入！'));
 
                         fs.copySync(path.resolve(ownPath, 'template/tsconfig.local.json'), tsconfigLocal, {
                             overwrite: true
                         });
-                        spinner.succeed('tsconfig.local.json已写入！');
+                        spinner.succeed(chalk.green('tsconfig.local.json已写入！'));
 
                         fs.copySync(path.resolve(ownPath, 'template/tslint.json'), tslint, {
                             overwrite: true
                         });
-                        spinner.succeed('tslint.json已写入！');
+                        spinner.succeed(chalk.green('tslint.json已写入！'));
 
                         if (fs.existsSync(jsconfig)) {
                             fs.removeSync(jsconfig);
-                            spinner.succeed('jsconfig.json已移除！');
+                            spinner.succeed(chalk.red('jsconfig.json已移除！'));
                         }
+                    }
+
+                    if (!fs.existsSync(globalDeclare)) {
+                        fs.copySync(path.resolve(ownPath, 'template/global.d.ts'), globalDeclare, {
+                            overwrite: true
+                        });
+                        spinner.succeed(chalk.green('global.d.ts已写入！'));
                     }
 
                     if (answers.rmGulpfile) {
                         fs.removeSync(gulpfile);
-                        spinner.succeed('gulpfile.js 已删除！');
+                        spinner.succeed(chalk.red('gulpfile.js 已删除！'));
                     }
 
                     console.log();
