@@ -20,6 +20,7 @@ var entries = {};
 
 glob.sync(resolveApp('app/!(_)*.js?(x)')).forEach(function(file) {
     var basename = path.basename(file).replace(/\.jsx?$/, '');
+
     entries[basename] = file;
 });
 
@@ -27,7 +28,8 @@ var alias = {
     components: resolveApp('app/components'),
     modules: resolveApp('app/modules'),
     utils: resolveApp('app/utils'),
-    stores: resolveApp('app/stores')
+    stores: resolveApp('app/stores'),
+    types: resolveApp('app/types')
 };
 
 // config after eject: we're in ./config/
