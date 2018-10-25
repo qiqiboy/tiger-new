@@ -1,16 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import Icon from 'components/Icon';
+// import Icon from 'components/Icon';
 import Portal from 'components/Portal';
 import { Flow, Fade } from 'components/Transition';
 import './style.scss';
 
-class Iframe extends Component {
-    static propTypes = {
-        onClose: PropTypes.func.isRequired, //关闭按钮点击的回调
-        src: PropTypes.string.isRequired //页面地址
-    };
+interface IIframeProps {
+    onClose(ev: React.MouseEvent): void;
+    src: string;
+    in?: boolean;
+}
 
+class Iframe extends Component<IIframeProps> {
     render() {
         const { src, onClose } = this.props;
 
@@ -23,7 +23,7 @@ class Iframe extends Component {
                                 <iframe title="tiger brokers" className="iframe" src={src} frameBorder="0" />
                             </div>
                             <div className="close" onClick={onClose}>
-                                <Icon name="clear" />
+                                {/*<Icon name="clear" />*/}
                             </div>
                         </div>
                     </Portal>

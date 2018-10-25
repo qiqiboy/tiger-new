@@ -78,6 +78,7 @@ checkMissDependencies(spinner).then(
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+    console.log();
     process.exit(1);
 }
 

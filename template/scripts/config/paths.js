@@ -18,8 +18,8 @@ var nodePaths = (process.env.NODE_PATH || '')
 
 var entries = {};
 
-glob.sync(resolveApp('app/!(_)*.js?(x)')).forEach(function(file) {
-    var basename = path.basename(file).replace(/\.jsx?$/, '');
+glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function(file) {
+    var basename = path.basename(file).replace(/\.[jt]sx?$/, '');
 
     entries[basename] = file;
 });
@@ -39,7 +39,7 @@ module.exports = {
     appBuildDev: resolveApp('buildDev'),
     appPublic: resolveApp('public'),
     appHtml: resolveApp('public/index.html'),
-    appIndexJs: resolveApp('app/index.js'),
+    appIndexJs: Object.values(entries)[0] || resolveApp('app/index.js'),
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('app'),
     staticSrc: resolveApp('static'),

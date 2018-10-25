@@ -1,7 +1,12 @@
 import { Component } from 'react';
-import PropTypes from 'prop-types';
 
-class Title extends Component {
+interface ITitleProps {
+    title: string;
+}
+
+class Title extends Component<ITitleProps> {
+    preTitle: string;
+
     componentDidMount() {
         this.preTitle = document.title;
 
@@ -9,16 +14,12 @@ class Title extends Component {
     }
 
     componentWillUnmount() {
-        //document.title = this.preTitle;
+        // document.title = this.preTitle;
     }
 
     render() {
         return null;
     }
-
-    static propTypes = {
-        title: PropTypes.string.isRequired
-    };
 }
 
 export default Title;

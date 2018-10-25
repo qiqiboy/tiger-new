@@ -23,7 +23,7 @@ var injects = [
     })
 ];
 
-var matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.jsx?)?\s*-->/g;
+var matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.[jt]sx?)?\s*-->/g;
 
 paths.pageEntries.forEach(function(name) {
     var chunks = ['vendor'];

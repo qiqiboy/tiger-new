@@ -6,7 +6,9 @@ class App extends Component {
         return (
             <div className="first-app">
                 <h3 className="title">tiger-new</h3>
-                <p>To get started, edit <code>app/index.js</code> and save to reload.</p>
+                <p>
+                    To get started, edit <code>app/index.js</code> and save to reload.
+                </p>
             </div>
         );
     }

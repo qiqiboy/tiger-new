@@ -2,7 +2,13 @@ import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import './style.scss';
 
-class Portal extends Component {
+interface IPortalProps {
+    className?: string;
+}
+
+class Portal extends Component<IPortalProps> {
+    container: Element;
+
     componentWillUnmount() {
         if (this.container) {
             document.body.removeChild(this.container);
