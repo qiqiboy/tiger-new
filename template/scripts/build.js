@@ -67,7 +67,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 if (userDevConfig) {
     process.env.NODE_ENV = 'development';
     config.output.path = paths.appBuild = paths.appBuildDev;
-    config.output.publicPath = pkg.noRewrite ? './' : '/';
+    config.output.publicPath = pkg.noRewrite ? './' : path.join(pkg.basename || '', '/');
 }
 
 // Input: /User/dan/app/build/static/js/main.82be8.js
@@ -150,7 +150,7 @@ function build(previousSizeMap) {
     };
 
     webpack(config).run((err, stats) => {
-        logProgress(true); //停止
+        logProgress(true); // 停止
         console.log();
 
         if (err) {
@@ -230,7 +230,7 @@ function copyPublicFolder() {
             var isDirectory = fs.statSync(file).isDirectory();
 
             return isDirectory
-                ? basename !== 'layout' //layout目录不复制
+                ? basename !== 'layout' // layout目录不复制
                 : !paths.pageEntries.find(name => name + '.html' === relative);
         }
     });

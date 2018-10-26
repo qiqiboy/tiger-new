@@ -103,13 +103,13 @@ if (program.upgrade) {
                         { name: 'jquery + react 项目', value: 3 }
                     ],
                     message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
-                    default: 3
+                    default: 2
                 },
                 {
                     name: 'supportDecorator',
                     type: 'confirm',
                     message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
-                    default: false
+                    default: true
                 },
                 {
                     name: 'proxy',
@@ -123,7 +123,7 @@ if (program.upgrade) {
                     name: 'isSpa',
                     type: 'confirm',
                     message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
-                    default: false
+                    default: true
                 },
                 {
                     name: 'enableSW',

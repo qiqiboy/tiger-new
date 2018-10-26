@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import Portal from 'components/Portal';
 import classlist from 'utils/classlist';
 import './style.scss';
 
-class Loading extends Component {
+interface ILoadingProps {
+    className?: string;
+    global: boolean;
+}
+
+class Loading extends Component<ILoadingProps> {
     _render() {
         return (
             <div className={classlist('loading-container', this.props.className)}>
@@ -26,11 +30,6 @@ class Loading extends Component {
 
     static defaultProps = {
         global: false
-    };
-
-    static propTypes = {
-        //是否全局
-        global: PropTypes.bool.isRequired
     };
 }
 

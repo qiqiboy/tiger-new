@@ -23,9 +23,9 @@ function ensureSlash(path, needsSlash) {
         return path.substr(path, path.length - 1);
     } else if (!hasSlash && needsSlash) {
         return path + '/';
-    } else {
-        return path;
     }
+
+        return path;
 }
 
 var relativeRoot = pkg.noRewrite ? '.' : '';
@@ -91,7 +91,7 @@ paths.pageEntries.forEach(function(name) {
 
 var webpackConfig = {
     bail: true,
-    //devtool: 'hidden-source-map', //如果需要source map，可以取消注释。并且将下方UglifyJSPlugin的sourceMap配置打开true
+    // devtool: 'hidden-source-map', //如果需要source map，可以取消注释。并且将下方UglifyJSPlugin的sourceMap配置打开true
     entry: Object.assign(paths.entries, {
         vendor: [require.resolve('./polyfills')].concat(pkg.vendor || [])
     }),
@@ -220,7 +220,7 @@ var webpackConfig = {
         new webpack.HashedModuleIdsPlugin(),
         new ImageminPlugin({
             pngquant: {
-                //quality: '95-100'
+                // quality: '95-100'
             }
         }),
         new webpack.optimize.ModuleConcatenationPlugin(),
@@ -279,7 +279,7 @@ var webpackConfig = {
             stripPrefix: 'build/',
 
             // For unknown URLs, fallback to the index page
-            navigateFallback: relativeRoot + '/index.html',
+            navigateFallback: relativeRoot + path.join(pkg.basename || '', '/index.html'),
             // Ignores URLs starting from /__ (useful for Firebase):
             // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
             navigateFallbackWhitelist: [/^(?!\/__).*/],
