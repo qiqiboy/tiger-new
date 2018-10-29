@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["es6", "dom"],
     "allowJs": true,
     "checkJs": true,
     "module": "esnext",
@@ -13,6 +12,7 @@
     "allowUnreachableCode": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": false,

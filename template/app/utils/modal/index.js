@@ -26,7 +26,7 @@ const defaultSettings = {
     windowClass: null,
     windowTopClass: null,
     component: null,
-    size: 'lg', //lg md sm dialog,
+    size: 'lg', // lg md sm dialog,
     backdrop: true,
     animation: false,
     animationDuration: 500
@@ -55,7 +55,7 @@ export const open = (settings = {}) => {
 
     let withResolve, withReject, instance, destroying;
 
-    //销毁组件
+    // 销毁组件
     const destroy = () => {
         if (destroying) {
             return;
@@ -63,7 +63,7 @@ export const open = (settings = {}) => {
 
         destroying = true;
 
-        //绑定离开时动画
+        // 绑定离开时动画
         makeAnimation(animationElements, 'leave', settings.animation, settings.animationDuration).then(() => {
             unmountComponentAtNode(modalElement);
 
@@ -131,7 +131,7 @@ export const open = (settings = {}) => {
 
     render(null, () => {
         animationElements.push(modalElement.children[0]);
-        //绑定进入时动画
+        // 绑定进入时动画
         makeAnimation(animationElements, 'enter', settings.animation, settings.animationDuration);
     });
 

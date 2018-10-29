@@ -1,7 +1,7 @@
 import React, { isValidElement } from 'react';
 import './style.scss';
 
-const noop = function() {}; //new Function
+const noop = function() {}; // new Function
 
 const DialogContainer = ({ title, content: Content, close, btns, dismiss }) => {
     const buttons = btns.map(({ text = '', className = '', click = noop }, index) => {

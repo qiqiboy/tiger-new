@@ -1,11 +1,11 @@
-/*eslint no-invalid-this: 0 */
+/* eslint no-invalid-this: 0 */
 import React, { isValidElement, Component } from 'react';
 import PropTypes from 'prop-types';
 
 class ModalContainer extends Component {
     render() {
         const { size, component: MyComponent, windowClass } = this.props;
-        //const MyComponent = component;
+        // const MyComponent = component;
         let classes = ['modal-container', `modal-${size}`];
 
         if (windowClass) {

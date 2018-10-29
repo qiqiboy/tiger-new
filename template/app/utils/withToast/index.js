@@ -29,7 +29,7 @@ export default function(WrappedComponent) {
 
                 clearTimeout(this.toastTimer);
 
-                //1s后清除显示
+                // 1s后清除显示
                 this.toastTimer = setTimeout(
                     () =>
                         this.setState(
