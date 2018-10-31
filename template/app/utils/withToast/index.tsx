@@ -4,18 +4,27 @@ import Portal from 'components/Portal';
 import Loading from 'components/Loading';
 import './style.scss';
 
+export interface IToastProps {
+    showToast(error: string | Error, timeout?: number): Promise<any>;
+    showToastLoading(loadingText?: string): void;
+    hideToastLoading(): void;
+}
+
 /**
  * @desc 对表单提供统一的逻辑处理
  *  当前支持：短暂错误浮窗展示 showToast
  *
  *  可以参考登录模块
  */
-export default function(WrappedComponent) {
-    return class extends Component {
+export default function withToast(WrappedComponent) {
+    return class WithToast extends Component {
+        toastTimer: NodeJS.Timer;
+
         state = {
             showToast: false,
             showToastLoading: false,
-            errorMsg: null
+            errorMsg: null,
+            loadingText: ''
         };
 
         showToast = (error, timeout = 1500) =>

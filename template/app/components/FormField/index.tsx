@@ -3,22 +3,23 @@ import ReactFormutil, { EasyField, connect } from 'react-formutil';
 import classlist from 'utils/classlist';
 import './style.scss';
 
-type stateCall = ($state?: ReactFormutil.FieldState) => React.ReactNode;
+type TRender<T, P> = ($state: ReactFormutil.FieldState<T, P>) => React.ReactNode;
 
-interface IFormFieldProps extends ReactFormutil.EasyFieldComponentProps {
-    label?: string | React.ReactElement<any> | stateCall;
-    content?: React.ReactNode | stateCall;
-    controlClass?: string;
-    className?: string;
-    $formutil: ReactFormutil.$Formutil;
+interface IFormFieldProps<T, P, K, D> extends ReactFormutil.EasyFieldComponentProps<T, P, K, D> {
+    label: string | React.ReactElement<any> | TRender<T, P>;
+    content: React.ReactNode | TRender<T, P>;
+    controlClass: string;
+    className: string;
+    $formutil: ReactFormutil.$Formutil<K, P, D>;
+    [key: string]: any;
 }
 
 // @ts-ignore
 @connect
-class FormField extends Component<IFormFieldProps> {
+class FormField<T = any, P = {}, K = {}, D = K> extends Component<Partial<IFormFieldProps<T, P, K, D>>> {
     render() {
         const { $formutil, content, className, controlClass, label, ...others } = this.props;
-        const { $weakErrors, $weakFocuses, $weakDirts, $weakStates } = $formutil;
+        const { $weakErrors, $weakFocuses, $weakDirts, $weakStates } = $formutil!;
         const name = others.name as string;
         const hasError = $weakErrors[name] && $weakDirts[name];
 
@@ -42,7 +43,7 @@ class FormField extends Component<IFormFieldProps> {
                 />
                 {hasError &&
                     $weakFocuses[name] && <div className="form-field-error">{Object.values($weakErrors[name])[0]}</div>}
-                {content && (typeof content === 'function' ? (content as stateCall)($weakStates[name]) : content)}
+                {content && (typeof content === 'function' ? (content as TRender<T, P>)($weakStates[name]) : content)}
             </div>
         );
     }

@@ -10,7 +10,9 @@ export default function createWithPreload(config) {
             static displayName = 'WithPreload-' + (WrappedComponent.displayName || WrappedComponent.name);
 
             state = {
-                loading: true
+                loading: true,
+                error: null,
+                data: null
             };
 
             componentDidMount() {
