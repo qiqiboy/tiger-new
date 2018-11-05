@@ -4,9 +4,15 @@ import Loading from 'components/Loading';
 import ErrorBox from 'components/ErrorBox';
 import './style.scss';
 
-export default function createWithPreload(config) {
-    return function withPreload(WrappedComponent) {
-        return class extends Component {
+interface IInjected {
+    loadData: any;
+}
+
+export default function createWithPreload(config: object) {
+    return function withPreload<Self = {}>(
+        WrappedComponent: React.ComponentType<Self & IInjected>
+    ): React.ComponentClass<Self> {
+        return class extends Component<Self> {
             static displayName = 'WithPreload-' + (WrappedComponent.displayName || WrappedComponent.name);
 
             state = {

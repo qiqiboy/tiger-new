@@ -4,9 +4,11 @@ import Portal from 'components/Portal';
 import Loading from 'components/Loading';
 import './style.scss';
 
+type TError = string | Error;
+
 export interface IToastProps {
-    showToast(error: string | Error, timeout?: number): Promise<any>;
-    showToastLoading(loadingText?: string): void;
+    showToast(error: TError, timeout?: number): Promise<any>;
+    showToastLoading(loadingText: React.ReactNode): void;
     hideToastLoading(): void;
 }
 
@@ -16,15 +18,15 @@ export interface IToastProps {
  *
  *  可以参考登录模块
  */
-export default function withToast(WrappedComponent) {
-    return class WithToast extends Component {
-        toastTimer: NodeJS.Timer;
+export default function<Self = {}>(WrappedComponent: React.ComponentType<Self & IToastProps>): React.ComponentClass<Self> {
+    return class extends Component<Self> {
+        toastTimer: NodeJS.Timeout;
 
         state = {
             showToast: false,
             showToastLoading: false,
             errorMsg: null,
-            loadingText: ''
+            loadingText: null
         };
 
         showToast = (error, timeout = 1500) =>
