@@ -1,25 +1,33 @@
 // 文档查看：https://github.com/mzabriskie/axios
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
+declare module 'axios' {
+    // tslint:disable-next-line
+    interface AxiosRequestConfig {
+        useJson?: boolean;
+        noToken?: boolean;
+    }
+
+    // tslint:disable-next-line
+    interface AxiosResponse {
+        [key: string]: any;
+    }
+}
+
 export default axios;
 
-type ErrorCode = number | string | undefined;
-type ErrorMsg = string | undefined;
+type ErrorCode = number | string;
+type ErrorMsg = string;
 interface IError extends Error {
     error_code: ErrorCode;
     error_msg: ErrorMsg;
     response: AxiosResponse;
 }
 
-interface IHttpConfig extends AxiosRequestConfig {
-    useJson: boolean;
-    noToken: boolean;
-}
-
 interface IData {
     error_msg?: ErrorMsg;
     error_description?: ErrorMsg;
-    error_message? : ErrorMsg;
+    error_message?: ErrorMsg;
     message?: ErrorMsg;
     description?: ErrorMsg;
     msg?: ErrorMsg;
@@ -59,7 +67,7 @@ function dataSerializer(data: object | string) {
     return result.join('&');
 }
 
-axios.interceptors.request.use((config: IHttpConfig) => {
+axios.interceptors.request.use((config: AxiosRequestConfig) => {
     if (!config.timeout) {
         config.timeout = 60 * 1000;
     }
@@ -105,9 +113,9 @@ axios.interceptors.response.use((response: AxiosResponse) => {
  *
  * @return {promise}
  */
-function createError(responseError: AxiosError) {
-    let error_code: ErrorCode;
-    let error_msg: ErrorMsg;
+function createError(responseError: AxiosError): Promise<any> {
+    let error_code!: ErrorCode;
+    let error_msg!: ErrorMsg;
     let response: AxiosResponse = {} as AxiosResponse;
 
     const pickError = function(data: IData) {
@@ -179,5 +187,5 @@ function createError(responseError: AxiosError) {
     error.error_msg = error_msg;
     error.response = response;
 
-    return Promise.reject(error as IError);
+    return Promise.reject(error);
 }

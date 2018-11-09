@@ -137,7 +137,11 @@ function setupCompiler(host, port, protocol) {
             // Teach some ESLint tricks.
             console.log('搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
             console.log(
-                '如果要忽略警告, 可以将 ' + chalk.cyan('// eslint-disable-next-line') + ' 添加到产生警告的代码行上方'
+                '如果要忽略警告, 可以将 ' +
+                    chalk.cyan('// eslint-disable-next-line') +
+                    ' 或 ' +
+                    chalk.cyan('// tslint:disable-next-line') +
+                    ' 添加到产生警告的代码行上方'
             );
         }
 
