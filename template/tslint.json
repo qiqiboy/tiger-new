@@ -2,6 +2,6 @@
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier", "./scripts/config/tslintrc.json"],
   "defaultSeverity": "warning",
   "linterOptions": {
-    "exclude": ["node_modules", "**/*.{js,jsx,mjs}"]
+    "exclude": ["node_modules", "**/*.{js,jsx,mjs,json}"]
   }
 }
