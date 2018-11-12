@@ -3,6 +3,8 @@
 // 该功能将会赋予app离线访问的能力
 // 但是离线访问只能在N+1次访问后才可以，即如果初次访问，离线功能将不会生效
 
+import pkg from 'package.json';
+import path from 'path';
 import './style.scss';
 
 const isLocalhost = Boolean(
@@ -17,12 +19,12 @@ const isLocalhost = Boolean(
 export default function register() {
     if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            const swUrl = process.env.SPA ? `/service-worker.js` : `./service-worker.js`;
+            const swUrl = pkg.noRewrite ? './' : path.join(pkg.basename || '', '/') + 'service-worker.js';
 
             if (isLocalhost) {
                 // 本地环境，检查SW是否还在，因为本地可能多个项目，前后会运行在同一个端口，彼此间是否开启sw会相互产生影响
                 checkValidServiceWorker(swUrl);
-            } else {
+            } else { console.log(swUrl)
                 registerValidSW(swUrl);
             }
         });

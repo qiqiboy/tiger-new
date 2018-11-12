@@ -1,7 +1,6 @@
 var checkDependencies = require('check-dependencies');
 var inquirer = require('react-dev-utils/inquirer');
 var spawn = require('cross-spawn');
-var fs = require('fs-extra');
 var chalk = require('chalk');
 var paths = require('./paths');
 

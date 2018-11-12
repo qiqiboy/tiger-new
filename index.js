@@ -211,7 +211,7 @@ function createApp(name) {
     );
 
     if (projectCustom.supportDecorator) {
-        packageJson.babel.plugins.push('transform-decorators-legacy');
+        packageJson.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
     }
 
     if (projectCustom.useCdn) {

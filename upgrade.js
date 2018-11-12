@@ -168,11 +168,22 @@ function appUpgrade(projectName) {
                         if (!package.babel.plugins) {
                             package.babel.plugins = [];
                         }
-                        package.babel.plugins.push('transform-decorators-legacy');
+                        package.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
                     }
 
                     if (!package.stylelint) {
                         package['stylelint'] = pkgTemp['stylelint'];
+                    }
+
+                    if (!package.browserslist) {
+                        package['browserslist'] = pkgTemp['browserslist'];
+                    }
+
+                    if (package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
+                        package.babel.plugins.splice(package.babel.plugins.indexOf('transform-decorators-legacy'), 1, [
+                            '@babel/plugin-proposal-decorators',
+                            { legacy: true }
+                        ]);
                     }
 
                     if (!package.config) {

@@ -6,6 +6,7 @@
 module.exports = {
     rules: {
         'react/jsx-no-target-blank': 0,
+        'jsx-a11y/anchor-is-valid': 0,
         eqeqeq: [1, 'smart'],
         radix: 0,
         'no-script-url': 0,
