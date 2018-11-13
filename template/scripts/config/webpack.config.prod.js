@@ -363,7 +363,8 @@ module.exports = {
                 checkSyntacticErrors: true,
                 tsconfig: paths.appTsConfig,
                 compilerOptions: {
-                    jsx: 'preserve'
+                    jsx: 'preserve',
+                    checkJs: false
                 },
                 reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
                 watch: paths.appSrc,
