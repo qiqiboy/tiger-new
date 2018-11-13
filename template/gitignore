@@ -5,8 +5,14 @@
 .DS_Store
 node_modules
 bower_components
-/npm-debug.log
 /dump.rdb
 Thumbs.db
-buildDev
+/buildDev
 .vscode
+
+.env.local
+.env.*.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

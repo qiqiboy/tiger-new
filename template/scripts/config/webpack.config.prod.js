@@ -186,12 +186,32 @@ module.exports = {
             {
                 oneOf: [
                     {
+                        test: /\.html$/,
+                        loader: require.resolve('html-loader'),
+                        options: {
+                            url: true,
+                            import: true
+                        }
+                    },
+                    {
                         test: /\.(js|mjs|jsx|ts|tsx)$/,
                         include: paths.appSrc,
 
                         loader: require.resolve('babel-loader'),
                         options: {
                             customize: require.resolve('babel-preset-react-app/webpack-overrides'),
+                            plugins: [
+                                [
+                                    require.resolve('babel-plugin-named-asset-import'),
+                                    {
+                                        loaderMap: {
+                                            svg: {
+                                                ReactComponent: '@svgr/webpack?-prettier,-svgo![path]'
+                                            }
+                                        }
+                                    }
+                                ]
+                            ],
                             cacheDirectory: true,
                             cacheCompression: true,
                             compact: true
@@ -345,7 +365,7 @@ module.exports = {
                 compilerOptions: {
                     jsx: 'preserve'
                 },
-                reportFiles: ['**', '!**/*.json', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
+                reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
                 watch: paths.appSrc,
                 silent: true,
                 formatter: typescriptFormatter
@@ -395,7 +415,8 @@ function getStyleLoaders(cssOptions, preProcessor) {
         loaders.push({
             loader: require.resolve(preProcessor),
             options: {
-                sourceMap: shouldUseSourceMap
+                sourceMap: shouldUseSourceMap,
+                javascriptEnabled: true
             }
         });
     }
@@ -413,14 +434,4 @@ function ensureSlash(path, needsSlash) {
     }
 
     return path;
-}
-
-function recursiveIssuer(m) {
-    if (m.issuer) {
-        return recursiveIssuer(m.issuer);
-    } else if (m.name) {
-        return m.name;
-    }
-
-    return false;
 }

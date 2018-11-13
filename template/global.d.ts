@@ -6,6 +6,9 @@ declare module '*.jpeg'
 declare module '*.gif'
 declare module '*.bmp'
 declare module '*.tiff'
+declare module '*.html'
+declare module '*.txt'
+declare module '*.htm'
 
 /**
  * From T delete a set of properties P

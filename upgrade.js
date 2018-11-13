@@ -87,7 +87,7 @@ function appUpgrade(projectName) {
                     });
                 }
 
-                if (!package.babel.plugins || package.babel.plugins.indexOf('transform-decorators-legacy') === -1) {
+                if (!package.babel.plugins) {
                     questions.push({
                         name: 'supportDecorator',
                         type: 'confirm',
@@ -108,11 +108,6 @@ function appUpgrade(projectName) {
                         });
                         spinner.succeed(chalk.green('tsconfig.json已写入！'));
 
-                        fs.copySync(path.resolve(ownPath, 'template/tsconfig.local.json'), tsconfigLocal, {
-                            overwrite: true
-                        });
-                        spinner.succeed(chalk.green('tsconfig.local.json已写入！'));
-
                         fs.copySync(path.resolve(ownPath, 'template/tslint.json'), tslint, {
                             overwrite: true
                         });
@@ -122,6 +117,11 @@ function appUpgrade(projectName) {
                             fs.removeSync(jsconfig);
                             spinner.succeed(chalk.red('jsconfig.json已移除！'));
                         }
+                    }
+
+                    if (fs.existsSync(tsconfigLocal)) {
+                        fs.removeSync(tsconfigLocal);
+                        spinner.succeed(chalk.red('tsconfig.local.json已移除！'));
                     }
 
                     if (!fs.existsSync(globalDeclare)) {

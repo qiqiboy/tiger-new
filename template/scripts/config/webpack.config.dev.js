@@ -138,6 +138,18 @@ module.exports = {
                         loader: require.resolve('babel-loader'),
                         options: {
                             customize: require.resolve('babel-preset-react-app/webpack-overrides'),
+                            plugins: [
+                                [
+                                    require.resolve('babel-plugin-named-asset-import'),
+                                    {
+                                        loaderMap: {
+                                            svg: {
+                                                ReactComponent: '@svgr/webpack?-prettier,-svgo![path]'
+                                            }
+                                        }
+                                    }
+                                ]
+                            ],
                             cacheDirectory: true,
                             cacheCompression: false
                         }
@@ -232,7 +244,7 @@ module.exports = {
                 compilerOptions: {
                     jsx: 'preserve'
                 },
-                reportFiles: ['**', '!**/*.json', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
+                reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
                 watch: paths.appSrc,
                 silent: true,
                 formatter: typescriptFormatter
@@ -277,7 +289,12 @@ function getStyleLoaders(cssOptions, preProcessor) {
     ];
 
     if (preProcessor) {
-        loaders.push(require.resolve(preProcessor));
+        loaders.push({
+            loader: require.resolve(preProcessor),
+            options: {
+                javascriptEnabled: true
+            }
+        });
     }
 
     return loaders;

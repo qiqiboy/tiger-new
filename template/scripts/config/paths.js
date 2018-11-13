@@ -43,7 +43,7 @@ module.exports = {
     appIndexJs: Object.values(entries)[0] || resolveApp('app/index.js'),
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('app'),
-    appTsConfig: resolveApp('tsconfig.local.json'),
+    appTsConfig: resolveApp('tsconfig.json'),
     staticSrc: resolveApp('static'),
     proxySetup: resolveApp('setupProxy.js'),
     appNodeModules: resolveApp('node_modules'),
