@@ -1,4 +1,5 @@
 # tiger-new
+[![npm](https://img.shields.io/npm/v/tiger-new.svg?style=flat)](https://npm.im/tiger-new)
 
 快速生成一个标准开发项目的 CLI。(本项目自 facebook 官方出品的 [create-react-app](https://github.com/facebookincubator/create-react-app) 修改而来)
 
@@ -17,6 +18,13 @@
 更多特性及使用细节请安装后创建项目查看
 
 ![screenshot](https://cloud.githubusercontent.com/assets/3774036/26042794/b2ee8ce0-396a-11e7-97e1-b52f31309c2c.png)
+
+## v3.x 新功能
+
+-   webpack 升级到 v4
+-   babel 升级到 v7
+-   eslint 升级到 v5
+-   更好的typescript支持
 
 ## v2.x 新功能
 
