@@ -83,6 +83,7 @@
     "react-awesome-snippets": "latest",
     "react-dom": "16",
     "react-formutil": "0.3",
+    "react-loadable": "*",
     "react-router-dom": "4",
     "react-transition-group": "2"
   }

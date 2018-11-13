@@ -23,11 +23,6 @@ const injects = [];
 // eslint-disable-next-line
 const matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.[jt]sx?)?\s*-->/g;
 const hotDev = require.resolve('react-dev-utils/webpackHotDevClient');
-const fileEntries = Object.keys(paths.entries).reduce((entries, name) => {
-    entries[name] = [hotDev, paths.entries[name]];
-
-    return entries;
-}, {});
 
 paths.pageEntries.forEach(function(name) {
     var chunks = ['_vendor_'];
@@ -56,13 +51,14 @@ paths.pageEntries.forEach(function(name) {
 });
 
 module.exports = {
-    mode: process.env.NODE_ENV,
+    mode: 'development',
     devtool: 'cheap-module-source-map',
-    entry: Object.assign(fileEntries, {
-        _vendor_: [require.resolve('./polyfills'), require.resolve('react-dev-utils/webpackHotDevClient')].concat(
-            pkg.vendor || []
-        )
-    }),
+    entry: Object.assign(
+        {
+            _vendor_: [require.resolve('./polyfills'), hotDev].concat(pkg.vendor || [])
+        },
+        paths.entries
+    ),
     output: {
         pathinfo: true,
         filename: 'static/js/[name].[hash:8].js',

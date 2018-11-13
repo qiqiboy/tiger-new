@@ -80,12 +80,15 @@ paths.pageEntries.forEach(function(name) {
 });
 
 module.exports = {
-    mode: process.env.NODE_ENV,
+    mode: 'production',
     bail: true,
     devtool: shouldUseSourceMap ? 'hidden-source-map' : false,
-    entry: Object.assign(paths.entries, {
-        _vendor_: [require.resolve('./polyfills')].concat(pkg.vendor || [])
-    }),
+    entry: Object.assign(
+        {
+            _vendor_: [require.resolve('./polyfills')].concat(pkg.vendor || [])
+        },
+        paths.entries
+    ),
     output: {
         path: paths.appBuild,
         filename: 'static/js/[name].[chunkhash:8].js',
