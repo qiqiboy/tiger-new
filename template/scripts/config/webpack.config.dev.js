@@ -14,6 +14,7 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin-alt');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const pkg = require(paths.appPackageJson);
+const isBuilding = process.env.NODE_ENV === 'production';
 
 const publicPath = '/';
 const publicUrl = '';
@@ -55,7 +56,7 @@ module.exports = {
     devtool: 'cheap-module-source-map',
     entry: Object.assign(
         {
-            _vendor_: [require.resolve('./polyfills'), hotDev].concat(pkg.vendor || [])
+            _vendor_: [require.resolve('./polyfills'), !isBuilding && hotDev].filter(Boolean).concat(pkg.vendor || [])
         },
         paths.entries
     ),
