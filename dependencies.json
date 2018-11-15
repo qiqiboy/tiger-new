@@ -73,16 +73,16 @@
     "webpack-dev-server": "3"
   },
   "dependencies": {
-    "axios": "0.18.0",
-    "jquery": "3.1.1",
-    "normalize.css": "5.0.0",
+    "axios": "latest",
+    "jquery": "latest",
+    "normalize.css": "latest",
     "prop-types": "15",
     "react": "16",
     "react-animated-router": "latest",
     "react-awesome-snippets": "latest",
     "react-dom": "16",
-    "react-formutil": "0.3",
-    "react-loadable": "*",
+    "react-formutil": "latest",
+    "react-loadable": "latest",
     "react-router-dom": "4",
     "react-transition-group": "2"
   }
