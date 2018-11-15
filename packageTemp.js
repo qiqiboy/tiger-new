@@ -10,7 +10,7 @@ module.exports = {
         presets: ['react-app'],
         plugins: ['react-hot-loader/babel']
     },
-    browserslist: ['>0.2%', 'not dead', 'not ie <= 9', 'not op_mini all'],
+    browserslist: ['>0.2%', 'not dead', 'not op_mini all', 'ie > 10'],
     husky: {
         hooks: {
             'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
