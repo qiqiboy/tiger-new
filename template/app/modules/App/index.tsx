@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Demo from '../Demo';
 import './style.scss';
 
 class App extends Component {
@@ -9,6 +10,7 @@ class App extends Component {
                 <p>
                     To get started, edit <code>app/index.js</code> and save to reload.
                 </p>
+                <Demo />
             </div>
         );
     }

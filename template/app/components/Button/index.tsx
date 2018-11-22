@@ -1,68 +1,32 @@
 import React, { Component } from 'react';
+import { Button, ButtonProps, ProgressBar } from 'react-bootstrap';
 import classlist from 'utils/classlist';
-import { Fade } from '../Transition';
 import './style.scss';
 
-interface IButtonProps extends React.ButtonHTMLAttributes<any> {
-    className?: string;
-    disabled?: boolean;
-    block?: boolean;
-    active?: boolean;
-    size?: 'lg' | 'md' | 'sm' | 'xs';
-    link?: boolean;
-    href?: string;
-    type?: 'primary' | 'danger' | 'success' | 'info' | 'default' | 'warning';
-    isLoading?: boolean;
+export interface IHButtonProps extends ButtonProps {
     loading?: boolean;
 }
 
-class Button extends Component<IButtonProps> {
-    static defaultProps = {
-        isLoading: false,
-        loading: false,
-        disabled: false,
-        block: false,
-        active: false,
-        link: false,
-        size: 'md'
-    };
-
-    render() {
-        const {
-            className,
-            disabled,
-            size,
-            type,
-            link,
-            block,
-            active,
-            isLoading,
-            loading,
-            children,
-            ...restProps
-        } = this.props;
-
-        const Base: string = typeof this.props.href === 'string' ? 'a' : 'button';
-
+/**
+ * @description
+ * 相比于默认的Button，增加了loading状态
+ */
+class HButton extends Component<IHButtonProps> {
+    public render() {
+        const { children, loading, ...props } = this.props;
         return (
-            <Base
-                {...restProps}
-                className={classlist(className, 'btn', 'btn-' + size, {
-                    ['btn-' + type]: !!type,
-                    'btn-disabled': disabled,
-                    'btn-loading': isLoading || loading,
-                    'btn-block': block,
-                    'btn-active': active,
-                    'btn-link': link
-                })}
-                disabled={disabled}>
-                <Fade in={!!(isLoading || loading)}>
-                    <span className="spin" />
-                </Fade>
-                {children}
-            </Base>
+            <Button
+                {...props}
+                className={classlist(props.className, {
+                    'btn-loading': loading
+                })}>
+                {loading ? <span className="loading-text">{children}</span> : children}
+                {loading && (
+                    <ProgressBar active now={100} bsStyle={props.bsStyle === 'primary' ? undefined : props.bsStyle!} />
+                )}
+            </Button>
         );
     }
 }
 
-export default Button;
+export default HButton;

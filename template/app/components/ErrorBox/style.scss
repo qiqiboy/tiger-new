@@ -1,15 +1,12 @@
-.error-box {
-    text-align: center;
-    padding: 15px;
-    .icon {
-        display: block;
-        margin: 10px auto;
+.error-box-body {
+    .error-title {
+        margin-top: 0;
+        font-size: 14px;
     }
-    .texts {
-        color: #666;
+    > p + p {
+        margin-top: 10px;
     }
-    .btn-block {
-        max-width: 300px;
-        margin: 10px auto;
+    > p {
+        margin-bottom: 0;
     }
 }

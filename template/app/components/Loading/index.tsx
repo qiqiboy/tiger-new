@@ -1,36 +1,21 @@
 import React, { Component } from 'react';
-import Portal from 'components/Portal';
+import { ProgressBar } from 'react-bootstrap';
 import classlist from 'utils/classlist';
 import './style.scss';
 
-interface ILoadingProps {
+export interface ILoadingProps {
+    label?: React.ReactNode; // 加载中的文字
     className?: string;
-    global: boolean;
 }
 
 class Loading extends Component<ILoadingProps> {
-    _render() {
+    public render() {
         return (
-            <div className={classlist('loading-container', this.props.className)}>
-                <div className="circle" />
-                {typeof this.props.children === 'string' ? (
-                    <div className="loading-text">{this.props.children}</div>
-                ) : (
-                    this.props.children
-                )}
+            <div className={classlist('loading-root', this.props.className)}>
+                <ProgressBar active now={100} label={this.props.label} />
             </div>
         );
     }
-
-    render() {
-        const dom = this._render();
-
-        return this.props.global ? <Portal className="global-loading">{dom}</Portal> : dom;
-    }
-
-    static defaultProps = {
-        global: false
-    };
 }
 
 export default Loading;

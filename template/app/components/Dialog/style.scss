@@ -1,0 +1,37 @@
+.modal-dialog-root {
+    .modal-dialog {
+        width: auto;
+        min-width: 300px;
+        max-width: 400px;
+        margin: 30px auto;
+        padding: 0 10px;
+    }
+
+    .modal-header {
+        padding: 10px;
+    }
+
+    .modal-body {
+        padding: 20px 10px;
+    }
+
+    .modal-footer {
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+
+        > .btn {
+            flex: 1;
+            max-width: 150px;
+        }
+
+        > .btn + .btn {
+            margin-left: 20px;
+        }
+    }
+
+    .dialog-default-header .glyphicon {
+        color: #ffe100;
+        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
+    }
+}

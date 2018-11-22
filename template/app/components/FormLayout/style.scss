@@ -1,0 +1,20 @@
+.form-layout-root {
+    display: flex;
+
+    > .form-layout-flex + .form-layout-flex {
+        margin-left: 2%;
+    }
+
+    .form-layout-flex > .form-group {
+        margin-bottom: 0;
+        > .help-block {
+            margin-bottom: 0;
+        }
+    }
+}
+
+@for $i from 1 through 5 {
+    .form-layout-flex-#{$i} {
+        flex: $i;
+    }
+}

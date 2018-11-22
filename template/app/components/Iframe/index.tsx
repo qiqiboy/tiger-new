@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-// import Icon from 'components/Icon';
+import { Glyphicon } from 'react-bootstrap';
 import Portal from 'components/Portal';
 import { Flow, Fade } from 'components/Transition';
 import './style.scss';
@@ -23,7 +23,7 @@ class Iframe extends Component<IIframeProps> {
                                 <iframe title="tiger brokers" className="iframe" src={src} frameBorder="0" />
                             </div>
                             <div className="close" onClick={onClose}>
-                                {/*<Icon name="clear" />*/}
+                                <Glyphicon glyph="remove" />
                             </div>
                         </div>
                     </Portal>

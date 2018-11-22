@@ -1,42 +1,47 @@
-@import '~static/css/mixins/base';
-
 .btn-loading {
-    .spin {
-        display: inline-block;
-        vertical-align: middle;
-        width: $font-size-base;
-        height: $font-size-base;
-        margin-right: 0.3em;
+    position: relative;
+
+    .loading-text {
         position: relative;
-        &:after {
-            border-radius: 50%;
-            position: absolute;
-            content: '';
-            border: 2px solid;
-            border-right-color: transparent;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            animation: loading-rotate 1s linear infinite;
+        z-index: 1;
+    }
+    > .progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .progress-bar.active {
+        animation-duration: 0.5s;
+    }
+
+    &:disabled {
+        .progress {
+            color: #888;
+        }
+    }
+
+    &:active {
+        .progress {
+            opacity: 0.8;
+        }
+        .progress-bar.active {
+            animation-play-state: paused;
         }
     }
 }
-.btn-lg .spin {
-    width: $font-size-large;
-    height: $font-size-large;
-}
-.btn-sm .spin,
-.btn-sx .spin {
-    width: $font-size-small;
-    height: $font-size-small;
-}
 
-@keyframes loading-rotate {
-    from {
-        transform: rotate(0);
-    }
-    to {
-        transform: rotate(360deg);
+// some fix
+.btn-default {
+    .progress-bar {
+        background-color: rgba(0, 0, 0, 0.1);
     }
 }

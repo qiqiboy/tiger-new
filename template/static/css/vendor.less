@@ -1,0 +1,51 @@
+@import '~bootstrap/less/bootstrap.less';
+@import './variables.less';
+
+html,
+body {
+    height: 100%;
+}
+#wrap {
+    min-height: 100%;
+}
+.text-meta {
+    font-size: 12px;
+    color: #a6adbc;
+    margin: 8px 0;
+}
+
+// 进度条的细微调整
+// 激活状态下条纹更明显
+.progress-bar {
+    color: #333;
+}
+.progress-bar-striped {
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.25) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.25) 75%,
+        transparent 75%,
+        transparent
+    );
+}
+
+// 重设默认情况下按钮高度与输入框高度一致
+// 可能其他尺寸下高度也得调整
+.btn:not(.btn-lg),
+.btn:not(.btn-sm),
+.btn:not(.btn-xs) {
+    line-height: 1.65;
+}
+// 去掉按钮的outline
+.btn:focus,
+.btn:active:focus {
+    outline: none;
+}
+
+// form-group
+.help-block {
+    font-size: 13px;
+}

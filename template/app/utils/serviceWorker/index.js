@@ -24,7 +24,7 @@ export default function register() {
             if (isLocalhost) {
                 // 本地环境，检查SW是否还在，因为本地可能多个项目，前后会运行在同一个端口，彼此间是否开启sw会相互产生影响
                 checkValidServiceWorker(swUrl);
-            } else { console.log(swUrl)
+            } else {
                 registerValidSW(swUrl);
             }
         });
@@ -89,8 +89,11 @@ function checkValidServiceWorker(swUrl) {
 }
 
 function createNotification() {
-    document.body.insertAdjacentHTML('afterBegin', `<div class="sw-reload-notification">
+    document.body.insertAdjacentHTML(
+        'afterBegin',
+        `<div class="sw-reload-notification">
         <p>页面有新的内容更新</p>
         <button class="sw-reload" onclick="window.location.reload()">立即刷新</button>
-    </div>`);
+    </div>`
+    );
 }
