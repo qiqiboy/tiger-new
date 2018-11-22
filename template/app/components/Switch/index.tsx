@@ -3,9 +3,7 @@ import classlist from 'utils/classlist';
 import './style.less';
 
 export interface ISwitchProps {
-    value?: any;
-    checked?: any;
-    unchecked?: any;
+    checked?: boolean;
     children?: React.ReactNode;
     inline?: boolean;
     disabled?: boolean;
@@ -15,21 +13,20 @@ export interface ISwitchProps {
 }
 
 class Switch extends Component<ISwitchProps> {
+    static formutilType = 'checked';
     static defaultProps = {
-        checked: true,
-        unchecked: false,
+        checked: false,
         inline: false,
         type: 'primary',
         disabled: false
     };
 
     onChange = () => {
-        this.props.onChange!(this.props.value === this.props.checked ? this.props.unchecked : this.props.checked);
+        this.props.onChange!(!this.props.checked);
     };
 
     public render() {
-        const { children, value, checked, unchecked, className, inline, type, ...props } = this.props;
-        const isChecked = value === checked;
+        const { children, checked, className, inline, type, ...props } = this.props;
         const SwitchNode = <button {...props} onClick={this.onChange} className="switch-style-button" />;
         const childNode = typeof children === 'string' ? <span className="switch-label">{children}</span> : children;
 
@@ -40,7 +37,7 @@ class Switch extends Component<ISwitchProps> {
                     'switch-style-' + type,
                     {
                         'switch-inline': inline,
-                        'switch-active': isChecked,
+                        'switch-active': checked,
                         'switch-children': !!children,
                         'switch-disabled': props.disabled
                     },

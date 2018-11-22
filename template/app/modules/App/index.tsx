@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import Demo from '../Demo';
+import withLoadable from 'utils/withLoadable';
 import './style.scss';
+
+const Demo = withLoadable(() => import('../Demo'));
 
 class App extends Component {
     render() {

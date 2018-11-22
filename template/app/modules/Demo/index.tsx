@@ -26,26 +26,22 @@ class ComDemo extends Component<IProps> {
         return (
             <div className="demo app-main">
                 <h3>Switch</h3>
-                <FormGroup name="switch-primary" $defaultValue="a">
-                    <Switch checked="a" unchecked="b" />
+                <FormGroup name="switch-primary" $defaultValue="a" checked="a" unchecked="b">
+                    <Switch />
                 </FormGroup>
-                <FormGroup name="switch-danger" $defaultValue="a">
-                    <Switch type="danger" checked="a" unchecked="b">
-                        Danger
-                    </Switch>
+                <FormGroup name="switch-danger" $defaultValue="a" checked="a" unchecked="b">
+                    <Switch type="danger">Danger</Switch>
                 </FormGroup>
-                <FormGroup name="switch-success" $defaultValue="a">
-                    <Switch type="success" checked="a" unchecked="b">
-                        Success
-                    </Switch>
+                <FormGroup name="switch-success" $defaultValue="a" checked="a" unchecked="b">
+                    <Switch type="success">Success</Switch>
                 </FormGroup>
-                <FormGroup name="switch-info" $defaultValue="b">
-                    <Switch type="info" checked="a" unchecked="b" disabled>
+                <FormGroup name="switch-info" $defaultValue="b" checked="a" unchecked="b">
+                    <Switch type="info" disabled>
                         Info
                     </Switch>
                 </FormGroup>
-                <FormGroup name="switch-warning" $defaultValue="a">
-                    <Switch type="warning" checked="a" unchecked="b" disabled>
+                <FormGroup name="switch-warning" $defaultValue="a" checked="a" unchecked="b">
+                    <Switch type="warning" disabled>
                         Warning
                     </Switch>
                 </FormGroup>
