@@ -46,6 +46,10 @@
 
 ### 公共组件
 
+项目组件框架主要基于`react-bootstrap` + `bootstrap@3`，我们在此基础上，也添加及扩展了一些自定义的组件等。
+
+**特别需要强调的是，你应该总是用`compoennts`目录下的 Button、Modal 来代替`react-bootstrap`中的同名组件！！**
+
 > 在开发环境，可以打开 [/components](http://localhost:3006/accounts/components) 来查看项目中公共组件的示例
 
 > 注意：`components` 目录下的组件为基础组件，例如输入型组件 `Switch`、`Telcodes` 等，如果要使用于表单，也需要和 `react-bootstrap-formutil` 中的 `FormGroup` 搭配使用！
@@ -200,16 +204,15 @@ Toast.loading(true / false);
 用于配置接口，支持多服务器配置。每个服务器用一个文件进行表示，放到目录中的`apis`目录下（建议以大写字母命名）。
 然后就可以通过`API.xxx`来进行层级式访问
 
-
 ```javascript
 // API/apis/CUSTOME.js
 export const HOST = ['https://test.xxx.com', 'https://www.test.com'];
 export const API = {
-    userStatus: '/api/v1/status', // 用户状态
+    userStatus: '/api/v1/status' // 用户状态
 };
 
 // app.js
-API.CUSTOM.userStatus() // 获取到接口地址
+API.CUSTOM.userStatus(); // 获取到接口地址
 ```
 
 #### `utils/i18n`

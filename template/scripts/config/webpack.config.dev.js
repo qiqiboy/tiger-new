@@ -249,6 +249,7 @@ module.exports = {
                 typescript: resolve.sync('typescript', {
                     basedir: paths.appNodeModules
                 }),
+                tslint: true,
                 async: false,
                 checkSyntacticErrors: true,
                 tsconfig: paths.appTsConfig,
