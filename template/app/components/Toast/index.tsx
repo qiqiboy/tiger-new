@@ -32,7 +32,9 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
         if (!this.container) {
             this.container = document.createElement('div');
             document.body.appendChild(this.container);
-            document.body.classList.add('modal-open');
+            document.body.classList.add('toast-open');
+
+            Toast.allInstances.push(this);
         }
 
         this.setState({
@@ -43,7 +45,12 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
     public componentWillUnmount() {
         if (this.container) {
             document.body.removeChild(this.container);
-            document.body.classList.remove('modal-open');
+
+            Toast.allInstances = Toast.allInstances.filter(item => item !== this);
+
+            if (!Toast.allInstances.length) {
+                document.body.classList.remove('toast-open');
+            }
         }
     }
 
@@ -95,6 +102,8 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
 
         return result;
     };
+
+    static allInstances: Toast[] = [];
 }
 
 function open(content: React.ReactNode, others?: object) {
@@ -120,27 +129,32 @@ function open(content: React.ReactNode, others?: object) {
     }
 
     function render(visible, callback?: () => void) {
-        reactRender(
-            <Toast
-                {...others}
-                visible={visible}
-                onExited={() => {
-                    if (!callback) {
-                        callback = withResolve;
-                    }
+        const onExited = () => {
+            if (!callback) {
+                callback = withResolve;
+            }
 
-                    callback!();
-                    destroy();
-                }}>
+            callback!();
+            destroy();
+        };
+
+        reactRender(
+            <Toast {...others} visible={visible} onExited={onExited}>
                 {content}
             </Toast>,
             div
         );
+
+        if (!visible) {
+            setTimeout(() => {
+                if (!destroyed) {
+                    onExited();
+                }
+            }, 1000);
+        }
     }
 
-    render(false);
-
-    setTimeout(() => render(true));
+    render(true);
 
     return {
         close,
