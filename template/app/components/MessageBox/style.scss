@@ -1,0 +1,55 @@
+@import '~static/css/variables';
+
+.message-box-root {
+    display: flex;
+    margin: 10px auto;
+    padding: 8px;
+    .panel-body {
+        flex: 1;
+        color: #525c64;
+        font-size: 13px;
+        padding: 0;
+
+        > *:first-child {
+            margin-top: 0;
+        }
+
+        > p {
+            margin-bottom: 0;
+        }
+
+        > p + p {
+            margin-top: 10px;
+        }
+    }
+    .mb-icon {
+        font-size: 16px;
+        line-height: 1.2;
+    }
+
+    &.has-icon {
+        .panel-body {
+            margin-left: 8px;
+        }
+    }
+}
+
+@each $name,
+    $color
+        in (
+            primary: $brand-primary,
+            info: $brand-info,
+            warning: $brand-warning,
+            danger: $brand-danger,
+            success: $brand-success,
+            default: #ccc
+        )
+{
+    .message-box-type-#{$name} {
+        border-color: $color;
+        background-color: transparentize($color, 0.8);
+        .mb-icon {
+            color: $color;
+        }
+    }
+}

@@ -17,6 +17,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
+    animation: toast-fadeIn 0.6s ease;
 }
 
 body.toast-open {

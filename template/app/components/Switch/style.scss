@@ -1,13 +1,13 @@
 @import '~static/css/variables';
 
 .switch-style-button {
-    @size: 22px;
+    $size: 22px;
     position: relative;
     display: inline-block;
-    width: @size * 2.2;
+    width: $size * 2.2;
     padding: 1px;
     border-radius: 24px;
-    height: @size;
+    height: $size;
     background-color: #eee;
     cursor: pointer;
     vertical-align: middle;
@@ -28,7 +28,7 @@
     &:before {
         content: '';
         display: block;
-        border-radius: @size + 2px;
+        border-radius: $size + 2px;
         height: 100%;
         background-color: #dfe7ed;
         transform: scale(1, 1);
@@ -40,19 +40,19 @@
 
         .switch-active &,
         .switch-active.switch-style-primary & {
-            background-color: @brand-primary;
+            background-color: $brand-primary;
         }
         .switch-active.switch-style-warning & {
-            background-color: @brand-warning;
+            background-color: $brand-warning;
         }
         .switch-active.switch-style-info & {
-            background-color: @brand-info;
+            background-color: $brand-info;
         }
         .switch-active.switch-style-success & {
-            background-color: @brand-success;
+            background-color: $brand-success;
         }
         .switch-active.switch-style-danger & {
-            background-color: @brand-danger;
+            background-color: $brand-danger;
         }
     }
 
@@ -61,9 +61,9 @@
         position: absolute;
         top: 2px;
         left: 3px;
-        width: @size - 4;
-        height: @size - 4;
-        border-radius: @size / 2;
+        width: $size - 4;
+        height: $size - 4;
+        border-radius: $size / 2;
         background-color: #fff;
         box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.08);
         transform: translateX(0);
@@ -79,7 +79,7 @@
     &:active {
         &:after {
             :not(.switch-active) & {
-                width: @size * 1.5;
+                width: $size * 1.5;
                 transition: width 1s ease;
             }
         }

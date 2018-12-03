@@ -7,10 +7,6 @@ export interface IHButtonProps extends ButtonProps {
     loading?: boolean;
 }
 
-/**
- * @description
- * 相比于默认的Button，增加了loading状态
- */
 class HButton extends Component<IHButtonProps> {
     public render() {
         const { children, loading, ...props } = this.props;

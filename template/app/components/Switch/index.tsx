@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import classlist from 'utils/classlist';
-import './style.less';
+import './style.scss';
 
 export interface ISwitchProps {
     checked?: boolean;
@@ -27,7 +27,7 @@ class Switch extends Component<ISwitchProps> {
 
     public render() {
         const { children, checked, className, inline, type, ...props } = this.props;
-        const SwitchNode = <button {...props} onClick={this.onChange} className="switch-style-button" />;
+        const SwitchNode = <button type="button" {...props} onClick={this.onChange} className="switch-style-button" />;
         const childNode = typeof children === 'string' ? <span className="switch-label">{children}</span> : children;
 
         return (

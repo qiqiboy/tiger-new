@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Glyphicon } from 'react-bootstrap';
 import classlist from 'utils/classlist';
-import './style.less';
+import './style.scss';
 
 export interface IBigIconProps {
     icon: React.ReactNode;

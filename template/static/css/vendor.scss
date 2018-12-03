@@ -1,5 +1,5 @@
-@import '~bootstrap/less/bootstrap.less';
-@import './variables.less';
+@import './variables';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
 
 html,
 body {
@@ -7,11 +7,6 @@ body {
 }
 #wrap {
     min-height: 100%;
-}
-.text-meta {
-    font-size: 12px;
-    color: #a6adbc;
-    margin: 8px 0;
 }
 
 // 进度条的细微调整
@@ -32,13 +27,6 @@ body {
     );
 }
 
-// 重设默认情况下按钮高度与输入框高度一致
-// 可能其他尺寸下高度也得调整
-.btn:not(.btn-lg),
-.btn:not(.btn-sm),
-.btn:not(.btn-xs) {
-    line-height: 1.65;
-}
 // 去掉按钮的outline
 .btn:focus,
 .btn:active:focus {
@@ -48,4 +36,15 @@ body {
 // form-group
 .help-block {
     font-size: 13px;
+    .hide-error > & {
+        display: none;
+    }
+}
+.form-control-feedback {
+    color: #a6adbc;
+}
+
+// label
+.label-primary {
+    color: #555;
 }
