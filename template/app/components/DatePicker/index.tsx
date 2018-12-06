@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
-import { Glyphicon } from 'react-bootstrap';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
 import MomentLocaleUtils from 'react-day-picker/moment';
@@ -106,7 +105,6 @@ class DatePicker extends Component<IDatePickerProps, { visible: boolean }> {
 
         return (
             <div className={'date-picker-root' + (this.state.visible ? ' date-picker-active' : '')}>
-                <Glyphicon glyph="calendar" />
                 <input
                     className="form-control"
                     readOnly

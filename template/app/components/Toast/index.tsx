@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
-import { Glyphicon } from 'react-bootstrap';
+import Loading from 'components/Loading';
 import { createPortal } from 'react-dom';
 import { Fade } from 'components/Transition';
 import classlist from 'utils/classlist';
@@ -10,6 +10,7 @@ export interface IToastProps {
     visible: boolean;
     children: React.ReactNode;
     className?: string;
+    backdrop?: 'static' | false | 'transparent';
 
     [key: string]: any;
 }
@@ -24,6 +25,10 @@ export interface IToastProps {
  *
  */
 class Toast extends Component<IToastProps, { loaded: boolean }> {
+    static defaultProps = {
+        backdrop: 'transparent'
+    };
+
     readonly state = { loaded: false };
 
     container: Element;
@@ -55,16 +60,18 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
     }
 
     public render() {
-        const { children, visible, className, ...props } = this.props;
+        const { children, visible, className, backdrop, ...props } = this.props;
 
         return this.state.loaded
             ? createPortal(
                   <Fragment>
+                      {backdrop && (
+                          <Fade in={visible}>
+                              <div className={classlist('toast-backdrop', `toast-backdrop-${backdrop}`)} />
+                          </Fade>
+                      )}
                       <Fade in={visible} {...props}>
                           <div className={classlist('toast-root', className)}>{children}</div>
-                      </Fade>
-                      <Fade in={visible}>
-                          <div className="toast-backdrop" />
                       </Fade>
                   </Fragment>,
                   this.container
@@ -86,11 +93,14 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
 
     static loadingInstance: any = null;
 
-    static loading = (visible: boolean) => {
+    static loading = (visible: boolean, text: string = '') => {
         let result;
 
         if (visible && !Toast.loadingInstance) {
-            Toast.loadingInstance = open(<Glyphicon glyph="refresh" />, { className: 'toast-loading-root' });
+            Toast.loadingInstance = open(<Loading type="circle" label={text} />, {
+                className: 'toast-loading-root',
+                backdrop: 'static'
+            });
             result = Toast.loadingInstance.result;
         }
 

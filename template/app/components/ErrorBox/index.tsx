@@ -32,10 +32,17 @@ class ErrorBox extends Component<IErrorBoxProps, IErrorBoxState> {
             //
         }
 
-        this.setState({
-            loading: false
-        });
+        if (!this.isUnmount) {
+            this.setState({
+                loading: false
+            });
+        }
     };
+
+    isUnmount: boolean;
+    public componentWillUnmount() {
+        this.isUnmount = true;
+    }
 
     public render() {
         const { error, title, onClick } = this.props;

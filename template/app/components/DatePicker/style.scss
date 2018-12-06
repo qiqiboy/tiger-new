@@ -1,15 +1,5 @@
 .date-picker-root {
     position: relative;
-    .glyphicon {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        line-height: 1;
-        color: #a6adbc;
-        transition: color 0.4s ease;
-        pointer-events: none;
-    }
     .form-control[readonly]:not([disabled]) {
         background-color: #fff;
     }

@@ -7,3 +7,25 @@
         border-radius: 10px;
     }
 }
+
+.loading-type-circle {
+    text-align: center;
+    .loading-inner {
+        margin: 5px 0;
+    }
+    .glyphicon {
+        font-size: 20px;
+        color: #ffe100;
+        animation: loading-rotate 2s linear infinite;
+        vertical-align: middle;
+    }
+}
+
+@keyframes loading-rotate {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

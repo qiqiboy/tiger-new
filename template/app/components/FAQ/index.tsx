@@ -47,7 +47,7 @@ class OverlayContainer extends Component<
         const parentRect = (this.targetNode.parentNode as Element).getBoundingClientRect();
 
         this.setState({
-            top: targetRect.top + targetRect.height + 10,
+            top: targetRect.top + targetRect.height + 7,
             left: parentRect.left,
             right: window.innerWidth - parentRect.right,
             arrowLeft: targetRect.left - parentRect.left
