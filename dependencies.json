@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "axios": "latest",
-    "bootstrap": "3",
+    "bootstrap-sass": "3",
     "moment": "2",
     "prop-types": "15",
     "react": "16",

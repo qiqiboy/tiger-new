@@ -22,7 +22,7 @@ class Loading extends Component<ILoadingProps> {
                 ) : (
                     <Fragment>
                         <div className="loading-inner">
-                            <Glyphicon glyph="refresh" />
+                            <Glyphicon glyph="hourglass" />
                         </div>
                         {this.props.label}
                     </Fragment>

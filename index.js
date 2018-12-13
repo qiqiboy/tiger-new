@@ -190,7 +190,7 @@ function createApp(name) {
         pkgVendor.push('utils/serviceWorker/register');
     }
 
-    pkgVendor.push('./static/css/vendor.less');
+    pkgVendor.push('./static/css/vendor.scss');
 
     fs.ensureDirSync(name);
 

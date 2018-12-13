@@ -16,16 +16,21 @@
     .glyphicon {
         font-size: 20px;
         color: #ffe100;
-        animation: loading-rotate 2s linear infinite;
+        animation: loading-rotate 3s linear infinite;
         vertical-align: middle;
     }
 }
 
 @keyframes loading-rotate {
-    from {
+    0% {
         transform: rotate(0);
     }
-    to {
+    25%,
+    50% {
+        transform: rotate(180deg);
+    }
+    75%,
+    100% {
         transform: rotate(360deg);
     }
 }
