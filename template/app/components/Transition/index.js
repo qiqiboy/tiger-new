@@ -13,3 +13,5 @@ export const Flow = withTransition({
     classNames: 'transition-flow',
     timeout: 600
 });
+
+export { default as Collapse } from './Collspse';
