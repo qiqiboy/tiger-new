@@ -41,4 +41,12 @@ export const Flow = withTransition(
     true
 );
 
+export const Flip = withTransition(
+    {
+        classNames: 'transition-flip',
+        timeout: 600
+    },
+    true
+);
+
 export { default as Collapse } from './Collspse';

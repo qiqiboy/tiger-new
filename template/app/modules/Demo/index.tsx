@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { ButtonToolbar } from 'react-bootstrap';
+import { ButtonToolbar, ToggleButtonGroup, ToggleButton, Jumbotron } from 'react-bootstrap';
 import moment from 'moment';
 import { withForm, $Formutil, FormGroup } from 'react-bootstrap-formutil';
+import Debug from 'components/Debug';
 import MessageBox from 'components/MessageBox';
 import ErrorBox from 'components/ErrorBox';
 import Loading from 'components/Loading';
@@ -12,6 +13,7 @@ import Toast from 'components/Toast';
 import Switch from 'components/Switch';
 import FAQ from 'components/FAQ';
 import DatePicker from 'components/DatePicker';
+import { Fade, Zoom, Flow, Flip, Collapse } from 'components/Transition';
 
 import './style.scss';
 
@@ -21,8 +23,39 @@ interface IProps {
 
 // @ts-ignore
 class ComDemo extends Component<IProps> {
+    readonly state = {
+        visible: false
+    };
+
     handleClick = () => Toast.show('重新请求!');
     render() {
+        let Transition;
+        let direction;
+
+        switch (this.props.$formutil.$params.transition) {
+            case 'Zoom':
+                Transition = Zoom;
+                break;
+            case 'Flow':
+                Transition = Flow;
+                break;
+            case 'Flip':
+                Transition = Flip;
+                break;
+            case 'CollapseV':
+                Transition = Collapse;
+                direction = 'v';
+                break;
+            case 'CollapseH':
+                Transition = Collapse;
+                direction = 'h';
+                break;
+
+            default:
+                Transition = Fade;
+                break;
+        }
+
         return (
             <div className="demo app-main">
                 <h3>Switch</h3>
@@ -161,6 +194,41 @@ class ComDemo extends Component<IProps> {
                         Toast.loading
                     </Button>
                 </ButtonToolbar>
+
+                <h3>Transition</h3>
+                <FormGroup name="transition" $defaultValue="Fade">
+                    <ToggleButtonGroup type="radio" name="1">
+                        <ToggleButton value="Fade">Fade</ToggleButton>
+                        <ToggleButton value="Zoom">Zoom</ToggleButton>
+                        <ToggleButton value="Flow">Flow</ToggleButton>
+                        <ToggleButton value="Flip">Flip</ToggleButton>
+                        <ToggleButton value="CollapseV">Collapse Vertical</ToggleButton>
+                        <ToggleButton value="CollapseH">Collapse Horizontal</ToggleButton>
+                    </ToggleButtonGroup>
+                </FormGroup>
+                <p>
+                    <Button
+                        bsStyle="primary"
+                        onClick={() =>
+                            this.setState({
+                                visible: !this.state.visible
+                            })
+                        }>
+                        Toggle
+                    </Button>
+                </p>
+                <Transition in={this.state.visible} direction={direction}>
+                    <Jumbotron>
+                        <h1>这里将被动画处理</h1>
+                        <p>
+                            默认提供了四种动画效果：<code>Fade</code> <code>Zoom</code> <code>Flow</code>{' '}
+                            <code>Flip</code> <code>Collapse</code>
+                        </p>
+                    </Jumbotron>
+                </Transition>
+
+                <h3>Debug</h3>
+                <Debug data={this.props.$formutil.$params} />
             </div>
         );
     }

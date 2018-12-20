@@ -1,4 +1,5 @@
 @for $i from 1 through 30 {
+    /* Fade */
     .transition-fade-#{$i * 100}-enter {
         opacity: 0;
     }
@@ -13,7 +14,7 @@
         opacity: 0;
         transition: opacity $i * 100ms ease;
     }
-
+    /* Zoom */
     .transition-zoom-#{$i * 100}-enter {
         transform: scale(0);
     }
@@ -28,7 +29,7 @@
         transform: scale(0);
         transition: transform $i * 100ms ease;
     }
-
+    /* Flow */
     .transition-flow-#{$i * 100}-enter {
         opacity: 0;
         transform: translateY(-20%);
@@ -47,7 +48,24 @@
         transform: translateY(-20%);
         transition: transform $i * 100ms ease, opacity $i * 100ms ease;
     }
-
+    /* Flip */
+    .transition-flip-#{$i * 100}-enter {
+        transform: perspective(1000px) rotateX(90deg);
+    }
+    .transition-flip-#{$i * 100}-enter-active {
+        transform: perspective(1000px) rotateX(0);
+        transition: transform $i * 100ms ease;
+        backface-visibility: hidden;
+    }
+    .transition-flip-#{$i * 100}-exit {
+        transform: perspective(1000px) rotateX(0);
+    }
+    .transition-flip-#{$i * 100}-exit-active {
+        transform: perspective(1000px) rotateX(90deg);
+        transition: transform $i * 100ms ease;
+        backface-visibility: hidden;
+    }
+    /* Collapse */
     .transition-collapse-active-#{$i * 100} {
         transition: $i * 100ms ease;
         overflow: hidden;

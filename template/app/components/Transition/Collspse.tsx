@@ -112,8 +112,6 @@ class Collapse extends Component<ICollapseProps> {
     onEnter = node => {
         const cssNames = this.getCssNames();
 
-        node.classList.add(TransitionClassName + this.props.timeout);
-
         this.snapStyle(node);
 
         // 将相关值设为0
@@ -124,6 +122,8 @@ class Collapse extends Component<ICollapseProps> {
         triggerReflow(node);
 
         const cssNames = this.getCssNames();
+
+        node.classList.add(TransitionClassName + this.props.timeout);
 
         // 保持其默认值
         cssNames.boxProps.forEach(name => (node.style[name] = this.defaultStyle[name]));
@@ -138,8 +138,6 @@ class Collapse extends Component<ICollapseProps> {
     onExit = node => {
         const cssNames = this.getCssNames();
 
-        node.classList.add(TransitionClassName + this.props.timeout);
-
         this.snapStyle(node);
 
         node.style[cssNames.sizeName] = node[cssNames.sizeFrom] + 'px';
@@ -148,6 +146,8 @@ class Collapse extends Component<ICollapseProps> {
         triggerReflow(node);
 
         const cssNames = this.getCssNames();
+
+        node.classList.add(TransitionClassName + this.props.timeout);
 
         node.style[cssNames.sizeName] = 0;
         cssNames.boxProps.forEach(name => (node.style[name] = 0));
