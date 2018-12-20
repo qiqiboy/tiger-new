@@ -191,13 +191,17 @@ Toast.loading(true / false);
 
 #### `<Transition />`
 
-辅助动画组件。默认支持 `Fade`、`Zoom`、`FLow` 三种动画效果，其实就是对`react-transition-group`的二次封装:
+辅助动画组件。默认支持 `Fade`、`Zoom`、`FLow`、`Collapse` 等动画效果，基于`react-transition-group`的二次封装:
 
 ```javascript
-<Fade in={true}>
+import { Fade, Zoom, Flow, Collapse } from 'components/Transition';
+
+<Fade in={true} timeout={600}>
     <div>这个节点将引用fade动效</div>
 </Fade>
 ```
+
+> 需要注意的是，由于动画基于css3实现，所以提供了100ms到3000ms区间（每间隔100ms）的动画时间设定，在这个区间里的动画时间无需额外的css设置。超出这个范围外的动画，需要额外提供css对动画时间进行设置。
 
 #### `utils/API`
 

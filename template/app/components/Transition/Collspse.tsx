@@ -1,29 +1,11 @@
 import React, { Component } from 'react';
 import Transition, { TransitionProps } from 'react-transition-group/Transition';
 
-export interface ICollapseProps
-    extends Pick<
-            TransitionProps,
-            | 'appear'
-            | 'enter'
-            | 'exit'
-            | 'unmountOnExit'
-            | 'mountOnEnter'
-            | 'addEndListener'
-            | 'onEnter'
-            | 'onEntering'
-            | 'onEntered'
-            | 'onExit'
-            | 'onExiting'
-            | 'onExited'
-        > {
+export interface ICollapseProps extends Partial<TransitionProps> {
     direction?: 'v' | 'h';
-    timeout?: number;
-    in: boolean;
-    children: React.ReactElement<any>;
 }
 
-const TransitionClassName = 'transition-collapse-active';
+const TransitionClassName = 'transition-collapse-active-';
 const events = ['onEnter', 'onEntering', 'onEntered', 'onExit', 'onExiting', 'onExited'];
 const verticalCssNames = [
     'marginTop',
@@ -54,7 +36,7 @@ class Collapse extends Component<ICollapseProps> {
         timeout: 600,
         unmountOnExit: true,
         addEndListener(node, done) {
-            node.addEventListener('transitionend', done, false);
+            node.addEventListener('transitionend', ev => ev.target === node && done(), false);
         }
     };
 
@@ -130,7 +112,7 @@ class Collapse extends Component<ICollapseProps> {
     onEnter = node => {
         const cssNames = this.getCssNames();
 
-        node.classList.add(TransitionClassName);
+        node.classList.add(TransitionClassName + this.props.timeout);
 
         this.snapStyle(node);
 
@@ -148,7 +130,7 @@ class Collapse extends Component<ICollapseProps> {
         node.style[cssNames.sizeName] = this.defaultStyle[cssNames.sizeName];
     };
     onEntered = node => {
-        node.classList.remove(TransitionClassName);
+        node.classList.remove(TransitionClassName + this.props.timeout);
 
         // 恢复默认的内联样式
         this.revertStyle(node);
@@ -156,7 +138,7 @@ class Collapse extends Component<ICollapseProps> {
     onExit = node => {
         const cssNames = this.getCssNames();
 
-        node.classList.add(TransitionClassName);
+        node.classList.add(TransitionClassName + this.props.timeout);
 
         this.snapStyle(node);
 
@@ -171,15 +153,15 @@ class Collapse extends Component<ICollapseProps> {
         cssNames.boxProps.forEach(name => (node.style[name] = 0));
     };
     onExited = node => {
-        node.classList.remove(TransitionClassName);
+        node.classList.remove(TransitionClassName + this.props.timeout);
 
         this.revertStyle(node);
     };
 
     public render() {
-        const props = { ...this.props, ...this.transitionEvents };
+        const { direction, ...props } = this.props;
 
-        return <Transition timeout={600} {...props} />;
+        return <Transition timeout={100} {...props} {...this.transitionEvents} />;
     }
 }
 
