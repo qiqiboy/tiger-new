@@ -5,7 +5,7 @@ export interface ICollapseProps extends Partial<TransitionProps> {
     direction?: 'v' | 'h';
 }
 
-const TransitionClassName = 'transition-collapse-active-';
+const TransitionClassName = 'transition-collapse-active';
 const events = ['onEnter', 'onEntering', 'onEntered', 'onExit', 'onExiting', 'onExited'];
 const verticalCssNames = [
     'marginTop',
@@ -109,6 +109,12 @@ class Collapse extends Component<ICollapseProps> {
         delete this.defaultStyle;
     };
 
+    addTransition = node => {
+        node.classList.add(TransitionClassName);
+        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
+            this.props.timeout + 'ms';
+    };
+
     onEnter = node => {
         const cssNames = this.getCssNames();
 
@@ -121,16 +127,15 @@ class Collapse extends Component<ICollapseProps> {
     onEntering = node => {
         triggerReflow(node);
 
+        this.addTransition(node);
+
         const cssNames = this.getCssNames();
-
-        node.classList.add(TransitionClassName + this.props.timeout);
-
-        // 保持其默认值
         cssNames.boxProps.forEach(name => (node.style[name] = this.defaultStyle[name]));
         node.style[cssNames.sizeName] = this.defaultStyle[cssNames.sizeName];
     };
     onEntered = node => {
-        node.classList.remove(TransitionClassName + this.props.timeout);
+        node.classList.remove(TransitionClassName);
+        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = '';
 
         // 恢复默认的内联样式
         this.revertStyle(node);
@@ -145,23 +150,19 @@ class Collapse extends Component<ICollapseProps> {
     onExiting = node => {
         triggerReflow(node);
 
-        const cssNames = this.getCssNames();
+        this.addTransition(node);
 
-        node.classList.add(TransitionClassName + this.props.timeout);
+        const cssNames = this.getCssNames();
 
         node.style[cssNames.sizeName] = 0;
         cssNames.boxProps.forEach(name => (node.style[name] = 0));
     };
-    onExited = node => {
-        node.classList.remove(TransitionClassName + this.props.timeout);
-
-        this.revertStyle(node);
-    };
+    onExited = this.onEntered;
 
     public render() {
-        const { direction, ...props } = this.props;
+        const { direction, timeout, ...props } = this.props;
 
-        return <Transition timeout={100} {...props} {...this.transitionEvents} />;
+        return <Transition timeout={timeout!} {...props} {...this.transitionEvents} />;
     }
 }
 

@@ -17,36 +17,24 @@ import './transition.scss';
 
 export { withTransition };
 
-export const Fade = withTransition(
-    {
-        classNames: 'transition-fade',
-        timeout: 600
-    },
-    true
-);
+export const Fade = withTransition({
+    classNames: 'transition-fade',
+    timeout: 600
+});
 
-export const Zoom = withTransition(
-    {
-        classNames: 'transition-zoom',
-        timeout: 600
-    },
-    true
-);
+export const Zoom = withTransition({
+    classNames: 'transition-zoom',
+    timeout: 600
+});
 
-export const Flow = withTransition(
-    {
-        classNames: 'transition-flow',
-        timeout: 600
-    },
-    true
-);
+export const Flow = withTransition({
+    classNames: 'transition-flow',
+    timeout: 600
+});
 
-export const Flip = withTransition(
-    {
-        classNames: 'transition-flip',
-        timeout: 600
-    },
-    true
-);
+export const Flip = withTransition({
+    classNames: 'transition-flip',
+    timeout: 600
+});
 
 export { default as Collapse } from './Collspse';
