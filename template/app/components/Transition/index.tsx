@@ -1,8 +1,13 @@
 /*
  * @description
- * 提供简单的动画组件。默认提供了Fade、Zoom、Flow、Collspse四种动画效果。
- * 由于动画主要基于css3动画，为了方便控制动画时间，默认提供了从100ms到3000ms区间（每100ms间隔）的动画时间设定。
- * 在这之间的动画时间无需额外设置css:
+ * 提供简单的动画组件。默认提供了Fade、Zoom、Flow、Flip、Collapse等动画效果。
+ * 基于react-transition-group实现，通过in属性控制组件显隐。
+ *
+ * @prop in: boolean 表示组件展示/隐藏
+ * @prop timeout: number 动画持续时间
+ * @prop direction: 'v' | 'h' 该属性紧紧Collapse可用，表示折叠的方向，v纵向，h横向
+ *
+ * 更多属性配置可以查看 http://reactcommunity.org/react-transition-group/transition
  *
  * <Fade in={true} timeout={400}>
  *      <div>

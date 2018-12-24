@@ -28,12 +28,17 @@ export default function withTransition(defaultProps) {
         }, {});
 
         onEntering = node => {
-            node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
-                this.props.timeout + 'ms';
+            if (node) {
+                node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
+                    this.props.timeout + 'ms';
+            }
         };
 
         onEntered = node => {
-            node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = '';
+            if (node) {
+                node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
+                    '';
+            }
         };
 
         onExiting = this.onEntering;

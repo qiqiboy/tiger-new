@@ -116,46 +116,56 @@ class Collapse extends Component<ICollapseProps> {
     };
 
     onEnter = node => {
-        const cssNames = this.getCssNames();
+        if (node) {
+            const cssNames = this.getCssNames();
 
-        this.snapStyle(node);
+            this.snapStyle(node);
 
-        // 将相关值设为0
-        node.style[cssNames.sizeName] = 0;
-        cssNames.boxProps.forEach(name => (node.style[name] = 0));
+            // 将相关值设为0
+            node.style[cssNames.sizeName] = 0;
+            cssNames.boxProps.forEach(name => (node.style[name] = 0));
+        }
     };
     onEntering = node => {
-        triggerReflow(node);
+        if (node) {
+            triggerReflow(node);
 
-        this.addTransition(node);
+            this.addTransition(node);
 
-        const cssNames = this.getCssNames();
-        cssNames.boxProps.forEach(name => (node.style[name] = this.defaultStyle[name]));
-        node.style[cssNames.sizeName] = this.defaultStyle[cssNames.sizeName];
+            const cssNames = this.getCssNames();
+            cssNames.boxProps.forEach(name => (node.style[name] = this.defaultStyle[name]));
+            node.style[cssNames.sizeName] = this.defaultStyle[cssNames.sizeName];
+        }
     };
     onEntered = node => {
-        node.classList.remove(TransitionClassName);
-        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = '';
+        if (node) {
+            node.classList.remove(TransitionClassName);
+            node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = '';
 
-        // 恢复默认的内联样式
-        this.revertStyle(node);
+            // 恢复默认的内联样式
+            this.revertStyle(node);
+        }
     };
     onExit = node => {
-        const cssNames = this.getCssNames();
+        if (node) {
+            const cssNames = this.getCssNames();
 
-        this.snapStyle(node);
+            this.snapStyle(node);
 
-        node.style[cssNames.sizeName] = node[cssNames.sizeFrom] + 'px';
+            node.style[cssNames.sizeName] = node[cssNames.sizeFrom] + 'px';
+        }
     };
     onExiting = node => {
-        triggerReflow(node);
+        if (node) {
+            triggerReflow(node);
 
-        this.addTransition(node);
+            this.addTransition(node);
 
-        const cssNames = this.getCssNames();
+            const cssNames = this.getCssNames();
 
-        node.style[cssNames.sizeName] = 0;
-        cssNames.boxProps.forEach(name => (node.style[name] = 0));
+            node.style[cssNames.sizeName] = 0;
+            cssNames.boxProps.forEach(name => (node.style[name] = 0));
+        }
     };
     onExited = this.onEntered;
 
