@@ -52,9 +52,9 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
         return (
             <Fade in={isShow} {...props}>
                 <Portal>
-                    <div>
+                    <div className="toast-root">
                         {backdrop && <div className={classlist('toast-backdrop', `toast-backdrop-${backdrop}`)} />}
-                        <div className={classlist('toast-root', className)}>{children}</div>
+                        <div className={classlist('toast-body', className)}>{children}</div>
                     </div>
                 </Portal>
             </Fade>

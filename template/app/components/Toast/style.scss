@@ -1,11 +1,14 @@
 .toast-root {
-    position: absolute;
+    position: relative;
+    z-index: 1500;
+}
+
+.toast-body {
     position: fixed;
     top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.9);
-    z-index: 1500;
     color: #fff;
     border-radius: 6px;
     padding: 10px;
@@ -24,7 +27,6 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 1500;
 }
 
 .toast-backdrop-static {
