@@ -13,9 +13,8 @@ import Toast from 'components/Toast';
 import Switch from 'components/Switch';
 import FAQ from 'components/FAQ';
 import DatePicker from 'components/DatePicker';
+import Iframe from 'components/Iframe';
 import { Fade, Zoom, Flow, Flip, Collapse } from 'components/Transition';
-
-import './style.scss';
 
 interface IProps {
     $formutil: $Formutil<any>;
@@ -24,7 +23,8 @@ interface IProps {
 // @ts-ignore
 class ComDemo extends Component<IProps> {
     readonly state = {
-        visible: false
+        visible: false,
+        iframe: false
     };
 
     handleClick = () => Toast.show('重新请求!');
@@ -79,7 +79,7 @@ class ComDemo extends Component<IProps> {
                     </Switch>
                 </FormGroup>
 
-                <h3>forms</h3>
+                <h3>DatePicker</h3>
                 <FormGroup
                     name="datepicker"
                     label="出生日期"
@@ -187,7 +187,7 @@ class ComDemo extends Component<IProps> {
                     <Button onClick={() => Toast.show('toast消息框')}>Toast.show</Button>
                     <Button
                         onClick={() => {
-                            Toast.loading(true);
+                            Toast.loading(true, 'loading...');
 
                             setTimeout(() => Toast.loading(false), 3000);
                         }}>
@@ -226,6 +226,20 @@ class ComDemo extends Component<IProps> {
                         </p>
                     </Jumbotron>
                 </Transition>
+
+                <h3>Iframe</h3>
+                <p>
+                    <Button
+                        bsStyle="primary"
+                        onClick={() =>
+                            this.setState({
+                                iframe: true
+                            })
+                        }>
+                        show iframe
+                    </Button>
+                </p>
+                <Iframe in={this.state.iframe} src={window.location.href} onClose={() => this.setState({ iframe: false })} />
 
                 <h3>Debug</h3>
                 <Debug data={this.props.$formutil.$params} />

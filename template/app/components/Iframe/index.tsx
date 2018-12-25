@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Glyphicon } from 'react-bootstrap';
 import Portal from 'components/Portal';
-import { Flow, Fade } from 'components/Transition';
+import { Flip, Fade } from 'components/Transition';
 import './style.scss';
 
 interface IIframeProps {
@@ -16,7 +16,7 @@ class Iframe extends Component<IIframeProps> {
 
         return (
             <Fragment>
-                <Flow in={this.props.in}>
+                <Flip in={this.props.in}>
                     <Portal>
                         <div className="iframe-container">
                             <div className="scroll-wrapper">
@@ -27,9 +27,11 @@ class Iframe extends Component<IIframeProps> {
                             </div>
                         </div>
                     </Portal>
-                </Flow>
+                </Flip>
                 <Fade in={this.props.in}>
-                    <div className="iframe-backdrop" />
+                    <Portal>
+                        <div className="iframe-backdrop" />
+                    </Portal>
                 </Fade>
             </Fragment>
         );

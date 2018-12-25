@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import Loading from 'components/Loading';
-import { createPortal } from 'react-dom';
 import { Fade } from 'components/Transition';
+import Portal from 'components/Portal';
 import classlist from 'utils/classlist';
 import './style.scss';
 
@@ -29,18 +29,12 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
         backdrop: 'transparent'
     };
 
-    readonly state = { loaded: false };
-
-    container: Element;
+    state = {
+        loaded: false
+    };
 
     public componentDidMount() {
-        if (!this.container) {
-            this.container = document.createElement('div');
-            document.body.appendChild(this.container);
-            document.body.classList.add('toast-open');
-
-            Toast.allInstances.push(this);
-        }
+        Toast.allInstances.push(this);
 
         this.setState({
             loaded: true
@@ -48,35 +42,23 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
     }
 
     public componentWillUnmount() {
-        if (this.container) {
-            document.body.removeChild(this.container);
-
-            Toast.allInstances = Toast.allInstances.filter(item => item !== this);
-
-            if (!Toast.allInstances.length) {
-                document.body.classList.remove('toast-open');
-            }
-        }
+        Toast.allInstances = Toast.allInstances.filter(item => item !== this);
     }
 
     public render() {
         const { children, visible, className, backdrop, ...props } = this.props;
+        const isShow = visible && this.state.loaded;
 
-        return this.state.loaded
-            ? createPortal(
-                  <Fragment>
-                      {backdrop && (
-                          <Fade in={visible}>
-                              <div className={classlist('toast-backdrop', `toast-backdrop-${backdrop}`)} />
-                          </Fade>
-                      )}
-                      <Fade in={visible} {...props}>
-                          <div className={classlist('toast-root', className)}>{children}</div>
-                      </Fade>
-                  </Fragment>,
-                  this.container
-              )
-            : null;
+        return (
+            <Fade in={isShow} {...props}>
+                <Portal>
+                    <div>
+                        {backdrop && <div className={classlist('toast-backdrop', `toast-backdrop-${backdrop}`)} />}
+                        <div className={classlist('toast-root', className)}>{children}</div>
+                    </div>
+                </Portal>
+            </Fade>
+        );
     }
 
     static show = (content: React.ReactNode, timeout: number = 1500) => {

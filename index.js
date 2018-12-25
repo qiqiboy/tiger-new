@@ -358,16 +358,17 @@ function run(appPath, appName) {
 
                         console.log();
                         spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(appPath));
+                        console.log();
                         console.log('在该项目，你可以运行以下几个命令：');
                         console.log();
                         console.log(chalk.cyan('  npm start'));
                         console.log('    启动本地服务，进行开发.');
                         console.log();
                         console.log(chalk.cyan('  npm run build:dev'));
-                        console.log('    打测试包，部署测试.');
+                        console.log('    构建测试包，部署测试.');
                         console.log();
                         console.log(chalk.cyan('  npm run pack'));
-                        console.log('    打线上包，部署线上.');
+                        console.log('    构建线上包，部署线上.');
                         console.log();
                         console.log('运行下面的命令切换到项目目录开始工作:');
                         console.log(chalk.green('  cd ' + path.relative(oldPath, appPath)));

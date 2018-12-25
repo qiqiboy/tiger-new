@@ -2,37 +2,41 @@ import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import './style.scss';
 
-class Portal extends Component<
-    {
-        className?: string;
-    },
-    { loaded: boolean }
-> {
-    state = { loaded: false };
+class Portal extends Component<{
+    className?: string;
+    children: React.ReactElement<any>;
+}> {
     container: Element;
-    componentDidMount() {
-        if (!this.container) {
-            this.container = document.createElement('div');
-            this.container.className = this.props.className || '';
-            document.body.appendChild(this.container);
-            document.body.classList.add('portal-opened');
-        }
-
-        this.setState({
-            loaded: true
-        });
-    }
 
     componentWillUnmount() {
-        if (this.container) {
-            document.body.removeChild(this.container);
+        Portal.instancesNumber--;
+
+        document.body.removeChild(this.container);
+
+        if (Portal.instancesNumber <= 0) {
             document.body.classList.remove('portal-opened');
+
+            Portal.instancesNumber = 0;
         }
+    }
+
+    public componentDidMount() {
+        Portal.instancesNumber++;
+
+        document.body.classList.add('portal-opened');
+        document.body.appendChild(this.container);
     }
 
     render() {
-        return this.state.loaded ? createPortal(this.props.children, this.container) : null;
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.className = this.props.className || '';
+        }
+
+        return createPortal(this.props.children, this.container);
     }
+
+    static instancesNumber = 0;
 }
 
 export default Portal;

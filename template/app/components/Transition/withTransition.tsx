@@ -1,19 +1,25 @@
 import React from 'react';
 import CSSTransition from 'react-transition-group/CSSTransition';
-
-type TransitionProps = Partial<CSSTransition.CSSTransitionProps>;
+import { CSSTransitionProps } from './types';
 
 const events = ['onEntering', 'onEntered', 'onExiting', 'onExited'];
 
-export default function withTransition(defaultProps) {
-    return class Transition extends React.Component<TransitionProps> {
+export default function withTransition(defaultProps: CSSTransitionProps) {
+    return class Transition extends React.Component<Partial<CSSTransitionProps>> {
         static defaultProps = {
-            timeout: 1000,
+            timeout: 600,
             unmountOnExit: true,
             addEndListener: (node, done) => {
-                node.addEventListener('transitionend', ev => ev.target === node && done(), false);
+                const onTransitionEnd = ev => {
+                    node.removeEventListener('transitionend', onTransitionEnd, false);
+
+                    if (ev.target === node) {
+                        done();
+                    }
+                };
+
+                node.addEventListener('transitionend', onTransitionEnd, false);
             },
-            classNames: 'transition-fade',
             ...defaultProps
         };
 

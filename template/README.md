@@ -50,7 +50,7 @@
 
 **特别需要强调的是，你应该总是用`compoennts`目录下的 Button、Modal 来代替`react-bootstrap`中的同名组件！！**
 
-> 在开发环境，可以打开 [/components](http://localhost:3006/accounts/components) 来查看项目中公共组件的示例
+> 首次生成项目后，你可以运行该项目来查看项目中公共组件的调用示例。
 
 > 注意：`components` 目录下的组件为基础组件，例如输入型组件 `Switch`、`Telcodes` 等，如果要使用于表单，也需要和 `react-bootstrap-formutil` 中的 `FormGroup` 搭配使用！
 

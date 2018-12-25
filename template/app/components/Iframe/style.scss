@@ -18,17 +18,21 @@
     }
     > .close {
         position: absolute;
-        width: 40px;
-        height: 40px;
-        right: -20px;
-        top: -20px;
+        width: 20px;
+        height: 20px;
+        right: -10px;
+        top: -10px;
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: #fff;
+        border-radius: 100%;
         z-index: 1;
-        .icon {
-            background-color: #fff;
-            border-radius: 100%;
+        opacity: 1;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        .glyphicon {
+            opacity: 0.2;
+            font-size: 14px;
         }
     }
 }

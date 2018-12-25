@@ -2,7 +2,8 @@ import React, { Children, cloneElement } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import { Modal } from 'react-bootstrap';
 
-export default Modal as INewModal;
+const _Modal = Modal;
+export default _Modal as INewModal;
 
 type INewModal = typeof Modal & {
     open: (
@@ -47,7 +48,7 @@ const defaultSettings = {};
  * @return {Object} { close, dismiss, result: Promise }
  *          返回一个对象，包含了close、dismiss两个关闭方法，以及一个result的promise对象，可以通过该promise来访问modal关闭时的回调！
  */
-export const open = ((Modal as INewModal).open = config => {
+export const open = ((_Modal as INewModal).open = config => {
     let destroyed;
     let withResolve;
     let withReject;

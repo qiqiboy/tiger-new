@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import Transition, { TransitionProps } from 'react-transition-group/Transition';
+import Transition from 'react-transition-group/Transition';
+import { TransitionProps } from './types';
 
-export interface ICollapseProps extends Partial<TransitionProps> {
+export interface ICollapseProps extends TransitionProps {
     direction?: 'v' | 'h';
 }
 
@@ -35,8 +36,16 @@ class Collapse extends Component<ICollapseProps> {
         direction: 'v',
         timeout: 600,
         unmountOnExit: true,
-        addEndListener(node, done) {
-            node.addEventListener('transitionend', ev => ev.target === node && done(), false);
+        addEndListener: (node, done) => {
+            const onTransitionEnd = ev => {
+                node.removeEventListener('transitionend', onTransitionEnd, false);
+
+                if (ev.target === node) {
+                    done();
+                }
+            };
+
+            node.addEventListener('transitionend', onTransitionEnd, false);
         }
     };
 
