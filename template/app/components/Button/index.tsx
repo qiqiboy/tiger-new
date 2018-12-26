@@ -18,7 +18,13 @@ class HButton extends Component<IHButtonProps> {
                 })}>
                 {loading ? <span className="loading-text">{children}</span> : children}
                 {loading && (
-                    <ProgressBar active now={100} bsStyle={props.bsStyle === 'primary' ? undefined : props.bsStyle!} />
+                    <ProgressBar
+                        active
+                        now={100}
+                        bsStyle={
+                            props.bsStyle === 'primary' || props.bsStyle === 'default' ? undefined : props.bsStyle!
+                        }
+                    />
                 )}
             </Button>
         );

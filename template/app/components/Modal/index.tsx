@@ -123,6 +123,11 @@ export const open = ((_Modal as INewModal).open = config => {
         result: new Promise((resolve, reject) => {
             withResolve = resolve;
             withReject = reject;
-        })
+        }),
+        render(newContent) {
+            settings.component = newContent;
+
+            render(true);
+        }
     };
 });

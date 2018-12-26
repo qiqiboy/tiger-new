@@ -179,7 +179,7 @@ function appUpgrade(projectName) {
                         package['browserslist'] = pkgTemp['browserslist'];
                     }
 
-                    if (package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
+                    if (package.babel.plugin && package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
                         package.babel.plugins.splice(package.babel.plugins.indexOf('transform-decorators-legacy'), 1, [
                             '@babel/plugin-proposal-decorators',
                             { legacy: true }

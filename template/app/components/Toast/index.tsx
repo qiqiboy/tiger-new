@@ -78,11 +78,17 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
     static loading = (visible: boolean, text: string = '') => {
         let result;
 
-        if (visible && !Toast.loadingInstance) {
-            Toast.loadingInstance = open(<Loading type="circle" label={text} />, {
-                className: 'toast-loading-root',
-                backdrop: 'static'
-            });
+        if (visible) {
+            const LoadingElement = <Loading type="circle" label={text} />;
+            if (!Toast.loadingInstance) {
+                Toast.loadingInstance = open(LoadingElement, {
+                    className: 'toast-loading-root',
+                    backdrop: 'static'
+                });
+            } else {
+                Toast.loadingInstance.render(LoadingElement);
+            }
+
             result = Toast.loadingInstance.result;
         }
 
@@ -152,7 +158,12 @@ function open(content: React.ReactNode, others?: object) {
         close,
         result: new Promise(resolve => {
             withResolve = resolve;
-        })
+        }),
+        render(newContent) {
+            content = newContent;
+
+            render(true);
+        }
     };
 }
 

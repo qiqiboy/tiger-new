@@ -28,6 +28,12 @@ body {
     );
 }
 
+// 去掉输入框阴影
+.form-control {
+    box-shadow: none;
+    background-clip: padding-box;
+}
+
 // 去掉按钮的outline
 .btn:focus,
 .btn:active:focus {
