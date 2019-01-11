@@ -336,6 +336,7 @@ module.exports = {
             new MiniCssExtractPlugin({
                 filename: 'static/css/[name].[contenthash:8].css'
             }),
+            new webpack.HashedModuleIdsPlugin(),
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
             shouldUseSW &&
                 new SWPrecacheWebpackPlugin({
