@@ -10,12 +10,15 @@ type INewModal = typeof Modal & {
         config: IConfig
     ) => IModalHandler & {
         result: Promise<any>;
+        render(component: RenderCompoenent): void;
     };
 };
 
+type RenderCompoenent = React.ComponentType<any> | React.ReactElement<any>;
+
 type IConfig = Omit<Modal.ModalProps, 'onHide'> & {
     onHide?(handler: IModalHandler): void;
-    component: React.ComponentType<any> | React.ReactElement<any>;
+    component: RenderCompoenent;
 };
 
 export interface IModalHandler {
@@ -124,7 +127,7 @@ export const open = ((_Modal as INewModal).open = config => {
             withResolve = resolve;
             withReject = reject;
         }),
-        render(newContent) {
+        render(newContent: RenderCompoenent) {
             settings.component = newContent;
 
             render(true);

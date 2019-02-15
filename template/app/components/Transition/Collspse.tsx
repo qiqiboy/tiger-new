@@ -109,13 +109,15 @@ class Collapse extends Component<ICollapseProps> {
     };
 
     revertStyle = node => {
-        const cssNames = this.getCssNames();
+        if (this.inlineStyle) {
+            const cssNames = this.getCssNames();
 
-        node.style[cssNames.sizeName] = this.inlineStyle[cssNames.sizeName];
-        cssNames.boxProps.forEach(name => (node.style[name] = this.inlineStyle[name]));
+            node.style[cssNames.sizeName] = this.inlineStyle[cssNames.sizeName];
+            cssNames.boxProps.forEach(name => (node.style[name] = this.inlineStyle[name]));
 
-        delete this.inlineStyle;
-        delete this.defaultStyle;
+            delete this.inlineStyle;
+            delete this.defaultStyle;
+        }
     };
 
     addTransition = node => {

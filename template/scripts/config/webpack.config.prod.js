@@ -199,7 +199,6 @@ module.exports = {
                     {
                         test: /\.(js|mjs|jsx|ts|tsx)$/,
                         include: paths.appSrc,
-
                         loader: require.resolve('babel-loader'),
                         options: {
                             customize: require.resolve('babel-preset-react-app/webpack-overrides'),

@@ -29,15 +29,15 @@ export default {
         if (typeof url === 'string') {
             url = URL.parse(url, true);
 
-            delete URL.search;
+            delete url.search;
         }
 
         Object.keys(url).forEach(key => {
             if (key === 'query') {
                 base.query = Object.assign(base.query || {}, url.query);
+            } else {
+                base[key] = url[key];
             }
-
-            base[key] = url[key];
         });
 
         return URL.format(base);
