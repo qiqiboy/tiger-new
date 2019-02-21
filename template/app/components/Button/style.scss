@@ -1,47 +1,17 @@
 .btn-loading {
     position: relative;
 
-    .loading-text {
+    > .loading-root {
+        display: inline-block;
+        margin: 0 5px;
         position: relative;
-        z-index: 1;
-    }
-    > .progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-
-    .progress-bar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .progress-bar.active {
-        animation-duration: 0.5s;
-    }
-
-    &:disabled {
-        .progress {
-            color: #888;
+        top: -1px;
+        .loading-inner {
+            margin: 0;
         }
-    }
-
-    &:active {
-        .progress {
-            opacity: 0.8;
+        .glyphicon {
+            color: inherit;
+            font-size: inherit;
         }
-        .progress-bar.active {
-            animation-play-state: paused;
-        }
-    }
-}
-
-// some fix
-.btn-default {
-    .progress-bar {
-        background-color: rgba(0, 0, 0, 0.1);
     }
 }

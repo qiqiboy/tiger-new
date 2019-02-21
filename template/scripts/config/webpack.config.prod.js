@@ -40,6 +40,15 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 // eslint-disable-next-line
 const matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.[jt]sx?)?\s*-->/g;
 const injects = [];
+const babelOption = {
+    babelrc: false,
+    configFile: false,
+    compact: false,
+    presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
+    cacheDirectory: true,
+    cacheCompression: true,
+    sourceMaps: false
+};
 
 paths.pageEntries.forEach(function(name) {
     var chunks = ['_vendor_'];
@@ -190,11 +199,21 @@ module.exports = {
                 oneOf: [
                     {
                         test: /\.html$/,
-                        loader: require.resolve('html-loader'),
-                        options: {
-                            url: true,
-                            import: true
-                        }
+                        use: [
+                            {
+                                loader: require.resolve('babel-loader'),
+                                options: babelOption
+                            },
+                            {
+                                loader: require.resolve('html-loader'),
+                                options: {
+                                    url(url) {
+                                        return !/\.(webp|png|jpeg|jpg|gif|svg|mp3|wmv|mp4|ogg|webm)$/.test(url);
+                                    },
+                                    import: true
+                                }
+                            }
+                        ]
                     },
                     {
                         test: /\.(js|mjs|jsx|ts|tsx)$/,
@@ -223,15 +242,7 @@ module.exports = {
                         test: /\.(js|mjs)$/,
                         exclude: /@babel(?:\/|\\{1,2})runtime/,
                         loader: require.resolve('babel-loader'),
-                        options: {
-                            babelrc: false,
-                            configFile: false,
-                            compact: false,
-                            presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
-                            cacheDirectory: true,
-                            cacheCompression: true,
-                            sourceMaps: false
-                        }
+                        options: babelOption
                     },
                     {
                         test: /\.css$/,

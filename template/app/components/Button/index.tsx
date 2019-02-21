@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button, ButtonProps, ProgressBar } from 'react-bootstrap';
+import { Button, ButtonProps } from 'react-bootstrap';
+import Loading from 'components/Loading';
 import classlist from 'utils/classlist';
 import './style.scss';
 
@@ -16,16 +17,8 @@ class HButton extends Component<IHButtonProps> {
                 className={classlist(props.className, {
                     'btn-loading': loading
                 })}>
-                {loading ? <span className="loading-text">{children}</span> : children}
-                {loading && (
-                    <ProgressBar
-                        active
-                        now={100}
-                        bsStyle={
-                            props.bsStyle === 'primary' || props.bsStyle === 'default' ? undefined : props.bsStyle!
-                        }
-                    />
-                )}
+                {loading && <Loading type="circle" />}
+                {children}
             </Button>
         );
     }

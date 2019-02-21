@@ -41,7 +41,7 @@
     "html-loader": "next",
     "html-webpack-plugin": "next",
     "husky": "1.1",
-    "imagemin-webpack-plugin": "2.3",
+    "imagemin-webpack-plugin": "2",
     "jest": "23",
     "jest-resolve": "23",
     "less": "3.8",
