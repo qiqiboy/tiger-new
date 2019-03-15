@@ -29,7 +29,8 @@ const alias = {
     modules: resolveApp('app/modules'),
     utils: resolveApp('app/utils'),
     stores: resolveApp('app/stores'),
-    types: resolveApp('app/types')
+    types: resolveApp('app/types'),
+    hooks: resolveApp('app/hooks')
 };
 
 // config after eject: we're in ./config/
