@@ -4,7 +4,9 @@ module.exports = {
         build: 'node scripts/build.js',
         'build:dev': 'node scripts/build.js --dev',
         pack: 'npm run build',
-        count: 'node scripts/count.js'
+        count: 'node scripts/count.js',
+        'i18n-scan': 'node scripts/i18n.js --scan',
+        'i18n-read': 'node scripts/i18n.js --read'
     },
     babel: {
         presets: ['react-app'],

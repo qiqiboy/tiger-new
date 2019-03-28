@@ -81,87 +81,96 @@ if (program.upgrade) {
                 type: 'confirm',
                 message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
                 default: false
+            },
+            {
+                name: 'host',
+                type: 'input',
+                message: '请输入cdn服务器host地址:',
+                default: 'https://static.example.com',
+                validate: function(input) {
+                    return /^http/.test(input) ? true : '请输入一个服务器地址';
+                },
+                when: function(answers) {
+                    return answers.useCdn;
+                }
+            },
+            {
+                name: 'pathname',
+                type: 'input',
+                message: '请输入项目在cdn服务器上的存储文件夹名:',
+                default: '/spa-' + path.basename(projectName),
+                validate: function(input) {
+                    return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
+                },
+                when: function(answers) {
+                    return answers.useCdn;
+                }
+            },
+            {
+                name: 'useLocals',
+                type: 'confirm',
+                message: '是否要支持多语言/国际化？',
+                default: false
+            },
+            {
+                name: 'locals',
+                type: 'input',
+                message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
+                default: 'zh_CN,en_US',
+                validate: function(input) {
+                    return input ? true : '该字段不能为空';
+                },
+                when: function(answers) {
+                    return answers.useLocals;
+                }
+            },
+            {
+                name: 'author',
+                type: 'input',
+                message: '请输入项目所属者（组织）的名字或邮箱:',
+                validate: function(input) {
+                    return !!input || '该字段不能为空';
+                }
+            },
+            {
+                name: 'libs',
+                type: 'list',
+                choices: [
+                    { name: '无框架依赖', value: 0 },
+                    { name: 'jquery 项目', value: 1 },
+                    { name: 'react 项目', value: 2 },
+                    { name: 'jquery + react 项目', value: 3 }
+                ],
+                message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
+                default: 2
+            },
+            {
+                name: 'supportDecorator',
+                type: 'confirm',
+                message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
+                default: true
+            },
+            {
+                name: 'proxy',
+                type: 'input',
+                message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
+                validate: function(input) {
+                    return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+                }
+            },
+            {
+                name: 'isSpa',
+                type: 'confirm',
+                message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
+                default: true
+            },
+            {
+                name: 'enableSW',
+                type: 'confirm',
+                message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
+                default: false
             }
         ])
-        .then(function(answers) {
-            var questions = [
-                {
-                    name: 'author',
-                    type: 'input',
-                    message: '请输入项目所属者（组织）的名字或邮箱:',
-                    validate: function(input) {
-                        return !!input || '该字段不能为空';
-                    }
-                },
-                {
-                    name: 'libs',
-                    type: 'list',
-                    choices: [
-                        { name: '无框架依赖', value: 0 },
-                        { name: 'jquery 项目', value: 1 },
-                        { name: 'react 项目', value: 2 },
-                        { name: 'jquery + react 项目', value: 3 }
-                    ],
-                    message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
-                    default: 2
-                },
-                {
-                    name: 'supportDecorator',
-                    type: 'confirm',
-                    message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
-                    default: true
-                },
-                {
-                    name: 'proxy',
-                    type: 'input',
-                    message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
-                    validate: function(input) {
-                        return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
-                    }
-                },
-                {
-                    name: 'isSpa',
-                    type: 'confirm',
-                    message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
-                    default: true
-                },
-                {
-                    name: 'enableSW',
-                    type: 'confirm',
-                    message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
-                    default: false
-                }
-            ];
-
-            if (answers.useCdn) {
-                questions.unshift(
-                    {
-                        name: 'host',
-                        type: 'input',
-                        message: '请输入cdn服务器host地址:',
-                        default: 'https://static.example.com',
-                        validate: function(input) {
-                            return /^http/.test(input) ? true : '请输入一个服务器地址';
-                        }
-                    },
-                    {
-                        name: 'pathname',
-                        type: 'input',
-                        message: '请输入项目在cdn服务器上的存储文件夹名:',
-                        default: '/spa-' + path.basename(projectName),
-                        validate: function(input) {
-                            return /\s|\//.test(input.replace(/^\//, ''))
-                                ? '文件夹名不能包含 空格、/ 等其它字符'
-                                : true;
-                        }
-                    }
-                );
-            }
-
-            return inquirer.prompt(questions).then(function(answers_rest) {
-                return Object.assign(answers, answers_rest);
-            });
-        })
         .then(function(answers) {
             projectCustom = answers;
 
@@ -223,6 +232,10 @@ function createApp(name) {
 
         packageJson.scripts.cdn = 'node scripts/cdn.js';
         packageJson.scripts.pack += ' && npm run cdn';
+    }
+
+    if (projectCustom.locals) {
+        packageJson.locals = projectCustom.locals.split(/\s+|\s*,\s*/g);
     }
 
     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(packageJson, null, 2));

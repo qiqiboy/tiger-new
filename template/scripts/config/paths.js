@@ -46,6 +46,7 @@ module.exports = {
     appSrc: resolveApp('app'),
     appTsConfig: resolveApp('tsconfig.json'),
     staticSrc: resolveApp('static'),
+    locals: resolveApp('locals'),
     proxySetup: resolveApp('setupProxy.js'),
     appNodeModules: resolveApp('node_modules'),
     ownNodeModules: resolveApp('node_modules'),

@@ -4,6 +4,9 @@
  * 2: error
  */
 module.exports = {
+    globals: {
+        __: true
+    },
     parserOptions: {
         ecmaFeatures: {
             legacyDecorators: true

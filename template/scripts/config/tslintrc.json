@@ -15,6 +15,7 @@
     "prefer-const": false,
     "jsx-boolean-value": false,
     "only-arrow-functions": false,
-    "jsx-no-lambda": false
+    "jsx-no-lambda": false,
+    "interface-name": false
   }
 }

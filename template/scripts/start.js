@@ -19,6 +19,7 @@ const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const checkMissDependencies = require('./config/checkMissDependencies');
 const config = require('./config/webpack.config.dev');
 const paths = require('./config/paths');
+const { ensureLocals } = require('./i18n');
 const pkg = require(paths.appPackageJson);
 
 const spinner = ora('webpack启动中...').start();
@@ -30,6 +31,8 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
     console.log();
     process.exit(1);
 }
+
+ensureLocals();
 
 checkMissDependencies(spinner)
     .then(() => {

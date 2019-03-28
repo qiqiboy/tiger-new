@@ -21,6 +21,7 @@ const clearConsole = require('react-dev-utils/clearConsole');
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const checkMissDependencies = require('./config/checkMissDependencies');
+const { ensureLocals } = require('./i18n');
 const ora = require('ora');
 const pkg = require(paths.appPackageJson);
 
@@ -28,6 +29,8 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
     console.log();
     process.exit(1);
 }
+
+ensureLocals();
 
 if (userDevConfig) {
     process.env.NODE_ENV = 'development';
