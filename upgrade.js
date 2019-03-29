@@ -96,6 +96,29 @@ function appUpgrade(projectName) {
                     });
                 }
 
+                if (!package.locals || !package.scripts['i18n-scan']) {
+                    questions.push(
+                        {
+                            name: 'addLocals',
+                            type: 'confirm',
+                            message: '是否升级i18n支持?',
+                            default: false
+                        },
+                        {
+                            name: 'locals',
+                            type: 'input',
+                            message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
+                            default: 'zh_CN,en_US',
+                            validate: function(input) {
+                                return input ? true : '该字段不能为空';
+                            },
+                            when: function(answers) {
+                                return answers.addLocals && !package.locals;
+                            }
+                        }
+                    );
+                }
+
                 inquirer.prompt(questions).then(answers => {
                     console.log();
 
@@ -145,22 +168,22 @@ function appUpgrade(projectName) {
 
                         if (package.scripts.precommit) {
                             delete package.scripts.precommit;
-                            package.husky.hooks['pre-commit'] = 'lint-staged';
+                            package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
                         }
 
                         if (package.scripts.commitmsg) {
                             delete package.scripts.commitmsg;
-                            package.husky.hooks['commit-msg'] = 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS';
+                            package.husky.hooks['commit-msg'] = pkgTemp.husky.hooks['commit-msg'];
                         }
                     }
 
                     if (answers.addPrettier) {
-                        package.husky.hooks['pre-commit'] = 'lint-staged';
+                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
                         package.prettier = pkgTemp.prettier;
                     }
 
                     if (answers.addCommitlint) {
-                        package.husky.hooks['commit-msg'] = 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS';
+                        package.husky.hooks['commit-msg'] = pkgTemp.husky.hooks['commit-msg'];
                         package.commitlint = pkgTemp.commitlint;
                     }
 
@@ -186,6 +209,35 @@ function appUpgrade(projectName) {
                         ]);
                     }
 
+                    if (answers.addLocals) {
+                        if (answers.locals) {
+                            package.locals = answers.locals.split(/\s+|\s*,\s*/g);
+                        }
+
+                        if (!package.scripts['i18n-scan']) {
+                            package.scripts['i18n-scan'] = pkgTemp.scripts['i18n-scan'];
+                            package.scripts['i18n-read'] = pkgTemp.scripts['i18n-read'];
+
+                            spinner.succeed(chalk.red('已增加 i18n-scan 任务！'));
+                            spinner.succeed(chalk.red('已增加 i18n-read 任务！'));
+                        }
+
+                        fs.copy(
+                            path.resolve(ownPath, 'template/app/utils/i18n/index.ts'),
+                            path.resolve(root, 'app/utils/i18n/index.ts'),
+                            {
+                                overwrite: true
+                            }
+                        );
+
+                        spinner.succeed(chalk.red('已更新 utils/i18n 模块依赖！'));
+
+                        fs.copySync(path.resolve(ownPath, 'template/global.d.ts'), globalDeclare, {
+                            overwrite: true
+                        });
+
+                        spinner.succeed(chalk.red('已成功升级i18n支持！'));
+                    }
 
                     if (!package.config) {
                         package.config = {};

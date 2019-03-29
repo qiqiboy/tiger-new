@@ -56,7 +56,7 @@ interface I18n extends DefaultLang {
 
 // 可用的语言
 // @ts-ignore
-const avaliable = pkg.locals || ['zh_CN', 'en_US', 'zh_TW'];
+const avaliable = pkg.locals || ['zh_CN', 'en_US'];
 const lang2code = {
     zh_CN: 'cn',
     zh_TW: 'tw',
