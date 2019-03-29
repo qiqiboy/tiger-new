@@ -108,18 +108,6 @@ function ensureLang(base, checkedLang, name) {
     });
 }
 
-function deepMergeLang(config, base = i18n) {
-    each(config, (item, key) => {
-        if (key in base) {
-            if (item && typeof item === 'object') {
-                deepMergeLang(item, base[key]);
-            } else {
-                base[key] = item;
-            }
-        }
-    });
-}
-
 /**
  * @description
  * 处理语言包配置
@@ -157,12 +145,20 @@ const i18n: I18n = (config => {
 
 i18n.language = language;
 
+// tslint:disable-next-line
+const langConfig = require(`./config/${language}`);
+
+// 我们以zh_CN为基础语言配置，对其它语言包的完整性进行检查和修复
+if (language !== 'zh_CN') {
+    ensureLang(zh_CN, langConfig, language);
+}
+
 // 默认先挂载中文语言包
-Object.assign(i18n, zh_CN);
+Object.assign(i18n, langConfig);
 
 export default i18n;
 
-const loadLangs = [import(`./config/${language}`)];
+const loadLangs: any[] = [];
 
 // @ts-ignore
 if (pkg.locals) {
@@ -174,15 +170,8 @@ export const ready = Promise.all(loadLangs);
 let globalTranslation = {};
 
 ready.then(translations => {
-    deepMergeLang(translations[0]);
-    // 我们以zh_CN为基础语言配置，对其它语言包的完整性进行检查和修复
-    if (language !== 'zh_CN') {
-        ensureLang(zh_CN, translations[0], language);
-    }
-
-    if (translations[1]) {
-        globalTranslation = translations[1];
-        console.log(globalTranslation);
+    if (translations[0]) {
+        globalTranslation = translations[0];
     }
 });
 

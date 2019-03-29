@@ -129,10 +129,12 @@ exports.ensureLocals = function() {
     fs.ensureDirSync(path.join(paths.locals));
 
     if (Array.isArray(pkg.locals)) {
-        if (!fs.existsSync(paths.locals)) {
-            paths.locals.forEach(lang => {
-                fs.outputJSONSync(path.join(paths.locals, lang + '.json', '{}'));
-            });
-        }
+        pkg.locals.forEach(lang => {
+            const file = path.join(paths.locals, lang + '.json');
+
+            if (!fs.existsSync(file)) {
+                fs.outputJSONSync(file, {});
+            }
+        });
     }
 };
