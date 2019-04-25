@@ -41,7 +41,11 @@ function ensureLocalsConfig() {
  */
 function scanner() {
     const i18nParser = new Parser({
-        lngs: pkg.locals
+        lngs: pkg.locals,
+        nsSeparator: false,
+        keySeparator: false,
+        pluralSeparator: false,
+        contextSeparator: false
     });
 
     fs.ensureDirSync(path.join(paths.locals, 'xlsx'));
