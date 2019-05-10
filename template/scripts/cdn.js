@@ -8,14 +8,18 @@ var paths = require('./config/paths');
 var ora = require('ora');
 var pkg = require(paths.appPackageJson);
 var throttleDelay = 0;
-var spinner;
+var spinner = ora();
 
 var staticFileName = 'static.config.json';
 var staticConfigFile = path.resolve(paths.root, staticFileName);
 var oldStaticConfig = lodash.invert(getStaticConfig(staticConfigFile));
 var newStaticConfig = {};
 
-runCDN();
+if (pkg.cdn) {
+    runCDN();
+} else {
+    spinner.info(chalk.cyan('未发现CDN配置信息，已跳过'));
+}
 
 function getStaticConfig(path) {
     try {
@@ -35,7 +39,7 @@ function removeFileNameHash(fileName) {
 function runCDN() {
     throttleDelay = 0;
 
-    spinner = ora('开始上传').start();
+    spinner.start('开始上传');
 
     var exitsNum = 0;
     var allFiles = glob.sync(path.join(paths.appBuild, 'static/**/!(*.map)'));

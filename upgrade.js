@@ -119,6 +119,15 @@ function appUpgrade(projectName) {
                     );
                 }
 
+                if (!package.scripts['release']) {
+                     questions.push({
+                        name: 'supportRelease',
+                        type: 'confirm',
+                        message: '是否增加自动release支持?',
+                        default: false
+                    });
+                }
+
                 inquirer.prompt(questions).then(answers => {
                     console.log();
 
@@ -237,6 +246,10 @@ function appUpgrade(projectName) {
                         });
 
                         spinner.succeed(chalk.red('已成功升级i18n支持！'));
+                    }
+
+                    if (answers.supportRelease) {
+                        package.scripts.release = pkgTemp.scripts.release;
                     }
 
                     if (!package.config) {

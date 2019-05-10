@@ -5,8 +5,8 @@ var chalk = require('chalk');
 var _ = require('lodash');
 
 var files = {
-    js: glob.sync('./app/**/*.{js,jsx}'),
-    css: glob.sync('./{app,static}/**/*.scss'),
+    js: glob.sync('./app/**/*.{js,jsx,ts,tsx}'),
+    css: glob.sync('./{app,static}/**/*.{scss,css,less}'),
     images: glob.sync('./{app,static,public}/**/*.{png,jpg,jpeg,gif,svg,ico}')
 };
 

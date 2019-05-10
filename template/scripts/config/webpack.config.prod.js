@@ -20,7 +20,7 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const pkg = require(paths.appPackageJson);
 
-const relativeRoot = pkg.noRewrite ? '.' : '';
+const relativeRoot = pkg.noRewrite ? '.' : path.join(pkg.basename || '');
 const cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
 const publicPath = ensureSlash(cdnUrl, true);
 const publicUrl = ensureSlash(cdnUrl, false);
