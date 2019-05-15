@@ -115,7 +115,7 @@ module.exports = {
             { parser: { requireEnsure: false } },
 
             {
-                test: /\.(js|mjs|jsx)$/,
+                test: /\.(js|mjs|jsx|ts|tsx)$/,
                 enforce: 'pre',
                 use: [
                     {
@@ -252,7 +252,6 @@ module.exports = {
             new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
             new ModuleNotFoundPlugin(paths.root),
             new webpack.EnvironmentPlugin(env.raw),
-            new webpack.HotModuleReplacementPlugin(),
             new CaseSensitivePathsPlugin(),
             new WatchMissingNodeModulesPlugin(paths.appNodeModules),
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -260,7 +259,7 @@ module.exports = {
                 typescript: resolve.sync('typescript', {
                     basedir: paths.appNodeModules
                 }),
-                tslint: true,
+                tslint: false,
                 async: false,
                 checkSyntacticErrors: true,
                 tsconfig: paths.appTsConfig,

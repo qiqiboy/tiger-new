@@ -3,6 +3,7 @@ import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import { Modal } from 'react-bootstrap';
 
 const _Modal = Modal;
+
 export default _Modal as INewModal;
 
 type INewModal = typeof Modal & {

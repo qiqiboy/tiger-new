@@ -11,6 +11,7 @@ export interface IHButtonProps extends ButtonProps {
 class HButton extends Component<IHButtonProps> {
     public render() {
         const { children, loading, ...props } = this.props;
+
         return (
             <Button
                 {...props}

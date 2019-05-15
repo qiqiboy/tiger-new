@@ -26,10 +26,12 @@ export default function withTransition(defaultProps: CSSTransitionProps) {
         transitionEvents = events.reduce((props, name) => {
             props[name] = (...args) => {
                 this[name](...args);
+
                 if (this.props[name]) {
                     this.props[name](...args);
                 }
             };
+
             return props;
         }, {});
 

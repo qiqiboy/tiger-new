@@ -120,7 +120,7 @@ function appUpgrade(projectName) {
                 }
 
                 if (!package.scripts['release']) {
-                     questions.push({
+                    questions.push({
                         name: 'supportRelease',
                         type: 'confirm',
                         message: '是否增加自动release支持?',
@@ -139,16 +139,11 @@ function appUpgrade(projectName) {
                             overwrite: true
                         });
                         spinner.succeed(chalk.green('tsconfig.json已写入！'));
+                    }
 
-                        fs.copySync(path.resolve(ownPath, 'template/tslint.json'), tslint, {
-                            overwrite: true
-                        });
-                        spinner.succeed(chalk.green('tslint.json已写入！'));
-
-                        if (fs.existsSync(jsconfig)) {
-                            fs.removeSync(jsconfig);
-                            spinner.succeed(chalk.red('jsconfig.json已移除！'));
-                        }
+                    if (fs.existsSync(tslint)) {
+                        fs.removeSync(tslint);
+                        spinner.succeed(chalk.red('tslint.json已移除！'));
                     }
 
                     if (fs.existsSync(tsconfigLocal)) {
@@ -262,6 +257,13 @@ function appUpgrade(projectName) {
 
                     if (!package['lint-staged']) {
                         package['lint-staged'] = pkgTemp['lint-staged'];
+                    } else {
+                        if ('{app,static}/**/*.{ts,tsx}' in package['lint-staged']) {
+                            delete package['lint-staged']['{app,static}/**/*.{ts,tsx}'];
+                            delete package['lint-staged']['{app,static}/**/*.{js,jsx,mjs}'];
+
+                            Object.assign(package['lint-staged'], pkgTemp['lint-staged']);
+                        }
                     }
 
                     if (package.cdn) {

@@ -145,7 +145,7 @@ const i18n: I18n = (config => {
 
 i18n.language = language;
 
-// tslint:disable-next-line
+// eslint-disable-next-line
 const langConfig = require(`./config/${language}`);
 
 // 我们以zh_CN为基础语言配置，对其它语言包的完整性进行检查和修复

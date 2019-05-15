@@ -1,13 +1,19 @@
+const paths = require('./paths');
+
 /**
  * 0: off
  * 1: warn
  * 2: error
  */
 module.exports = {
+    parser: '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint'],
+    extends: ['plugin:@typescript-eslint/recommended'],
     globals: {
         __: true
     },
     parserOptions: {
+        // project: paths.appTsConfig,
         ecmaFeatures: {
             legacyDecorators: true
         }
@@ -52,7 +58,7 @@ module.exports = {
         ],
         semi: 0,
         'array-callback-return': 2,
-        //"complexity": [2, 20],
+        // "complexity": [2, 20],
         'default-case': 1,
         curly: 2,
         'dot-location': [1, 'property'],
@@ -61,7 +67,7 @@ module.exports = {
         'guard-for-in': 2,
         'no-empty-pattern': 2,
         'no-implied-eval': 2,
-        //"no-invalid-this": 1,
+        // "no-invalid-this": 1,
         'no-global-assign': 2,
         'no-multi-spaces': [
             1,
@@ -87,6 +93,7 @@ module.exports = {
                 allowShortCircuit: true
             }
         ],
+        'no-unused-vars': 0,
         'no-unmodified-loop-condition': 2,
         'wrap-iife': [2, 'inside'],
         'lines-between-class-members': [1, 'always', { exceptAfterSingleLine: true }],
@@ -105,6 +112,29 @@ module.exports = {
             { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
             { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },
             { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] }
+        ],
+
+        // typescript
+        '@typescript-eslint/interface-name-prefix': 0,
+        '@typescript-eslint/explicit-member-accessibility': 0,
+        '@typescript-eslint/indent': 0,
+        '@typescript-eslint/no-object-literal-type-assertion': 0,
+        '@typescript-eslint/no-non-null-assertion': 0,
+        '@typescript-eslint/explicit-function-return-type': 0,
+        '@typescript-eslint/no-explicit-any': 0,
+        '@typescript-eslint/no-use-before-define': [2, { functions: false, classes: false }],
+        '@typescript-eslint/unified-signatures': 1,
+        // '@typescript-eslint/await-thenable': 2,
+        '@typescript-eslint/camelcase': 0,
+        '@typescript-eslint/no-unused-vars': [
+            1,
+            {
+                vars: 'all',
+                args: 'after-used',
+                ignoreRestSiblings: true,
+                varsIgnorePattern: '^_',
+                argsIgnorePattern: '^_|^err|^ev' // _xxx, err, error, ev, event
+            }
         ]
     }
 };

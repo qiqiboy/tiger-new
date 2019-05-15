@@ -62,6 +62,7 @@ function choosePort(host, defaultPort, spinner) {
 
 function createCompiler(webpack, config, appName, urls, spinner) {
     let compiler;
+    let stime = Date.now();
 
     try {
         compiler = webpack(config);
@@ -78,6 +79,7 @@ function createCompiler(webpack, config, appName, urls, spinner) {
             clearConsole();
         }
 
+        stime = Date.now();
         spinner.text = chalk.cyan('重新编译...');
     });
 
@@ -90,11 +92,13 @@ function createCompiler(webpack, config, appName, urls, spinner) {
             clearConsole();
         }
 
+        const useTimer = chalk.grey('(编译耗时 ' + (Date.now() - stime) / 1000 + 's)');
+
         const messages = formatWebpackMessages(stats.toJson({ all: false, warnings: true, errors: true }));
         const isSuccessful = !messages.errors.length && !messages.warnings.length;
 
         if (isSuccessful && (isInteractive || isFirstCompile)) {
-            spinner.succeed(chalk.green('编译通过！'));
+            spinner.succeed(chalk.green('编译通过！' + useTimer));
             console.log();
             spinner.succeed(chalk.green('应用(' + appName + ')已启动:'));
             console.log();
@@ -115,7 +119,7 @@ function createCompiler(webpack, config, appName, urls, spinner) {
                 messages.errors.length = 1;
             }
 
-            spinner.fail(chalk.red('编译失败！！'));
+            spinner.fail(chalk.red('编译失败！！' + useTimer));
             console.log();
             console.log(messages.errors.join('\n\n'));
             console.log();
@@ -123,7 +127,7 @@ function createCompiler(webpack, config, appName, urls, spinner) {
 
         // Show warnings if no errors were found.
         if (messages.warnings.length) {
-            spinner.warn(chalk.yellow('编译有警告产生：'));
+            spinner.warn(chalk.yellow('编译有警告产生：' + useTimer));
             console.log();
             console.log(messages.warnings.join('\n\n'));
             console.log();
@@ -131,11 +135,7 @@ function createCompiler(webpack, config, appName, urls, spinner) {
             // Teach some ESLint tricks.
             console.log('\n搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
             console.log(
-                '如果要忽略警告, 可以将 ' +
-                    chalk.cyan('// eslint-disable-next-line') +
-                    ' 或 ' +
-                    chalk.cyan('// tslint:disable-next-line') +
-                    ' 添加到产生警告的代码行上方\n'
+                '如果要忽略警告, 可以将 ' + chalk.cyan('// eslint-disable-next-line') + ' 添加到产生警告的代码行上方\n'
             );
         }
 

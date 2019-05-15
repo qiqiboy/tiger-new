@@ -56,6 +56,7 @@ class OverlayContainer extends Component<
 
     public render() {
         const { children, className } = this.props;
+
         return (
             <div
                 className={className + ' faq-overlay-root'}
@@ -79,6 +80,7 @@ class FAQ extends Component<IFAQProps, IFAQState> {
 
     public render() {
         const { children, ...props } = this.props;
+
         return (
             <Fragment>
                 <Glyphicon glyph="question-sign" className="faq-root" onClick={this.toggle} />

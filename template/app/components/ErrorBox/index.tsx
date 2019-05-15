@@ -27,6 +27,7 @@ class ErrorBox extends Component<IErrorBoxProps, IErrorBoxState> {
                 loading: true
             });
 
+            // eslint-disable-next-line
             await onClick!(ev);
         } catch (error) {
             //

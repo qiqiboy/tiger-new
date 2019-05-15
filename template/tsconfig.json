@@ -20,7 +20,7 @@
     "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "baseUrl": ".",
     "paths": {
       "*": ["*", "app/*"]

@@ -80,6 +80,7 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
 
         if (visible) {
             const LoadingElement = <Loading type="circle" label={text} />;
+
             if (!Toast.loadingInstance) {
                 Toast.loadingInstance = open(LoadingElement, {
                     className: 'toast-loading-root',

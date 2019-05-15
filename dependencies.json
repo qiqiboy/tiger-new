@@ -12,6 +12,8 @@
     "@types/react-dom": "16",
     "@types/react-router-dom": "4",
     "@types/react-transition-group": "2",
+    "@typescript-eslint/eslint-plugin": "1",
+    "@typescript-eslint/parser": "1",
     "babel-eslint": "10",
     "babel-jest": "23",
     "babel-loader": "8",
@@ -69,12 +71,9 @@
     "stylelint-config-recommended": "2.1.0",
     "sw-precache-webpack-plugin": "0.11",
     "terser-webpack-plugin": "1.1",
-    "tslint": "5.11",
-    "tslint-config-prettier": "1.15",
-    "tslint-react": "3.6",
-    "typescript": "3.1",
+    "typescript": "3",
     "webpack": "4",
-    "webpack-dev-server": "3.2"
+    "webpack-dev-server": "3"
   },
   "dependencies": {
     "axios": "latest",
@@ -90,7 +89,7 @@
     "react-dom": "16",
     "react-formutil": "latest",
     "react-loadable": "latest",
-    "react-router-dom": "4",
+    "react-router-dom": "5",
     "react-transition-group": "2"
   }
 }

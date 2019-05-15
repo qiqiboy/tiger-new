@@ -12,7 +12,7 @@ function createNode(text) {
 export default function copyMe(text) {
     const targetNode = createNode(text);
     const range = document.createRange();
-    const selection = window.getSelection();
+    const selection = window.getSelection()!;
 
     targetNode.focus();
     range.selectNodeContents(targetNode);

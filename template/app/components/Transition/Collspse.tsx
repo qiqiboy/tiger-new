@@ -27,7 +27,7 @@ const horizontalCssNames = [
 ];
 
 function triggerReflow(node) {
-    // tslint:disable-next-line
+    // eslint-disable-next-line
     node.offsetHeight;
 }
 
@@ -52,10 +52,12 @@ class Collapse extends Component<ICollapseProps> {
     transitionEvents = events.reduce((props, name) => {
         props[name] = (...args) => {
             this[name](...args);
+
             if (this.props[name]) {
                 this.props[name](...args);
             }
         };
+
         return props;
     }, {});
 
@@ -137,6 +139,7 @@ class Collapse extends Component<ICollapseProps> {
             cssNames.boxProps.forEach(name => (node.style[name] = 0));
         }
     };
+
     onEntering = node => {
         if (node) {
             triggerReflow(node);
@@ -144,10 +147,12 @@ class Collapse extends Component<ICollapseProps> {
             this.addTransition(node);
 
             const cssNames = this.getCssNames();
+
             cssNames.boxProps.forEach(name => (node.style[name] = this.defaultStyle[name]));
             node.style[cssNames.sizeName] = this.defaultStyle[cssNames.sizeName];
         }
     };
+
     onEntered = node => {
         if (node) {
             node.classList.remove(TransitionClassName);
@@ -157,6 +162,7 @@ class Collapse extends Component<ICollapseProps> {
             this.revertStyle(node);
         }
     };
+
     onExit = node => {
         if (node) {
             const cssNames = this.getCssNames();
@@ -166,6 +172,7 @@ class Collapse extends Component<ICollapseProps> {
             node.style[cssNames.sizeName] = node[cssNames.sizeFrom] + 'px';
         }
     };
+
     onExiting = node => {
         if (node) {
             triggerReflow(node);
@@ -178,10 +185,11 @@ class Collapse extends Component<ICollapseProps> {
             cssNames.boxProps.forEach(name => (node.style[name] = 0));
         }
     };
+
     onExited = this.onEntered;
 
     public render() {
-        const { direction, timeout, ...props } = this.props;
+        const { timeout, ...props } = this.props;
 
         return <Transition timeout={timeout!} {...props} {...this.transitionEvents} />;
     }

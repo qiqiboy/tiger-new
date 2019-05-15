@@ -182,7 +182,7 @@ module.exports = {
             { parser: { requireEnsure: false } },
 
             {
-                test: /\.(js|mjs|jsx)$/,
+                test: /\.(js|mjs|jsx|ts|tsx)$/,
                 enforce: 'pre',
                 use: [
                     {
@@ -387,7 +387,7 @@ module.exports = {
                 typescript: resolve.sync('typescript', {
                     basedir: paths.appNodeModules
                 }),
-                tslint: true,
+                tslint: false,
                 async: false,
                 checkSyntacticErrors: true,
                 tsconfig: paths.appTsConfig,
