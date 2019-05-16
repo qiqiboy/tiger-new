@@ -28,7 +28,7 @@ module.exports = {
                 }
             ],
             '@typescript-eslint/adjacent-overload-signatures': 2,
-            '@typescript-eslint/array-type': 2,
+            '@typescript-eslint/array-type': [1, 'array-simple'],
             '@typescript-eslint/ban-types': 2,
             '@typescript-eslint/class-name-casing': 2,
             '@typescript-eslint/explicit-function-return-type': 0,

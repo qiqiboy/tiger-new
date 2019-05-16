@@ -162,7 +162,7 @@ const loadLangs: any[] = [];
 
 // @ts-ignore
 if (pkg.locals) {
-    loadLangs.push(import(`locals/${language}.json`));
+    loadLangs.push(import(/* webpackMode: "eager" */ `locals/${language}.json`));
 }
 
 export const ready = Promise.all(loadLangs);
