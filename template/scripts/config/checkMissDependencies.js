@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: 0 */
 var checkDependencies = require('check-dependencies');
 var inquirer = require('react-dev-utils/inquirer');
 var spawn = require('cross-spawn');

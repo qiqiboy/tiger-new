@@ -6,9 +6,50 @@ const paths = require('./paths');
  * 2: error
  */
 module.exports = {
-    parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint'],
-    extends: ['plugin:@typescript-eslint/recommended'],
+    overrides: {
+        files: ['**/*.ts', '**/*.tsx'],
+        /* parserOptions: {
+         *     project: paths.appTsConfig,
+         * }, */
+        rules: {
+            // typescript
+            '@typescript-eslint/no-use-before-define': [2, { functions: false, classes: false }],
+            '@typescript-eslint/unified-signatures': 1,
+            // '@typescript-eslint/await-thenable': 2,
+            '@typescript-eslint/camelcase': 0,
+            '@typescript-eslint/no-unused-vars': [
+                1,
+                {
+                    vars: 'all',
+                    args: 'after-used',
+                    ignoreRestSiblings: true,
+                    varsIgnorePattern: '^_',
+                    argsIgnorePattern: '^_|^err|^ev' // _xxx, err, error, ev, event
+                }
+            ],
+            '@typescript-eslint/adjacent-overload-signatures': 2,
+            '@typescript-eslint/array-type': 2,
+            '@typescript-eslint/ban-types': 2,
+            '@typescript-eslint/class-name-casing': 2,
+            '@typescript-eslint/explicit-function-return-type': 0,
+            '@typescript-eslint/explicit-member-accessibility': 0,
+            '@typescript-eslint/indent': 0,
+            '@typescript-eslint/interface-name-prefix': 0,
+            '@typescript-eslint/member-delimiter-style': 2,
+            '@typescript-eslint/no-empty-interface': 2,
+            '@typescript-eslint/no-explicit-any': 0,
+            '@typescript-eslint/no-inferrable-types': 2,
+            '@typescript-eslint/no-misused-new': 2,
+            '@typescript-eslint/no-non-null-assertion': 0,
+            '@typescript-eslint/no-object-literal-type-assertion': 0,
+            '@typescript-eslint/no-parameter-properties': 2,
+            '@typescript-eslint/no-triple-slash-reference': 2,
+            '@typescript-eslint/no-var-requires': 2,
+            '@typescript-eslint/prefer-interface': 2,
+            '@typescript-eslint/prefer-namespace-keyword': 2,
+            '@typescript-eslint/type-annotation-spacing': 2
+        }
+    },
     globals: {
         __: true
     },
@@ -57,6 +98,8 @@ module.exports = {
             }
         ],
         semi: 0,
+        'semi-spacing': [1, { before: false }],
+        'no-extra-semi': 1,
         'array-callback-return': 2,
         // "complexity": [2, 20],
         'default-case': 1,
@@ -93,7 +136,16 @@ module.exports = {
                 allowShortCircuit: true
             }
         ],
-        'no-unused-vars': 0,
+        'no-unused-vars': [
+            1,
+            {
+                vars: 'all',
+                args: 'after-used',
+                ignoreRestSiblings: true,
+                varsIgnorePattern: '^_',
+                argsIgnorePattern: '^_|^err|^ev' // _xxx, err, error, ev, event
+            }
+        ],
         'no-unmodified-loop-condition': 2,
         'wrap-iife': [2, 'inside'],
         'lines-between-class-members': [1, 'always', { exceptAfterSingleLine: true }],
@@ -112,29 +164,6 @@ module.exports = {
             { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
             { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },
             { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] }
-        ],
-
-        // typescript
-        '@typescript-eslint/interface-name-prefix': 0,
-        '@typescript-eslint/explicit-member-accessibility': 0,
-        '@typescript-eslint/indent': 0,
-        '@typescript-eslint/no-object-literal-type-assertion': 0,
-        '@typescript-eslint/no-non-null-assertion': 0,
-        '@typescript-eslint/explicit-function-return-type': 0,
-        '@typescript-eslint/no-explicit-any': 0,
-        '@typescript-eslint/no-use-before-define': [2, { functions: false, classes: false }],
-        '@typescript-eslint/unified-signatures': 1,
-        // '@typescript-eslint/await-thenable': 2,
-        '@typescript-eslint/camelcase': 0,
-        '@typescript-eslint/no-unused-vars': [
-            1,
-            {
-                vars: 'all',
-                args: 'after-used',
-                ignoreRestSiblings: true,
-                varsIgnorePattern: '^_',
-                argsIgnorePattern: '^_|^err|^ev' // _xxx, err, error, ev, event
-            }
         ]
     }
 };

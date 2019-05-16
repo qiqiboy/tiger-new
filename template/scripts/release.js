@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: 0 */
 const inquirer = require('inquirer');
 const semver = require('semver');
 const chalk = require('chalk');

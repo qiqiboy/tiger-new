@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: 0 */
 const path = require('path');
 const fs = require('fs');
 const glob = require('glob');

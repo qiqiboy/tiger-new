@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: 0 */
 const fs = require('fs-extra');
 const glob = require('glob');
 const Parser = require('i18next-scanner').Parser;

@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: 0 */
 const getProcessForPort = require('react-dev-utils/getProcessForPort');
 const clearConsole = require('react-dev-utils/clearConsole');
 const detect = require('detect-port-alt');

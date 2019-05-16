@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-var-requires: 0 */
 process.env.BABEL_ENV = 'production';
 process.env.NODE_ENV = 'production';
 
