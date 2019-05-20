@@ -8,12 +8,12 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
-const userDevConfig = process.argv[2] === '--dev';
+const useDevConfig = process.argv[2] === '--dev';
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const path = require('path');
 const webpack = require('webpack');
-const config = require(userDevConfig ? './config/webpack.config.dev' : './config/webpack.config.prod');
+const config = require(useDevConfig ? './config/webpack.config.dev' : './config/webpack.config.prod');
 const paths = require('./config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
@@ -33,7 +33,7 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 
 ensureLocals();
 
-if (userDevConfig) {
+if (useDevConfig) {
     process.env.NODE_ENV = 'development';
     process.env.BABEL_ENV = 'development';
     config.output.path = paths.appBuild = paths.appBuildDev;
@@ -66,16 +66,12 @@ checkMissDependencies(spinner)
             // Teach some ESLint tricks.
             console.log('\n搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
             console.log(
-                '如果要忽略警告, 可以将 ' +
-                    chalk.cyan('// eslint-disable-next-line') +
-                    ' 或 ' +
-                    chalk.cyan('// tslint:disable-next-line') +
-                    ' 添加到产生警告的代码行上方\n'
+                '如果要忽略警告, 可以将 ' + chalk.cyan('// eslint-disable-next-line') + ' 添加到产生警告的代码行上方\n'
             );
             console.log();
             console.log();
 
-            if (!userDevConfig) {
+            if (!useDevConfig) {
                 spinner.fail(chalk.red('请处理所有的错误和警告后再build代码！'));
 
                 console.log();
@@ -129,7 +125,7 @@ checkMissDependencies(spinner)
 
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-    let packText = userDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...';
+    let packText = useDevConfig ? '启动测试环境打包编译...' : '启动生产环境打包压缩...';
     let startTime = Date.now();
     let timer;
     let logProgress = function(stop) {

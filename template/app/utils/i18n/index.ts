@@ -31,7 +31,6 @@
  *  <App />
  * </Provider>
  */
-import { Component } from 'react';
 import * as zh_CN from './config/zh_CN';
 import URL from 'utils/URL';
 import pkg from 'package.json';
@@ -62,25 +61,24 @@ const lang2code = {
     zh_TW: 'tw',
     en_US: 'en'
 };
+const queryObj = URL.current().query;
 
-export let language = (URL.current().query.lang || localStorage.getItem('lang')) as string;
+export let language = (queryObj.lang || localStorage.getItem('lang')) as string;
 
-if (avaliable.includes(language)) {
-    localStorage.setItem('lang', language);
-} else {
+if (!avaliable.includes(language)) {
     const { language: browserlang } = window.navigator;
 
-    if (/en/i.test(browserlang)) {
+    if (/en/i.test(browserlang) && avaliable.includes('en_US')) {
         language = 'en_US';
-    } else if (/tw|hk/i.test(browserlang)) {
+    } else if (/tw|hk/i.test(browserlang) && avaliable.includes('zh_TW')) {
         language = 'zh_TW';
     } else {
         language = avaliable[0];
     }
 }
 
-if (!avaliable.includes(language)) {
-    language = avaliable[0];
+if (language === queryObj.lang) {
+    localStorage.setItem('lang', language);
 }
 
 function each(obj: object, callback: (item: any, key: any) => void) {
@@ -103,6 +101,7 @@ function ensureLang(base, checkedLang, name) {
             if (!checkedLang[key]) {
                 checkedLang[key] = Array.isArray(item) ? [] : {};
             }
+
             ensureLang(item, checkedLang[key], `${name}.${key}`);
         }
     });
@@ -158,22 +157,12 @@ Object.assign(i18n, langConfig);
 
 export default i18n;
 
-const loadLangs: any[] = [];
+let globalTranslation;
 
 // @ts-ignore
 if (pkg.locals) {
-    loadLangs.push(import(/* webpackMode: "eager" */ `locals/${language}.json`));
+    globalTranslation = require(`locals/${language}.json`);
 }
-
-export const ready = Promise.all(loadLangs);
-
-let globalTranslation = {};
-
-ready.then(translations => {
-    if (translations[0]) {
-        globalTranslation = translations[0];
-    }
-});
 
 /**
  * @description
@@ -182,18 +171,3 @@ ready.then(translations => {
 window.__ = function(key) {
     return globalTranslation[key] || key;
 };
-
-export class Provider extends Component {
-    constructor(props) {
-        super(props);
-
-        // 语言包加载成功后，强制刷新下组件
-        ready.then(() => {
-            this.forceUpdate();
-        });
-    }
-
-    render() {
-        return this.props.children;
-    }
-}

@@ -87,8 +87,13 @@ module.exports = {
                 vendors: {
                     chunks: 'all',
                     test: '_vendor_',
-                    name: 'vendor',
-                    reuseExistingChunk: true
+                    name: 'vendor'
+                },
+                i18n: {
+                    chunks: 'all',
+                    test: /utils\/i18n|locals\/\w+\.json/,
+                    enforce: true,
+                    name: 'i18n'
                 }
             }
         }

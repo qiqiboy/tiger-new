@@ -51,7 +51,7 @@
     "less": "3.8",
     "less-loader": "4.1",
     "lint-staged": "8",
-    "mini-css-extract-plugin": "0.4",
+    "mini-css-extract-plugin": "0",
     "node-sass": "4.6",
     "node-xlsx": "0.14",
     "optimize-css-assets-webpack-plugin": "5.0",
