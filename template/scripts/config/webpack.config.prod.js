@@ -21,7 +21,7 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const pkg = require(paths.appPackageJson);
 
-const relativeRoot = pkg.noRewrite ? '.' : path.join(pkg.basename || '');
+const relativeRoot = path.join(pkg.noRewrite ? '.' : pkg.basename || '/');
 const cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
 const publicPath = ensureSlash(cdnUrl, true);
 const publicUrl = ensureSlash(cdnUrl, false);
@@ -380,7 +380,7 @@ module.exports = {
                     stripPrefix: 'build/',
 
                     // For unknown URLs, fallback to the index page
-                    navigateFallback: relativeRoot + path.join(pkg.basename || '', '/index.html'),
+                    navigateFallback: path.join(relativeRoot, '/index.html'),
                     // Ignores URLs starting from /__ (useful for Firebase):
                     // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
                     navigateFallbackWhitelist: [/^(?!\/__).*/],
