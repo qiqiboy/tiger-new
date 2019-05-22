@@ -36,7 +36,7 @@ module.exports = {
             '@typescript-eslint/indent': 0,
             '@typescript-eslint/interface-name-prefix': 0,
             '@typescript-eslint/member-delimiter-style': 2,
-            '@typescript-eslint/no-empty-interface': 2,
+            '@typescript-eslint/no-empty-interface': 1,
             '@typescript-eslint/no-explicit-any': 0,
             '@typescript-eslint/no-inferrable-types': 2,
             '@typescript-eslint/no-misused-new': 2,
