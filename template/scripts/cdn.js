@@ -22,12 +22,13 @@ if (pkg.cdn) {
     if ('server' in pkg.cdn || 'ali-oss' in pkg.cdn) {
         runCDN();
     } else {
-        spinner.fail(
-            chalk.red(`未发现CDN服务连接信息，请根据下述信息在 ${chalk.cyan('package.json')} 中补充相关配置：`)
-        );
+        spinner.fail(chalk.red(`未发现CDN服务连接配置信息！`));
+        spinner.fail(chalk.red(`如果不需要CDN服务，您可以移除 ${chalk.cyan('package.json')} 中的 cdn 字段；`));
+        spinner.fail(chalk.red(`或者，请根据下述信息在 ${chalk.cyan('package.json')} 中补充相关配置：`));
         console.log(
             chalk.grey(`
-支持两种cdn配置方式，分别需要在 ${chalk.cyan('package.json')} 中配置相关的cdn字段
+支持两种cdn配置方式，分别需要在 ${chalk.cyan('package.json')} 中配置相关的cdn字段：
+
 {
     "name": "${pkg.name}",
     "version": "${pkg.version}",
