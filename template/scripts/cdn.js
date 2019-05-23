@@ -18,27 +18,37 @@ const newStaticConfig = {};
 const spinner = ora();
 let throttleDelay = 0;
 
-/*!
- * 支持两种cdn配置方式，分别需要在package.json中配置相关的cdn字段
- * {
- *      "cdn": {
- *          "host": "https://xxx.com",
- *          "path": "/xxx",
- *          "server": "host:path",
- *          "ali-oss": {
- *              ...
- *          }
- *      }
- * }
- *
- * server和ali-oss字段必选其一配置，别对对应下述两种cdn配置方式：
- *
- * 1. 阿里云的OSS存储服务，对应ali-oss配置（具体需要配置的内容可以参考阿里云文档）
- * 2. 通过ssh的rsync命令传到源服务器上，对应server字段配置，即rasync命令的目标服务器与路径
- */
-
 if (pkg.cdn) {
-    runCDN();
+    if ('server' in pkg.cdn || 'ali-oss' in pkg.cdn) {
+        runCDN();
+    } else {
+        spinner.fail(
+            chalk.red(`未发现CDN服务连接信息，请根据下述信息在 ${chalk.cyan('package.json')} 中补充相关配置：`)
+        );
+        console.log(
+            chalk.grey(`
+支持两种cdn配置方式，分别需要在 ${chalk.cyan('package.json')} 中配置相关的cdn字段
+{
+    "name": "${pkg.name}",
+    "version": "${pkg.version}",
+    "cdn": {
+        "host": "${pkg.cdn.host || 'https://xxx.com'}",
+        "path": "${pkg.cdn.path || '/xxx'}",
+        ${chalk.cyan(`"server": "host:path",
+        "ali-oss": {
+            ...
+        }`)}
+   },
+   ...
+}
+
+server和ali-oss字段必选其一配置，别对对应下述两种cdn配置方式：
+
+1. 阿里云的OSS存储服务，对应ali-oss配置（具体需要配置的内容可以参考阿里云文档）
+2. 通过ssh的rsync命令传到源服务器上，对应server字段配置，即rsync命令的目标服务器与路径，例如：BEIJING_HOST:/data0/webservice/static
+`) // `
+        );
+    }
 } else {
     spinner.info(chalk.cyan('未发现CDN配置信息，已跳过'));
 }
@@ -89,8 +99,8 @@ function runCDN() {
         .map(useOSS ? createOSS : createRsync);
 
     Promise.all(allSyncPromises).then(function(rets) {
-        var uploadNum = rets.filter(Boolean).length;
-        var failNum = rets.length - uploadNum;
+        let uploadNum = rets.filter(Boolean).length;
+        let failNum = rets.length - uploadNum;
 
         console.log();
         console.log(

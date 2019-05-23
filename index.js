@@ -98,7 +98,7 @@ if (program.upgrade) {
                 name: 'pathname',
                 type: 'input',
                 message: '请输入项目在cdn服务器上的存储文件夹名:',
-                default: '/spa-' + path.basename(projectName),
+                default: '/' + path.basename(projectName),
                 validate: function(input) {
                     return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
                 },
@@ -225,7 +225,6 @@ function createApp(name) {
 
     if (projectCustom.useCdn) {
         packageJson.cdn = {
-            server: 'static:/data0/webservice/static',
             host: projectCustom.host,
             path: '/' + projectCustom.pathname.replace(/^\//g, '')
         };
