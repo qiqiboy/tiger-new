@@ -1,6 +1,7 @@
 import React, { Children, cloneElement } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import { Modal } from 'react-bootstrap';
+import './style.scss';
 
 const _Modal = Modal;
 
@@ -9,7 +10,7 @@ export default _Modal as INewModal;
 type INewModal = typeof Modal & {
     open: (
         config: IConfig
-    ) => IModalHandler & {
+    ) => ModalHandler & {
         result: Promise<any>;
         render(component: RenderCompoenent): void;
     };
@@ -17,12 +18,13 @@ type INewModal = typeof Modal & {
 
 type RenderCompoenent = React.ComponentType<any> | React.ReactElement<any>;
 
-type IConfig = Omit<Modal.ModalProps, 'onHide'> & {
-    onHide?(handler: IModalHandler): void;
+type IConfig = Omit<Modal.ModalProps, 'onHide' | 'animation'> & {
+    onHide?(handler: ModalHandler): void;
     component: RenderCompoenent;
+    animation?: 'slide' | 'fade';
 };
 
-export interface IModalHandler {
+export interface ModalHandler {
     close(data?: any): void;
     dismiss(reason?: any): void;
 }
@@ -86,7 +88,7 @@ export const open = ((_Modal as INewModal).open = config => {
     }
 
     function render(visible, callback?: () => void) {
-        const { component: TheComponent, ...props } = settings;
+        const { component: TheComponent, animation, ...props } = settings;
         const childProps = {
             close,
             dismiss
@@ -104,6 +106,7 @@ export const open = ((_Modal as INewModal).open = config => {
             <Modal
                 onHide={dismiss}
                 {...props}
+                className={[props.className, `animation-${animation}`].filter(Boolean).join(' ')}
                 show={visible}
                 onExited={() => {
                     if (!callback) {

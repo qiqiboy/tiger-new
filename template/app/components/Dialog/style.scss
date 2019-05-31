@@ -1,37 +1,44 @@
 .modal-dialog-root {
     .modal-dialog {
         width: auto;
-        min-width: 300px;
         max-width: 400px;
-        margin: 30px auto;
-        padding: 0 10px;
+        margin: 100px auto 0;
+        padding: 0 30px;
+    }
+
+    .modal-content {
+        border-radius: 20px;
+        border: 0;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        padding: 16px;
+        color: #4f5364;
     }
 
     .modal-header {
-        padding: 10px;
+        padding: 0 0 20px;
+        border-bottom: 0;
+        .modal-title {
+            font-size: 16px;
+            text-align: center;
+        }
     }
 
     .modal-body {
-        padding: 20px 10px;
+        padding: 0 0 15px;
     }
 
     .modal-footer {
-        padding: 10px;
+        padding: 0 10px;
         display: flex;
         justify-content: center;
+        border-top: 0;
 
         > .btn {
             flex: 1 1 100%;
-            max-width: 150px;
         }
 
         > .btn + .btn {
             margin-left: 5%;
         }
-    }
-
-    .dialog-default-header .glyphicon {
-        color: #ffe100;
-        text-shadow: 1px 1px rgba(0, 0, 0, 0.6);
     }
 }

@@ -124,6 +124,7 @@ class Collapse extends Component<ICollapseProps> {
 
     addTransition = node => {
         node.classList.add(TransitionClassName);
+
         node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
             this.props.timeout + 'ms';
     };

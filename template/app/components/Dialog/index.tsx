@@ -73,7 +73,9 @@ class Dialog extends Component<IDialogProps, IDialogState> {
                 <Modal.Footer>
                     {type === 'confirm' && (
                         <Button
-                            bsStyle="default"
+                            type="default"
+                            round
+                            ghost
                             loading={loading}
                             disabled={loading}
                             onClick={this.onBtnClick.bind(this, 'onCancel')}>
@@ -81,7 +83,8 @@ class Dialog extends Component<IDialogProps, IDialogState> {
                         </Button>
                     )}
                     <Button
-                        bsStyle="primary"
+                        round
+                        type="primary"
                         loading={loading}
                         disabled={loading}
                         onClick={this.onBtnClick.bind(this, 'onOk')}>
