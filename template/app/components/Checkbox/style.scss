@@ -1,0 +1,49 @@
+.form-checkbox {
+    $color: #a6a9b6;
+    $activeColor: #f8cc00;
+    display: flex;
+    .checked-icon {
+        flex-shrink: 0;
+        margin-right: 8px;
+        margin-top: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid $color;
+        background-color: #fff;
+        position: relative;
+        transition: 0.4s ease;
+        &:before,
+        &:after {
+            height: 2px;
+            color: inherit;
+            background-color: $color;
+            position: absolute;
+            content: '';
+            transition: 0.4s ease;
+        }
+        &:before {
+            width: 5px;
+            transform: rotate(30deg);
+            top: 8px;
+            left: 2px;
+        }
+        &:after {
+            width: 8px;
+            transform: rotate(-50deg);
+            top: 6px;
+            left: 5px;
+        }
+    }
+    &.checkbox-checked {
+        .checked-icon {
+            color: #000;
+            border-color: $activeColor;
+            background-color: $activeColor;
+            &:before,
+            &:after {
+                background-color: #000;
+            }
+        }
+    }
+}

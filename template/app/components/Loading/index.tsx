@@ -11,7 +11,7 @@ export interface ILoadingProps {
 
 class Loading extends Component<ILoadingProps> {
     static defaultProps = {
-        type: 'bar'
+        type: 'circle'
     };
 
     public render() {

@@ -39,6 +39,11 @@
     font-size: 13px;
 }
 
+.btn-lg,
+.btn-group-lg > .btn {
+    font-size: 16px;
+}
+
 @each $name,
     $color
         in (

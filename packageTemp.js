@@ -57,7 +57,7 @@ module.exports = {
             'node_modules/.bin/prettier --write',
             'git add'
         ],
-        '{app,static}/**/*.{css,scss,less,json}': ['node_modules/.bin/prettier --write', 'git add']
+        '{app,static}/**/*.{css,scss,less,json,html,md}': ['node_modules/.bin/prettier --write', 'git add']
     },
     stylelint: {
         extends: 'stylelint-config-recommended'
