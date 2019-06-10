@@ -23,22 +23,24 @@ try {
 }
 
 const output = JSON.parse(
-    execSync('cloc app static public --exclude-dir=node_modules --json')
+    execSync('cloc app static public --exclude-lang=SVG --exclude-dir=node_modules --json')
         .toString()
         .trim()
 );
 
 const fileColors = {
     JavaScript: 'bgGreen',
-    TypeScript: 'bgBlue',
+    TypeScript: 'bgCyan',
     Sass: 'bgMagenta',
     HTML: 'bgRed',
     LESS: 'bgMagenta',
     CSS: 'bgMagenta',
-    JSON: 'bgYellow'
+    JSON: 'bgYellow',
+    Markdown: 'bgBlue',
+    Python: 'inverse'
 };
 
-const tableHeader = ['语言', '文件数', '空白行数', '注释行数', '代码行数', '总行数'].map(name => ({
+const tableHeader = ['语言', '文件数', '空白行数', '注释行数', '代码行数', '总行数', '行数占比', '类型占比'].map(name => ({
     content: name,
     color: 'cyan'
 }));
@@ -46,12 +48,21 @@ const tableData = Object.keys(output)
     .filter(key => key !== 'header')
     .map(key => {
         const detail = output[key];
+        const lineCount = detail.blank + detail.comment + detail.code;
+        const totalCount = output.header.n_lines;
+        const totalFiles = output.header.n_files;
         const result = [
             { content: key === 'SUM' ? '总计' : key, color: fileColors[key] || 'white', bold: true }
         ].concat(
-            [detail.nFiles, detail.blank, detail.comment, detail.code, detail.blank + detail.comment + detail.code].map(
-                content => ({ content: String(content), color: 'white' })
-            )
+            [
+                detail.nFiles,
+                detail.blank,
+                detail.comment,
+                detail.code,
+                lineCount,
+                ((lineCount / totalCount) * 100).toFixed(2) + '%',
+                ((detail.nFiles / totalFiles) * 100).toFixed(2) + '%'
+            ].map(content => ({ content: String(content), color: 'white' }))
         );
 
         return result;
@@ -108,7 +119,7 @@ function createTable(headerData, bodyData, footer = false) {
     console.log(border);
 
     bodyData.forEach((data, index) => {
-        if (footer && index === data.length - 1) {
+        if (footer && index === bodyData.length - 1) {
             console.log(border);
         }
 
@@ -126,7 +137,9 @@ createTable(tableHeader, tableData, true);
 Object.keys(output)
     .filter(key => key !== 'header' && key !== 'SUM')
     .forEach(lang => {
-        const outputStr = execSync(`cloc app static public --by-file --include-lang=${lang} --exclude-dir=node_modules --json`)
+        const outputStr = execSync(
+            `cloc app static public --by-file --exclude-lang=SVG --include-lang=${lang} --exclude-dir=node_modules --json`
+        )
             .toString()
             .trim();
 
@@ -163,7 +176,7 @@ Object.keys(output)
                         color: 'white'
                     },
                     {
-                        content: (item.size / 100).toFixed(2) + 'KB',
+                        content: (item.size / 100).toFixed(2) + ' KB',
                         color: 'white'
                     }
                 ])
