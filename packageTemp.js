@@ -53,8 +53,8 @@ module.exports = {
     },
     'lint-staged': {
         '{app,static}/**/*.{js,jsx,mjs,ts,tsx}': [
-            'node_modules/.bin/eslint --fix',
             'node_modules/.bin/prettier --write',
+            'node_modules/.bin/eslint --fix',
             'git add'
         ],
         '{app,static}/**/*.{css,scss,less,json,html,md}': ['node_modules/.bin/prettier --write', 'git add']

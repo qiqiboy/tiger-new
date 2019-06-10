@@ -1,105 +1,170 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
-var path = require('path');
-var fs = require('fs');
-var glob = require('glob');
-var chalk = require('chalk');
-var _ = require('lodash');
+const { execSync } = require('child_process');
+const chalk = require('chalk');
+const fs = require('fs');
+const ora = require('ora');
+const clearConsole = require('react-dev-utils/clearConsole');
+const paths = require('./config/paths');
+const pkg = require(paths.appPackageJson);
 
-var files = {
-    js: glob.sync('./app/**/*.{js,jsx,ts,tsx}'),
-    css: glob.sync('./{app,static}/**/*.{scss,css,less}'),
-    images: glob.sync('./{app,static,public}/**/*.{png,jpg,jpeg,gif,svg,ico}')
+const spinner = ora();
+
+try {
+    execSync('cloc --version', {
+        stdio: 'ignore'
+    });
+} catch (error) {
+    console.log();
+    spinner.fail(chalk.red(`请先安装 cloc 命令：`));
+    console.log();
+    console.log(chalk.cyan('   npm install cloc -g'));
+
+    process.exit(0);
+}
+
+const output = JSON.parse(
+    execSync('cloc app static public --exclude-dir=node_modules --json')
+        .toString()
+        .trim()
+);
+
+const fileColors = {
+    JavaScript: 'bgGreen',
+    TypeScript: 'bgBlue',
+    Sass: 'bgMagenta',
+    HTML: 'bgRed',
+    LESS: 'bgMagenta',
+    CSS: 'bgMagenta',
+    JSON: 'bgYellow'
 };
 
-console.log(chalk.green('---------------------------- js代码情况 --------------------------'));
-analysis(files.js);
-console.log(chalk.green('---------------------------- scss代码情况 --------------------------'));
-analysis(files.css);
-console.log(chalk.green('---------------------------- 图片情况 --------------------------'));
-analysis(files.images, true);
+const tableHeader = ['语言', '文件数', '空白行数', '注释行数', '代码行数', '总行数'].map(name => ({
+    content: name,
+    color: 'cyan'
+}));
+const tableData = Object.keys(output)
+    .filter(key => key !== 'header')
+    .map(key => {
+        const detail = output[key];
+        const result = [
+            { content: key === 'SUM' ? '总计' : key, color: fileColors[key] || 'white', bold: true }
+        ].concat(
+            [detail.nFiles, detail.blank, detail.comment, detail.code, detail.blank + detail.comment + detail.code].map(
+                content => ({ content: String(content), color: 'white' })
+            )
+        );
 
-function analysis(files, noLines) {
-    var readFiles = [];
-
-    files.forEach(function(file) {
-        var data = fs.readFileSync(file, 'utf8');
-        var stat = fs.statSync(file);
-
-        readFiles.push({
-            file: file,
-            size: stat.size,
-            lastTime: stat.ctime,
-            createTime: stat.birthtime,
-            lines: data.split('\n').length
-        });
+        return result;
     });
 
-    var filesSortBySize = _.sortBy(readFiles, 'size');
-    var filesSortByLine = _.sortBy(readFiles, 'lines');
-    var filesSortByCreatetime = _.sortBy(readFiles, 'createTime');
-    var filesSortByLasttime = _.sortBy(readFiles, 'lastTime');
+function charsLength(str) {
+    let len = 0;
 
-    console.log();
-    console.log(
-        chalk.cyan('所有文件总size：') +
-            chalk.yellow(
-                formatSize(
-                    readFiles.reduce(function(total, file) {
-                        return total + file.size;
-                    }, 0)
-                )
-            )
-    );
-    console.log(
-        chalk.cyan('最大size文件：') +
-            chalk.red(filesSortBySize[filesSortBySize.length - 1].file) +
-            chalk.yellow('(' + formatSize(filesSortBySize[filesSortBySize.length - 1].size) + ')')
-    );
-    console.log(
-        chalk.cyan('最小size文件：') +
-            chalk.red(filesSortBySize[0].file) +
-            chalk.yellow('(' + formatSize(filesSortBySize[0].size) + ')')
-    );
-
-    if (!noLines) {
-        console.log();
-        console.log(
-            chalk.cyan('所有文件总行数：') +
-                chalk.yellow(
-                    readFiles.reduce(function(total, file) {
-                        return total + file.lines;
-                    }, 0)
-                )
-        );
-        console.log(
-            chalk.cyan('最多行数文件：') +
-                chalk.red(filesSortByLine[filesSortByLine.length - 1].file) +
-                chalk.yellow('(' + filesSortByLine[filesSortByLine.length - 1].lines + '行)')
-        );
-        console.log(
-            chalk.cyan('最少行数文件：') +
-                chalk.red(filesSortByLine[0].file) +
-                chalk.yellow('(' + filesSortByLine[0].lines + '行)')
-        );
+    for (let i = 0, j = str.length; i < j; i++) {
+        len += str[i].charCodeAt(0) > 255 ? 2 : 1;
     }
 
-    console.log();
-    console.log(
-        chalk.cyan('最后修改的文件：') +
-            chalk.red(filesSortByLasttime[filesSortByLasttime.length - 1].file) +
-            chalk.yellow('(' + formatTime(filesSortByLasttime[filesSortByLasttime.length - 1].lastTime) + ')')
-    );
-    console.log();
+    return len;
 }
 
-function formatSize(size) {
-    return (size / 1000).toFixed(2) + 'KB';
+function createLine(data, colsWidth) {
+    return data
+        .map((item, index) => {
+            const { content, color, bold } = item;
+            const cellWidth = colsWidth[index];
+            const isAlignRight = index > 0;
+
+            const cellPad = new Array(cellWidth - charsLength(content)).fill(' ').join('');
+            let colorStr = chalk[color](content);
+
+            if (bold) {
+                colorStr = chalk.bold(colorStr);
+            }
+
+            return isAlignRight ? cellPad + colorStr : colorStr + cellPad;
+        })
+        .join('');
 }
 
-function formatTime(date) {
-    return (
-        [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-') +
-        ' ' +
-        [date.getHours(), date.getMinutes(), date.getSeconds()].join(':')
-    );
+/**
+ * 创建表格输出
+ * @param {Array<{ color: string; content: string }>} headerData
+ * @param {Array<Array<{ color: string; content: string }>>} bodyData
+ */
+function createTable(headerData, bodyData, footer = false) {
+    const colsWidth = headerData
+        .map((data, index) =>
+            Math.max.apply(
+                null,
+                [charsLength(data.content)].concat(bodyData.map(data => charsLength(data[index].content)))
+            )
+        )
+        .map(n => Math.max(n, 10) + 3);
+    const border = chalk.grey(new Array(colsWidth.reduce((total, n) => total + n, 0)).fill('-').join(''));
+
+    // output header
+    console.log(border);
+    console.log(createLine(headerData, colsWidth));
+    console.log(border);
+
+    bodyData.forEach((data, index) => {
+        if (footer && index === data.length - 1) {
+            console.log(border);
+        }
+
+        console.log(createLine(data, colsWidth));
+    });
+
+    console.log(border);
 }
+
+clearConsole();
+console.log(chalk.cyan(`${pkg.name} v${pkg.version} 的代码分析汇总: \n`));
+spinner.succeed(chalk.green('代码概览：\n'));
+createTable(tableHeader, tableData);
+
+Object.keys(output)
+    .filter(key => key !== 'header' && key !== 'SUM')
+    .forEach(lang => {
+        const filesJson = JSON.parse(
+            execSync(`cloc app static public --by-file --include-lang=${lang} --exclude-dir=node_modules --json`)
+                .toString()
+                .trim()
+        );
+
+        const maxLinesFiles = Object.keys(filesJson)
+            .filter(key => key !== 'header' && key !== 'SUM')
+            .slice(0, 5) // 取前五个文件
+            .map(file =>
+                Object.assign(filesJson[file], {
+                    file,
+                    count: filesJson[file].code + filesJson[file].comment + filesJson[file].blank,
+                    size: fs.statSync(file).size
+                })
+            );
+
+        console.log();
+        spinner.succeed(`${chalk[fileColors[lang] || 'green'](lang)} ${chalk.green('文件概览:')}\n`);
+
+        createTable(
+            ['文件', '代码行数', '总行数', '大小'].map(name => ({
+                content: name,
+                color: 'cyan'
+            })),
+            maxLinesFiles.map(item => [
+                { content: item.file, color: 'grey', bold: true },
+                {
+                    content: String(item.code),
+                    color: 'white'
+                },
+                {
+                    content: String(item.count),
+                    color: 'white'
+                },
+                {
+                    content: (item.size / 100).toFixed(2) + 'KB',
+                    color: 'white'
+                }
+            ])
+        );
+    });
