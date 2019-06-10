@@ -121,7 +121,7 @@ function createTable(headerData, bodyData, footer = false) {
 clearConsole();
 console.log(chalk.cyan(`${pkg.name} v${pkg.version} 的代码分析汇总: \n`));
 spinner.succeed(chalk.green('代码概览：\n'));
-createTable(tableHeader, tableData);
+createTable(tableHeader, tableData, true);
 
 Object.keys(output)
     .filter(key => key !== 'header' && key !== 'SUM')

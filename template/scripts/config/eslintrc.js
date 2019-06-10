@@ -53,6 +53,11 @@ module.exports = {
     globals: {
         __: true
     },
+    parserOptions: {
+        ecmaFeatures: {
+            legacyDecorators: true
+        }
+    },
     rules: {
         'react/jsx-no-target-blank': 0,
         'jsx-a11y/anchor-is-valid': 0,
