@@ -6,6 +6,7 @@ module.exports = {
         pack: 'npm run build',
         release: 'node scripts/release.js',
         count: 'node scripts/count.js',
+        'count:js': 'node scripts/count.js --js',
         'i18n-scan': 'node scripts/i18n.js --scan',
         'i18n-read': 'node scripts/i18n.js --read'
     },

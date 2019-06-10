@@ -6,6 +6,7 @@ const ora = require('ora');
 const clearConsole = require('react-dev-utils/clearConsole');
 const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
+const onlyJS = process.argv[2] === '--js';
 
 const spinner = ora();
 
@@ -22,8 +23,10 @@ try {
     process.exit(0);
 }
 
+const extraCommand = onlyJS ? ' --include-lang=JavaScript,TypeScript' : '';
+
 const output = JSON.parse(
-    execSync('cloc app static public --exclude-lang=SVG --exclude-dir=node_modules --json')
+    execSync('cloc app static public --exclude-lang=SVG --exclude-dir=node_modules --json' + extraCommand)
         .toString()
         .trim()
 );
@@ -40,10 +43,12 @@ const fileColors = {
     Python: 'inverse'
 };
 
-const tableHeader = ['语言', '文件数', '空白行数', '注释行数', '代码行数', '总行数', '行数占比', '类型占比'].map(name => ({
-    content: name,
-    color: 'cyan'
-}));
+const tableHeader = ['语言', '文件数', '空白行数', '注释行数', '代码行数', '总行数', '行数占比', '类型占比'].map(
+    name => ({
+        content: name,
+        color: 'cyan'
+    })
+);
 const tableData = Object.keys(output)
     .filter(key => key !== 'header')
     .map(key => {
