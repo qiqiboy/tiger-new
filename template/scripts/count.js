@@ -126,45 +126,47 @@ createTable(tableHeader, tableData);
 Object.keys(output)
     .filter(key => key !== 'header' && key !== 'SUM')
     .forEach(lang => {
-        const filesJson = JSON.parse(
-            execSync(`cloc app static public --by-file --include-lang=${lang} --exclude-dir=node_modules --json`)
-                .toString()
-                .trim()
-        );
+        const outputStr = execSync(`cloc app static public --by-file --include-lang=${lang} --exclude-dir=node_modules --json`)
+            .toString()
+            .trim();
 
-        const maxLinesFiles = Object.keys(filesJson)
-            .filter(key => key !== 'header' && key !== 'SUM')
-            .slice(0, 5) // 取前五个文件
-            .map(file =>
-                Object.assign(filesJson[file], {
-                    file,
-                    count: filesJson[file].code + filesJson[file].comment + filesJson[file].blank,
-                    size: fs.statSync(file).size
-                })
+        if (outputStr) {
+            const filesJson = JSON.parse(outputStr);
+
+            const maxLinesFiles = Object.keys(filesJson)
+                .filter(key => key !== 'header' && key !== 'SUM')
+                .slice(0, 5) // 取前五个文件
+                .map(file =>
+                    Object.assign(filesJson[file], {
+                        file,
+                        count: filesJson[file].code + filesJson[file].comment + filesJson[file].blank,
+                        size: fs.statSync(file).size
+                    })
+                );
+
+            console.log();
+            spinner.succeed(`${chalk[fileColors[lang] || 'green'](lang)} ${chalk.green('文件概览:')}\n`);
+
+            createTable(
+                ['文件', '代码行数', '总行数', '大小'].map(name => ({
+                    content: name,
+                    color: 'cyan'
+                })),
+                maxLinesFiles.map(item => [
+                    { content: item.file, color: 'grey', bold: true },
+                    {
+                        content: String(item.code),
+                        color: 'white'
+                    },
+                    {
+                        content: String(item.count),
+                        color: 'white'
+                    },
+                    {
+                        content: (item.size / 100).toFixed(2) + 'KB',
+                        color: 'white'
+                    }
+                ])
             );
-
-        console.log();
-        spinner.succeed(`${chalk[fileColors[lang] || 'green'](lang)} ${chalk.green('文件概览:')}\n`);
-
-        createTable(
-            ['文件', '代码行数', '总行数', '大小'].map(name => ({
-                content: name,
-                color: 'cyan'
-            })),
-            maxLinesFiles.map(item => [
-                { content: item.file, color: 'grey', bold: true },
-                {
-                    content: String(item.code),
-                    color: 'white'
-                },
-                {
-                    content: String(item.count),
-                    color: 'white'
-                },
-                {
-                    content: (item.size / 100).toFixed(2) + 'KB',
-                    color: 'white'
-                }
-            ])
-        );
+        }
     });
