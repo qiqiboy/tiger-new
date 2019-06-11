@@ -16,20 +16,12 @@
  *
  * 你可以将输出的excel进行翻译，翻译好后返回原来位置，再次运行 npm run i18n-read 即可将翻译好的文件同步回语言包。
  *
- *
- *
  * ********************************************************************************************************
  *
- * 另外由于语言包会动态引入，所以也提供了一个i18n.ready的promise对象，用来判断语言包是否加载完毕。
+ * 对于有动态变量的字符串，可以使用i18n.printf方法来辅助替换:
+ * import { printf } from 'utils/i18n';
  *
- * i18n.ready.then(() => {
- *  $('xxx').html(__1('xxx'));
- * })
- *
- * 如果是react项目，可以直接使用我们提供的 Provider 组件。
- * <Provider>
- *  <App />
- * </Provider>
+ * <div>{printf(__1('我今年%s岁'), age)}</div>
  */
 import * as zh_CN from './config/zh_CN';
 import URL from 'utils/URL';
@@ -51,6 +43,8 @@ type DefaultLang = typeof zh_CN;
 interface I18n extends DefaultLang {
     <T extends ILangConfig>(config: T): LangReturn<T>;
     language: string;
+    printf: typeof printf;
+    __: typeof __;
 }
 
 // 可用的语言
@@ -63,7 +57,7 @@ const lang2code = {
 };
 const queryObj = URL.current().query;
 
-export let language = (queryObj.lang || localStorage.getItem('lang')) as string;
+export let language: string = (queryObj.lang || localStorage.getItem('lang')) as string;
 
 if (!avaliable.includes(language)) {
     const { language: browserlang } = window.navigator;
@@ -143,6 +137,8 @@ const i18n: I18n = (config => {
 }) as I18n;
 
 i18n.language = language;
+i18n.printf = printf;
+i18n.__ = window.__ = __;
 
 // eslint-disable-next-line
 const langConfig = require(`./config/${language}`);
@@ -157,7 +153,7 @@ Object.assign(i18n, langConfig);
 
 export default i18n;
 
-let globalTranslation;
+let globalTranslation = {};
 
 // @ts-ignore
 if (pkg.locals) {
@@ -168,6 +164,16 @@ if (pkg.locals) {
  * @description
  * 语言包匹配
  */
-window.__ = function(key) {
-    return globalTranslation[key] || key;
-};
+export function __(text: string): string {
+    return globalTranslation[text] || text;
+}
+
+export function printf(text: string, ...args: Array<string | number>): string {
+    let i = 0;
+
+    return text.replace(/%s/g, () => {
+        const holder = args[i++];
+
+        return holder === undefined ? '' : (holder as string);
+    });
+}

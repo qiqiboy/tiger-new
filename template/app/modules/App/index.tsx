@@ -10,7 +10,7 @@ class App extends Component {
                 <h3 className="text-center">tiger-new</h3>
                 <blockquote>
                     <p>
-                        To get started, edit <code>app/index.js</code> and save to reload.
+                        To get started, edit <code>app/index.tsx</code> and save to reload.
                     </p>
                 </blockquote>
                 <Demo />

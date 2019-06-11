@@ -26,8 +26,10 @@
 - [上线](#上线)
 - [国际化/多语言](#国际化多语言)
     + [单文件直接使用](#单文件直接使用)
-    + [手动提取语言配置](#手动提取语言配置)
+    + [集中提取语言配置](#集中提取语言配置)
     + [自动提取配置](#自动提取配置)
+        * [错误的用法](#错误的用法)
+        * [正确的用法](#正确的用法)
 
 <!-- vim-markdown-toc -->
 
@@ -290,7 +292,6 @@ const label = language === 'en_US' ? 'username' : '用户名';
 
 或者也可以将 `i18n` 当作一个函数调用，传递文本配置参数，然后利用返回值就行访问：
 
-
 ```javascript
 import i18n from 'utils/i18n';
 
@@ -324,25 +325,25 @@ const label = i18n.xxx.label;
 
 我们提供了一个全局语言匹配函数: `__()`，任何需要配置多语言的文本，都可以使用该函数包装。但是，需要注意的是，只能传递普通的文本字符串，**不可传递字符串拼接、变量、或者 ES6 的字符串模板！**
 
-##### 正确的用法
-
-```javascript
-const label = __('用户名');
-
-// jsx
-<div>{__('用户名')}</div>;
-```
-
 ##### 错误的用法
 
 ```javascript
-const label = __('用户名' + '：'); // 应该是： __('用户名') + __('：'))
-
-// jsx
-<div>{__(label)}</div>; // 不可以传递变量名
+const text = __('我今年' + age + '岁了'); // 错误：不可以拼接字符串
+const text = __(`我今年${age}岁了`); // 错误：不可以使用带变量的字符串模板
+const text = __(Age_desc_variable); // 错误：不可以使用变量
 ```
 
-每次语言包有更新，需要更新语言包时，可以运行：
+##### 正确的用法
+
+```javascript
+const text = __('我今年') + age + __('岁了'); // 正确：如果翻译文本前后都可以对应，可以使用__()分别对应前后段文本翻译
+const text = __('我今年%s岁了').replace('%s', age); // 正确：使用占位符替换，可以更灵活的翻译
+const i18n.printf(__('我今年%s岁了'), age); // 正确，使用提供的printf方法来辅助输出
+```
+
+**导出语言包**
+
+每次文案有更新，需要进行翻译时，需要导出语言包，可以运行：
 
 ```bash
 npm run i18n-scan
@@ -358,4 +359,14 @@ npm run i18n-read
 
 然后即可正常构建上线！
 
-> **提醒**：需要尽可能将`utils/i18n`模块在代码中前置引用，例如在放到项目公共的`vendor.js`中，或者页面入口文件顶端引入本模块，确保语言包优先生效！
+> **提醒**：需要尽可能将`utils/i18n`模块在代码中前置引用，例如在放到项目项目入口文件`app/index.tsx`的顶部导入，确保语言包优先生效！
+
+```typescript
+// app/index.tsx
+import 'utils/i18n';
+import React from 'react';
+import { render } from 'react-dom';
+import App from 'modules/App';
+
+render(<App />, document.querySelector('#root'));
+```

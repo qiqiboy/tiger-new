@@ -32,6 +32,7 @@ function ensureLocalsConfig() {
         spinner.warn(
             chalk.yellow('需要 package.json 中添加 { "locals": ["zh_CN", "en_US"] } 配置后，才能运行该命令！')
         );
+
         process.exit(0);
     }
 }
@@ -54,7 +55,7 @@ function scanner() {
     glob.sync(paths.appSrc + '/**/*.{js,jsx,ts,tsx}').forEach(file => {
         const content = fs.readFileSync(file);
 
-        i18nParser.parseFuncFromString(content, { list: ['__'] }, key => {
+        i18nParser.parseFuncFromString(content, { list: ['__', 'i18n.__', 'window.__'] }, key => {
             if (key) {
                 i18nParser.set(key, key);
             }
