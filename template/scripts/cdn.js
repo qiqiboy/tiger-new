@@ -25,6 +25,7 @@ if (pkg.cdn) {
         spinner.fail(chalk.red(`未发现CDN服务连接配置信息！`));
         spinner.fail(chalk.red(`如果不需要CDN服务，您可以移除 ${chalk.cyan('package.json')} 中的 cdn 字段；`));
         spinner.fail(chalk.red(`或者，请根据下述信息在 ${chalk.cyan('package.json')} 中补充相关配置：`));
+
         console.log(
             chalk.grey(`
 支持两种cdn配置方式，分别需要在 ${chalk.cyan('package.json')} 中配置相关的cdn字段：
@@ -104,6 +105,7 @@ function runCDN() {
         let failNum = rets.length - uploadNum;
 
         console.log();
+
         console.log(
             chalk[failNum ? 'red' : 'cyan'](
                 '+++++++++++++++++++++++++++++++\n 文件上传完毕(' +
@@ -119,7 +121,7 @@ function runCDN() {
         );
 
         if (!failNum) {
-            fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 4));
+            fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 2));
             console.log(chalk.blue('配置文件已经更新: ' + staticConfigFile));
             console.log();
             console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
@@ -144,6 +146,7 @@ function createRsync(file) {
             const relative = path.relative(paths.appBuild, file);
 
             rsync.cwd(paths.appBuild);
+
             rsync
                 .flags('Rz') // 相对路径上传、压缩
                 .source(relative)

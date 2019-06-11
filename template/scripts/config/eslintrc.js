@@ -152,13 +152,33 @@ module.exports = {
             1,
             {
                 blankLine: 'always',
-                prev: ['multiline-block-like', 'multiline-expression', 'const', 'let', 'var', 'cjs-import', 'import', 'export', 'cjs-export'],
+                prev: [
+                    'multiline-block-like',
+                    'multiline-expression',
+                    'const',
+                    'let',
+                    'var',
+                    'cjs-import',
+                    'import',
+                    'export',
+                    'cjs-export'
+                ],
                 next: '*'
             },
             {
                 blankLine: 'always',
                 prev: '*',
-                next: ['multiline-block-like', 'multiline-expression', 'const', 'let', 'var', 'cjs-import', 'import', 'export', 'cjs-export']
+                next: [
+                    'multiline-block-like',
+                    'multiline-expression',
+                    'const',
+                    'let',
+                    'var',
+                    'cjs-import',
+                    'import',
+                    'export',
+                    'cjs-export'
+                ]
             },
             { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
             { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },

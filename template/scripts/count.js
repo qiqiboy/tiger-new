@@ -26,7 +26,10 @@ try {
 const extraCommand = onlyJS ? ' --include-lang=JavaScript,TypeScript' : '';
 
 const output = JSON.parse(
-    execSync('cloc app static public --exclude-lang=SVG --exclude-dir=node_modules --json' + extraCommand)
+    execSync(
+        'cloc app static --exclude-lang=SVG --force-lang=JavaScript,jsx --exclude-dir=node_modules --json' +
+            extraCommand
+    )
         .toString()
         .trim()
 );
@@ -143,7 +146,7 @@ Object.keys(output)
     .filter(key => key !== 'header' && key !== 'SUM')
     .forEach(lang => {
         const outputStr = execSync(
-            `cloc app static public --by-file --exclude-lang=SVG --include-lang=${lang} --exclude-dir=node_modules --json`
+            `cloc app static --by-file --exclude-lang=SVG --include-lang=${lang} --force-lang=JavaScript,jsx --exclude-dir=node_modules --json`
         )
             .toString()
             .trim();
