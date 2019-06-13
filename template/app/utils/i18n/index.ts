@@ -1,13 +1,8 @@
 /**
- * 用于多语言翻译。该模块提供了两种用法：
+ * @description
+ * 用于国际化多语言支持
  *
- * **** 手动维护翻译包 ****
- * 将需要翻译的文本手动整理到config目录下对应的语言目录下，然后可以通过引用该模块：
- * i18n.xxx.xxx
- * 获得相应的翻译后文本
- *
- * **** 自动提取翻译 ****
- * 在需要多语言的文本处，将文本提取使用全局函数 __() 包装即可（为了避免下面注释中的示例被捕获到，所以下面示例使用__1()代替）：
+ * 在需要多语言的文本处，将文本提取使用全局函数 __1() 包装即可（为了避免下面注释中的示例被捕获到，所以下面示例使用__1()代替）：
  * const text = __1('需要翻译的文案');
  *
  * <div className="title">{__1('需要翻译的文案')}</div>
@@ -22,136 +17,50 @@
  * import { printf } from 'utils/i18n';
  *
  * <div>{printf(__1('我今年%s岁'), age)}</div>
+ *
+ * ********************************************************************************************************
+ *
+ * 更详细用法，参考项目README.md
  */
-import * as zh_CN from './config/zh_CN';
+
 import URL from 'utils/URL';
 import pkg from 'package.json';
-import warning from 'warning';
-
-interface ILangConfig {
-    [key: string]: {
-        cn?: string;
-        tw?: string;
-        en?: string;
-    };
-}
-
-type LangReturn<T> = { [P in keyof T]: string };
-
-type DefaultLang = typeof zh_CN;
-
-interface I18n extends DefaultLang {
-    <T extends ILangConfig>(config: T): LangReturn<T>;
-    language: string;
-    printf: typeof printf;
-    __: typeof __;
-}
 
 // 可用的语言
 // @ts-ignore
-const avaliable = pkg.locals || ['zh_CN', 'en_US'];
-const lang2code = {
-    zh_CN: 'cn',
-    zh_TW: 'tw',
-    en_US: 'en'
-};
+const allowedLangs = pkg.locals || ['zh_CN', 'en_US'];
+const LOCAL_LANG_FLAG = 'lang';
+// url中的参数对象
 const queryObj = URL.current().query;
+const localLang = localStorage.getItem(LOCAL_LANG_FLAG);
 
-export let language: string = (queryObj.lang || localStorage.getItem('lang')) as string;
+// 从浏览器地址中解析 ?lang=xxx 或者从本地lcoalStorage中获取存在标识符
+const mayLang = Array.isArray(queryObj.lang)
+    ? queryObj.lang[0]
+    : queryObj.lang || localStorage.getItem(LOCAL_LANG_FLAG);
 
-if (!avaliable.includes(language)) {
+// 确保得到的语言标识符是允许的、合法的，否则则尝试根据浏览器语言设置默认语言
+export let language: string = allowedLangs.includes(mayLang as string) ? mayLang as string : getBrowserLang();
+
+// 如果本地的语言标识符与当前不一致，则更新本地存储
+if (localLang !== language) {
+    localStorage.setItem(LOCAL_LANG_FLAG, language);
+}
+
+// 从浏览器语言字符串中解析对应的默认语言
+function getBrowserLang(): string {
     const { language: browserlang } = window.navigator;
 
-    if (/en/i.test(browserlang) && avaliable.includes('en_US')) {
-        language = 'en_US';
-    } else if (/tw|hk/i.test(browserlang) && avaliable.includes('zh_TW')) {
-        language = 'zh_TW';
-    } else {
-        language = avaliable[0];
+    if (/en/i.test(browserlang) && allowedLangs.includes('en_US')) {
+        return 'en_US';
+    } else if (/tw|hk/i.test(browserlang) && allowedLangs.includes('zh_TW')) {
+        return 'zh_TW';
     }
+
+    return allowedLangs[0];
 }
 
-if (language === queryObj.lang) {
-    localStorage.setItem('lang', language);
-}
-
-function each(obj: object, callback: (item: any, key: any) => void) {
-    if (Array.isArray(obj)) {
-        obj.forEach(callback);
-    } else {
-        Object.keys(obj).forEach(key => callback(obj[key], key));
-    }
-}
-
-function ensureLang(base, checkedLang, name) {
-    each(base, (item, key) => {
-        if (typeof item === 'string') {
-            if (!(key in checkedLang)) {
-                warning(process.env.NODE_ENV === 'production', `【i18n】: "${name}.${key}" is mising.`);
-
-                checkedLang[key] = item;
-            }
-        } else {
-            if (!checkedLang[key]) {
-                checkedLang[key] = Array.isArray(item) ? [] : {};
-            }
-
-            ensureLang(item, checkedLang[key], `${name}.${key}`);
-        }
-    });
-}
-
-/**
- * @description
- * 处理语言包配置
- *
- * @param {Object} config 语言包配置
- *
- * @return {Object} 返回语言包中对应的当前语言文案对象
- *
- * @eg
- * const lang = i18n({
- *      title: {
- *          cn: '简体文案',
- *          zh_CN: '简体文案',
- *          tw: '繁体文案',
- *          zh_TW: '繁体文案',
- *          en: '英文文案',
- *          en_US: '英文文案',
- *      }
- * });
- *
- * lang.title // ‘英文文案'
- */
-const i18n: I18n = (config => {
-    const code = lang2code[language];
-
-    return Object.keys(config).reduce(function(ret, key) {
-        const langs = config[key];
-        const text = [langs[code], langs[language], key].find(str => typeof str === 'string');
-
-        ret[key] = text;
-
-        return ret;
-    }, {});
-}) as I18n;
-
-i18n.language = language;
-i18n.printf = printf;
-i18n.__ = window.__ = __;
-
-// eslint-disable-next-line
-const langConfig = require(`./config/${language}`);
-
-// 我们以zh_CN为基础语言配置，对其它语言包的完整性进行检查和修复
-if (language !== 'zh_CN') {
-    ensureLang(zh_CN, langConfig, language);
-}
-
-// 默认先挂载中文语言包
-Object.assign(i18n, langConfig);
-
-export default i18n;
+/** **********************语言翻译相关方法*************************/
 
 let globalTranslation = {};
 
@@ -168,6 +77,10 @@ export function __(text: string): string {
     return globalTranslation[text] || text;
 }
 
+/**
+ * @description
+ * 格式化字符串输出
+ */
 export function printf(text: string, ...args: Array<string | number>): string {
     let i = 0;
 
@@ -177,3 +90,13 @@ export function printf(text: string, ...args: Array<string | number>): string {
         return holder === undefined ? '' : (holder as string);
     });
 }
+
+window.__ = __;
+
+const i18n = {
+    language,
+    __,
+    printf
+};
+
+export default i18n;

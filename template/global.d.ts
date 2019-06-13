@@ -11,7 +11,7 @@ declare module '*.txt';
 declare module '*.htm';
 
 interface Window {
-    __: I18nFunc;
+    __: I18nParser;
 }
 
 /**
@@ -30,7 +30,7 @@ type HOC<InjectProps> = <SelfProps>(
 /**
  * i18n
  */
-type I18nFunc = (key: string) => string;
+type I18nParser = (text: string) => string;
 
-declare const __: I18nFunc;
+declare const __: I18nParser;
 
