@@ -2,7 +2,7 @@
  * @description
  * 用于国际化多语言支持
  *
- * 在需要多语言的文本处，将文本提取使用全局函数 __1() 包装即可（为了避免下面注释中的示例被捕获到，所以下面示例使用__1()代替）：
+ * 在需要多语言的文本处，将文本提取使用全局函数 __() 包装即可（为了避免下面注释中的示例被捕获到，所以下面示例使用 __1 代替）：
  * const text = __1('需要翻译的文案');
  *
  * <div className="title">{__1('需要翻译的文案')}</div>
@@ -35,12 +35,11 @@ const queryObj = URL.current().query;
 const localLang = localStorage.getItem(LOCAL_LANG_FLAG);
 
 // 从浏览器地址中解析 ?lang=xxx 或者从本地lcoalStorage中获取存在标识符
-const mayLang = Array.isArray(queryObj.lang)
-    ? queryObj.lang[0]
-    : queryObj.lang || localStorage.getItem(LOCAL_LANG_FLAG);
+const mayLang =
+    (Array.isArray(queryObj.lang) ? queryObj.lang[0] : queryObj.lang) || localStorage.getItem(LOCAL_LANG_FLAG);
 
 // 确保得到的语言标识符是允许的、合法的，否则则尝试根据浏览器语言设置默认语言
-export let language: string = allowedLangs.includes(mayLang as string) ? mayLang as string : getBrowserLang();
+export let language: string = allowedLangs.includes(mayLang as string) ? (mayLang as string) : getBrowserLang();
 
 // 如果本地的语言标识符与当前不一致，则更新本地存储
 if (localLang !== language) {
