@@ -18,7 +18,9 @@ const newStaticConfig = {};
 const spinner = ora();
 let throttleDelay = 0;
 
-if (pkg.cdn) {
+if (process.env.SKIP_CDN === 'true') {
+    spinner.info(chalk.cyan('本次构建忽略CDN任务'));
+} else if (pkg.cdn) {
     if ('server' in pkg.cdn || 'ali-oss' in pkg.cdn) {
         runCDN();
     } else {

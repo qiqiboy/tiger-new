@@ -15,10 +15,10 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin-alt');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const pkg = require(paths.appPackageJson);
-const isBuilding = process.env.NODE_ENV === 'production';
+const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 
-const publicPath = '/';
-const publicUrl = '';
+const publicPath = isBuilding ? path.join(process.env.BASE_NAME || '', '/') : '/';
+const publicUrl = publicPath.slice(0, -1);
 const env = getClientEnvironment(publicUrl);
 const injects = [];
 
@@ -71,6 +71,7 @@ module.exports = {
         paths.entries
     ),
     output: {
+        path: paths.appBuild,
         pathinfo: true,
         filename: 'static/js/[name].[hash:8].js',
         chunkFilename: 'static/js/[name].[hash:8].js',

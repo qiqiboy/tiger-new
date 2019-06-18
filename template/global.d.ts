@@ -10,8 +10,22 @@ declare module '*.html';
 declare module '*.txt';
 declare module '*.htm';
 
+/**
+ * window.xx
+ */
 interface Window {
     __: I18nParser;
+}
+
+/**
+ * process.env.XX
+ */
+declare namespace NodeJS {
+    interface ProcessEnv {
+        NODE_ENV: string;
+        BASE_NAME: string;
+        PUBLIC_URL: string;
+    }
 }
 
 /**

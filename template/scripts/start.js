@@ -40,12 +40,14 @@ checkMissDependencies(spinner)
         return choosePort(HOST, DEFAULT_PORT, spinner).then(port => {
             if (port === null) {
                 console.log();
+
                 spinner.fail(
                     '请关闭占用 ' +
                         chalk.bold(chalk.yellow(DEFAULT_PORT)) +
                         ' 端口的程序后再运行；或者指定一个新的端口：' +
                         chalk.bold(chalk.yellow('PORT=4000 npm start'))
                 );
+
                 console.log();
                 process.exit(0);
             } else {

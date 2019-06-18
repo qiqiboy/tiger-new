@@ -22,6 +22,7 @@
     + [`utils/API`](#utilsapi)
     + [`utils/i18n`](#utilsi18n)
 - [开始开发](#开始开发)
+- [环境变量](#环境变量)
 - [部署测试](#部署测试)
 - [上线](#上线)
 - [国际化/多语言](#国际化多语言)
@@ -247,6 +248,24 @@ $ HOST='local.test.com' npm start
 # 指定代理服务器
 $ PROXY='https://api.twitter.com/' npm start
 ```
+
+### 环境变量
+
+本项目支持通过环境变量配置一些项目运行规则，可用的环境变量如下：
+
+-   `PORT` 指定本地服务的端口
+-   `HOST` 指定本地服务的 host；请注意，单独设置该变量，将导致本地的`localhost`失效，只能使用指定的`HOST`访问服务
+-   `HTTPS` 配置使用 https；需要有本地的 SSL 证书
+-   `PROXY` 配置本地代理服务器
+-   `DANGEROUSLY_DISABLE_HOST_CHECK` 关闭 host 检测；`DANGEROUSLY_DISABLE_HOST_CHECK=false`将允许任意的 host 访问
+-   `BASE_NAME` 指定项目的`basename`，例如`BASE_NAME=/account`
+-   `SKIP_CDN` 跳过 CDN 上传阶段；`SKIP_CDN=true npm run pack`即表示本次构建不上传 cdn，仅本地构建
+-   `BUILD_DIR` 指定项目构建输出目录；不传递该变量情况下，`prodcution`环境输出到`build`目录，`development`环境输出到`buildDev`目录
+-   `TIGER_*` 任意的以`TIGER_`开头的变量。**该变量也会传递给 webpack 构建，所以你可以在项目代码中访问该变量：`process.env.TIGER_*`**
+
+以上环境变量，你可以在运行相关命令时指定，也可以通过项目根目录下的`.env` `.env.production` `.env.developement` `.env.local` `.env.production.local` `.env.developement.local` 等文件配置。
+
+但是，请注意，默认以`.local`结尾的环境变量文件，是不包含在项目 git 仓库中的。
 
 ### 部署测试
 

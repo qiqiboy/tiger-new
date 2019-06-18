@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const glob = require('glob');
 const execSync = require('child_process').execSync;
+const isDev = process.env.NODE_ENV === 'development';
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
@@ -38,8 +39,7 @@ const alias = {
 module.exports = {
     dotenv: resolveApp('.env'),
     root: resolveApp(''),
-    appBuild: resolveApp('build'),
-    appBuildDev: resolveApp('buildDev'),
+    appBuild: resolveApp(process.env.BUILD_DIR || (isDev ? 'buildDev' : 'build')),
     appPublic: resolveApp('public'),
     appHtml: resolveApp('public/index.html'),
     appIndexJs: Object.values(entries)[0] || resolveApp('app/index.js'),
@@ -69,6 +69,7 @@ function hasInstall(command) {
         execSync(command + ' --version', {
             stdio: 'ignore'
         });
+
         return true;
     } catch (e) {
         return false;

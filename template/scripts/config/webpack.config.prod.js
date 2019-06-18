@@ -21,8 +21,8 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const pkg = require(paths.appPackageJson);
 
-const relativeRoot = path.join(pkg.noRewrite ? '.' : pkg.basename || '/');
-const cdnUrl = pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
+const relativeRoot = path.join(pkg.noRewrite ? '.' : process.env.BASE_NAME || '/');
+const cdnUrl = process.env.SKIP_CDN !== 'true' && pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
 const publicPath = ensureSlash(cdnUrl, true);
 const publicUrl = ensureSlash(cdnUrl, false);
 const env = getClientEnvironment(publicUrl);
