@@ -17,7 +17,7 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const pkg = require(paths.appPackageJson);
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 
-const publicPath = isBuilding ? path.join(process.env.BASE_NAME || '', '/') : '/';
+const publicPath = isBuilding ? path.join(pkg.noRewrite ? '.' : process.env.BASE_NAME || '', '/') : '/';
 const publicUrl = publicPath.slice(0, -1);
 const env = getClientEnvironment(publicUrl);
 const injects = [];

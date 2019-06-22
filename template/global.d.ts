@@ -9,6 +9,9 @@ declare module '*.tiff';
 declare module '*.html';
 declare module '*.txt';
 declare module '*.htm';
+declare module '*.css';
+declare module '*.scss';
+declare module '*.less';
 
 /**
  * window.xx

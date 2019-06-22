@@ -2,7 +2,7 @@
  * @desc 对URL的重新封装，增加了merge方法
  *      文档参考：http://nodejs.cn/api/url.html#url_legacy_url_api
  */
-import URL from 'url';
+import URL, { UrlWithParsedQuery } from 'url';
 
 export default {
     /**
@@ -19,7 +19,7 @@ export default {
      *         }
      *     })
      */
-    merge(base, url) {
+    merge(base: any, url: any): string {
         if (typeof base === 'string') {
             base = URL.parse(base, true);
 
@@ -42,7 +42,7 @@ export default {
 
         return URL.format(base);
     },
-    current(url) {
+    current(url?: string): UrlWithParsedQuery {
         return URL.parse(url || window.location.href, true);
     },
     // 以下方法参考：http://nodejs.cn/api/url.html#url_legacy_url_api

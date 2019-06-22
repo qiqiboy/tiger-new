@@ -7,6 +7,7 @@ const paths = require('./config/paths');
 const path = require('path');
 const chalk = require('chalk');
 const ora = require('ora');
+const lodash = require('lodash');
 const pkg = require(paths.appPackageJson);
 
 const spinner = ora();
@@ -68,14 +69,13 @@ function scanner() {
         const jsonDestination = path.join(paths.locals, key + '.json');
         const excelDestination = path.join(paths.locals, 'xlsx', key + '.xlsx');
 
+        const translation = i18nJson[key].translation;
         const existConfig = fs.existsSync(jsonDestination) ? JSON.parse(fs.readFileSync(jsonDestination)) : {};
+        const newConfig = Object.assign(translation, lodash.pickBy(existConfig, (value, key) => key in translation));
 
-        fs.outputFile(
-            path.join(paths.locals, key + '.json'),
-            JSON.stringify(Object.assign(i18nJson[key].translation, existConfig), '\n', 2)
-        );
+        fs.outputFile(path.join(paths.locals, key + '.json'), JSON.stringify(newConfig, '\n', 2));
 
-        convertJson2Excel(Object.assign(i18nJson[key].translation, existConfig), key, path.join(excelDestination));
+        convertJson2Excel(newConfig, key, path.join(excelDestination));
 
         spinner.succeed('输出 ' + chalk.bold(chalk.green(key)) + ' 到 ' + chalk.cyan(excelDestination));
     });
