@@ -56,7 +56,11 @@ checkMissDependencies(spinner)
                 const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
                 const appName = pkg.name;
                 const urls = prepareUrls(protocol, HOST, port);
-                const compiler = createCompiler(webpack, config, appName, urls, spinner);
+                const devSocket = {
+                    warnings: warnings => devServer.sockWrite(devServer.sockets, 'warnings', warnings),
+                    errors: errors => devServer.sockWrite(devServer.sockets, 'errors', errors)
+                };
+                const compiler = createCompiler(webpack, config, appName, urls, devSocket, spinner);
                 const proxyConfig = prepareProxy(process.env.PROXY || pkg.proxy, paths.appPublic);
                 const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig);
                 const devServer = new WebpackDevServer(compiler, serverConfig);

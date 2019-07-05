@@ -151,6 +151,7 @@ interface IYearMonthProps {
     maxDate: Date;
     minDate: Date;
 }
+
 class YearMonth extends Component<IYearMonthProps> {
     onChange = ev => {
         let year = this.props.date.getFullYear();

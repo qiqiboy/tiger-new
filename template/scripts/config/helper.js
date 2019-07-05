@@ -7,7 +7,9 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
 const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
+const forkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
+const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const config = require('./webpack.config.dev');
 const paths = require('./paths');
 const chalk = require('chalk');
@@ -61,7 +63,7 @@ function choosePort(host, defaultPort, spinner) {
     );
 }
 
-function createCompiler(webpack, config, appName, urls, spinner) {
+function createCompiler(webpack, config, appName, urls, devSocket, spinner) {
     let compiler;
     let stime = Date.now();
 
@@ -85,21 +87,71 @@ function createCompiler(webpack, config, appName, urls, spinner) {
     });
 
     let isFirstCompile = true;
+    let tsMessagesPromise;
+    let tsMessagesResolver;
+
+    compiler.hooks.beforeCompile.tap('beforeCompile', () => {
+        tsMessagesPromise = new Promise(resolve => {
+            tsMessagesResolver = msgs => resolve(msgs);
+        });
+    });
+
+    forkTsCheckerWebpackPlugin.getCompilerHooks(compiler).receive.tap('afterTypeScriptCheck', (diagnostics, lints) => {
+        const allMsgs = [...diagnostics, ...lints];
+        const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
+
+        tsMessagesResolver({
+            errors: allMsgs.filter(msg => msg.severity === 'error').map(format),
+            warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
+        });
+    });
 
     // "done" event fires when Webpack has finished recompiling the bundle.
     // Whether or not you have warnings or errors, you will get this event.
-    compiler.hooks.done.tap('done', stats => {
+    compiler.hooks.done.tap('done', async stats => {
         if (isInteractive) {
             clearConsole();
         }
 
-        const useTimer = chalk.grey('(编译耗时 ' + (Date.now() - stime) / 1000 + 's)');
+        const useTimer = (isTotal = false) =>
+            chalk.grey(`(编译${isTotal ? '总' : '已'}耗时 ${(Date.now() - stime) / 1000}s)`);
 
-        const messages = formatWebpackMessages(stats.toJson({ all: false, warnings: true, errors: true }));
+        const statsData = stats.toJson({
+            all: false,
+            warnings: true,
+            errors: true
+        });
+
+        if (statsData.errors.length === 0) {
+            const delayedMsg = setTimeout(() => {
+                spinner.text = chalk.cyan('文件已编译，正在TSC检查...') + useTimer();
+            }, 100);
+
+            const messages = await tsMessagesPromise;
+
+            clearTimeout(delayedMsg);
+            statsData.errors.push(...messages.errors);
+            statsData.warnings.push(...messages.warnings);
+
+            stats.compilation.errors.push(...messages.errors);
+            stats.compilation.warnings.push(...messages.warnings);
+
+            if (messages.errors.length > 0) {
+                devSocket.errors(messages.errors);
+            } else if (messages.warnings.length > 0) {
+                devSocket.warnings(messages.warnings);
+            }
+
+            if (isInteractive) {
+                clearConsole();
+            }
+        }
+
+        const messages = formatWebpackMessages(statsData);
         const isSuccessful = !messages.errors.length && !messages.warnings.length;
 
         if (isSuccessful && (isInteractive || isFirstCompile)) {
-            spinner.succeed(chalk.green('编译通过！' + useTimer));
+            spinner.succeed(chalk.green('编译通过！' + useTimer(true)));
             console.log();
             spinner.succeed(chalk.green('应用(' + appName + ')已启动:'));
             console.log();
@@ -120,7 +172,7 @@ function createCompiler(webpack, config, appName, urls, spinner) {
                 messages.errors.length = 1;
             }
 
-            spinner.fail(chalk.red('编译失败！！' + useTimer));
+            spinner.fail(chalk.red('编译失败！！' + useTimer(true)));
             console.log();
             console.log(messages.errors.join('\n\n'));
             console.log();
@@ -128,7 +180,7 @@ function createCompiler(webpack, config, appName, urls, spinner) {
 
         // Show warnings if no errors were found.
         if (messages.warnings.length) {
-            spinner.warn(chalk.yellow('编译有警告产生：' + useTimer));
+            spinner.warn(chalk.yellow('编译有警告产生：' + useTimer(true)));
             console.log();
             console.log(messages.warnings.join('\n\n'));
             console.log();

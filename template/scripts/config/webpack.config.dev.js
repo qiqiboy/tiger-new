@@ -12,8 +12,7 @@ const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin-alt');
-const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const pkg = require(paths.appPackageJson);
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 
@@ -267,7 +266,8 @@ module.exports = {
                     basedir: paths.appNodeModules
                 }),
                 tslint: false,
-                async: false,
+                async: true,
+                useTypescriptIncrementalApi: true,
                 checkSyntacticErrors: true,
                 tsconfig: paths.appTsConfig,
                 compilerOptions: {
@@ -276,8 +276,7 @@ module.exports = {
                 },
                 reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
                 watch: paths.appSrc,
-                silent: true,
-                formatter: typescriptFormatter
+                silent: true
             }),
             new webpack.BannerPlugin('@author ' + pkg.author)
         ])

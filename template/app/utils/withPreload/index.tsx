@@ -44,7 +44,7 @@ interface IState {
  *      }
  * });
  */
-export default function createWithPreload<T = 'preload'>(loader: ILoader, config: IConfig = {}) {
+export default function createWithPreload<T extends string = 'preload'>(loader: ILoader, config: IConfig = {}) {
     return function withPreload<Self = {}>(
         WrappedComponent: React.ComponentType<Self>
     ): React.ComponentClass<Omit<Self, T>> {

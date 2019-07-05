@@ -60,7 +60,22 @@ module.exports = {
     },
     rules: {
         'react/jsx-no-target-blank': 0,
+        'react/no-unsafe': [2, { checkAliases: true }],
+        'react/no-deprecated': 2,
+        'react/state-in-constructor': [2, 'never'],
         'jsx-a11y/anchor-is-valid': 0,
+        'import/no-anonymous-default-export': [
+            2,
+            {
+                allowArray: true,
+                allowArrowFunction: false,
+                allowAnonymousClass: false,
+                allowAnonymousFunction: false,
+                allowCallExpression: true, // The true value here is for backward compatibility
+                allowLiteral: true,
+                allowObject: true
+            }
+        ],
         eqeqeq: [1, 'smart'],
         radix: 0,
         'no-script-url': 0,
@@ -152,13 +167,39 @@ module.exports = {
             1,
             {
                 blankLine: 'always',
-                prev: ['multiline-block-like', 'multiline-expression', 'const', 'let', 'var', 'cjs-import', 'import', 'export', 'cjs-export'],
+                prev: [
+                    'multiline-block-like',
+                    'multiline-expression',
+                    'const',
+                    'let',
+                    'var',
+                    'cjs-import',
+                    'import',
+                    'export',
+                    'cjs-export',
+                    'class',
+                    'throw',
+                    'directive'
+                ],
                 next: '*'
             },
             {
                 blankLine: 'always',
                 prev: '*',
-                next: ['multiline-block-like', 'multiline-expression', 'const', 'let', 'var', 'cjs-import', 'import', 'export', 'cjs-export']
+                next: [
+                    'multiline-block-like',
+                    'multiline-expression',
+                    'const',
+                    'let',
+                    'var',
+                    'cjs-import',
+                    'import',
+                    'export',
+                    'cjs-export',
+                    'class',
+                    'throw',
+                    'return'
+                ]
             },
             { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
             { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },
