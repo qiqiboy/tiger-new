@@ -62,7 +62,7 @@ module.exports = {
         'react/jsx-no-target-blank': 0,
         'react/no-unsafe': [2, { checkAliases: true }],
         'react/no-deprecated': 2,
-        'react/state-in-constructor': [2, 'never'],
+        'react/no-string-refs': [1, { noTemplateLiterals: true }],
         'jsx-a11y/anchor-is-valid': 0,
         'import/no-anonymous-default-export': [
             2,
@@ -115,7 +115,6 @@ module.exports = {
         'semi-spacing': [1, { before: false }],
         'no-extra-semi': 1,
         'array-callback-return': 2,
-        // "complexity": [2, 20],
         'default-case': 1,
         curly: 2,
         'dot-location': [1, 'property'],
