@@ -123,7 +123,6 @@ module.exports = {
         'guard-for-in': 2,
         'no-empty-pattern': 2,
         'no-implied-eval': 2,
-        // "no-invalid-this": 1,
         'no-global-assign': 2,
         'no-multi-spaces': [
             1,

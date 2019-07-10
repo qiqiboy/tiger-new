@@ -114,7 +114,7 @@ function createCompiler(webpack, config, appName, urls, devSocket, spinner) {
         }
 
         const useTimer = (isTotal = false) =>
-            chalk.grey(`(编译${isTotal ? '总' : '已'}耗时 ${(Date.now() - stime) / 1000}s)`);
+            chalk.grey(`(编译${isTotal ? '总' : '已'}耗时: ${(Date.now() - stime) / 1000}s)`);
 
         const statsData = stats.toJson({
             all: false,
@@ -214,6 +214,7 @@ function createDevServerConfig(proxy, allowedHost) {
         contentBase: paths.appPublic,
         watchContentBase: true,
         hot: true,
+        injectClient: false,
         publicPath: config.output.publicPath,
         quiet: true,
         watchOptions: {
