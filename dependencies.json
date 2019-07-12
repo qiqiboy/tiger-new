@@ -10,6 +10,7 @@
     "@types/react": "16",
     "@types/react-bootstrap": "0.32",
     "@types/react-dom": "16",
+    "@types/react-is": "16",
     "@types/react-router-dom": "4",
     "@types/react-transition-group": "2",
     "@typescript-eslint/eslint-plugin": "1",
@@ -91,6 +92,6 @@
     "react-formutil": "latest",
     "react-loadable": "latest",
     "react-router-dom": "5",
-    "react-transition-group": "2"
+    "react-transition-group": "4"
   }
 }
