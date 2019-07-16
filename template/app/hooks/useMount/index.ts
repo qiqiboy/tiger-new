@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useRef, useEffect, useLayoutEffect } from 'react';
 
 /**
  * @description
@@ -19,12 +19,14 @@ import { useState, useEffect, useLayoutEffect } from 'react';
  *  });
  */
 function useMount(callback?: React.EffectCallback) {
-    const [isMount, setMount] = useState(false);
+    const mountRef = useRef(false);
 
     useLayoutEffect(() => {
-        setMount(true);
+        mountRef.current = true;
 
-        return () => setMount(false);
+        return () => {
+            mountRef.current = false;
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -33,7 +35,7 @@ function useMount(callback?: React.EffectCallback) {
         // eslint-disable-next-line
     }, []);
 
-    return isMount;
+    return mountRef.current;
 }
 
 export default useMount;
