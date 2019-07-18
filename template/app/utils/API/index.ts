@@ -10,7 +10,7 @@ interface IAPI {
     PORTAL: typeof PORTAL;
 }
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development' || process.env.REACT_APP_ENV === 'development';
 // @ts-ignore
 const apiCtx = require.context('./apis', false, /\.[jt]sx?$/);
 
