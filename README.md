@@ -19,6 +19,10 @@
 
 ![screenshot](https://cloud.githubusercontent.com/assets/3774036/26042794/b2ee8ce0-396a-11e7-97e1-b52f31309c2c.png)
 
+## v4.x 新功能
+
+-   可以选择创建普通的开发项目，还是npm发布包项目
+
 ## v3.x 新功能
 
 -   webpack 升级到 v4

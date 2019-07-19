@@ -3,6 +3,7 @@
 var chalk = require('chalk');
 var ora = require('ora');
 var semver = require('semver');
+var validatePkgName = require('validate-npm-package-name');
 
 var spinner = ora();
 
@@ -18,6 +19,7 @@ if (semver.lt(currentNodeVersion, '4.0.0')) {
             ' 。\n' +
             '  请升级你的node！'
     );
+
     process.exit(1);
 }
 
@@ -28,12 +30,11 @@ var path = require('path');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
 var appUpgrade = require('./upgrade');
-var pkgTemp = require('./packageTemp');
 
 var ownPath = __dirname;
 var oldPath = process.cwd();
 var projectName;
-var projectCustom;
+var projectCustom = {};
 
 var program = commander
     .version(require('./package.json').version)
@@ -68,119 +69,170 @@ if (program.upgrade) {
     inquirer
         .prompt([
             {
-                name: 'version',
-                type: 'input',
-                message: '请输入项目版本号:',
-                default: '1.0.0',
-                validate: function(input) {
-                    return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号';
-                }
-            },
-            {
-                name: 'useCdn',
-                type: 'confirm',
-                message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
-                default: false
-            },
-            {
-                name: 'host',
-                type: 'input',
-                message: '请输入cdn服务器host地址:',
-                default: 'https://static.example.com',
-                validate: function(input) {
-                    return /^http/.test(input) ? true : '请输入一个服务器地址';
-                },
-                when: function(answers) {
-                    return answers.useCdn;
-                }
-            },
-            {
-                name: 'pathname',
-                type: 'input',
-                message: '请输入项目在cdn服务器上的存储文件夹名:',
-                default: '/' + path.basename(projectName),
-                validate: function(input) {
-                    return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
-                },
-                when: function(answers) {
-                    return answers.useCdn;
-                }
-            },
-            {
-                name: 'useLocals',
-                type: 'confirm',
-                message: '是否要支持多语言/国际化？',
-                default: false
-            },
-            {
-                name: 'locals',
-                type: 'input',
-                message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
-                default: 'zh_CN,en_US',
-                validate: function(input) {
-                    return input ? true : '该字段不能为空';
-                },
-                when: function(answers) {
-                    return answers.useLocals;
-                }
-            },
-            {
-                name: 'author',
-                type: 'input',
-                message: '请输入项目所属者（组织）的名字或邮箱:',
-                validate: function(input) {
-                    return !!input || '该字段不能为空';
-                }
-            },
-            {
-                name: 'libs',
+                name: 'type',
                 type: 'list',
-                choices: [
-                    { name: '无框架依赖', value: 0 },
-                    { name: 'jquery 项目', value: 1 },
-                    { name: 'react 项目', value: 2 },
-                    { name: 'jquery + react 项目', value: 3 }
-                ],
-                message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
-                default: 2
-            },
-            {
-                name: 'supportDecorator',
-                type: 'confirm',
-                message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
-                default: true
-            },
-            {
-                name: 'proxy',
-                type: 'input',
-                message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
-                validate: function(input) {
-                    return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
-                }
-            },
-            {
-                name: 'isSpa',
-                type: 'confirm',
-                message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
-                default: true
-            },
-            {
-                name: 'enableSW',
-                type: 'confirm',
-                message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
-                default: false
+                choices: [{ name: '普通项目(application)', value: 'application' }, { name: 'npm包项目(package)', value: 'package' }],
+                message: '请选择该项目用途？',
+                default: 'application'
             }
         ])
         .then(function(answers) {
-            projectCustom = answers;
+            Object.assign(projectCustom, answers);
 
-            createApp(projectName);
+            const questions = [
+                {
+                    name: 'version',
+                    type: 'input',
+                    message: '请输入项目版本号(version):',
+                    default: answers.type === 'application' ? '1.0.0' : '0.0.1',
+                    validate: function(input) {
+                        return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号';
+                    }
+                },
+                {
+                    name: 'name',
+                    type: 'input',
+                    message: '请输入项目名称(name):',
+                    default: path.basename(path.resolve(projectName)),
+                    validate: function(input) {
+                        const result = validatePkgName(input);
+
+                        if (result.validForNewPackages) {
+                            return true;
+                        } else {
+                            return (
+                                chalk.cyan(input) +
+                                ' 不是一个有效的package名称：\n' +
+                                chalk.red((result.errors || result.warnings).map(text => '* ' + text).join('\n'))
+                            );
+                        }
+                    }
+                },
+                {
+                    name: 'description',
+                    type: 'input',
+                    message: '请输入项目描述(description):'
+                },
+                {
+                    name: 'author',
+                    type: 'input',
+                    message: '请输入项目所属者（组织）的名字或邮箱:',
+                    validate: function(input) {
+                        return !!input || '该字段不能为空';
+                    }
+                }
+            ];
+
+            if (answers.type === 'application') {
+                questions.push(
+                    {
+                        name: 'useCdn',
+                        type: 'confirm',
+                        message:
+                            '该项目是否需要托管静态资源到cdn服务器?' +
+                            chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
+                        default: false
+                    },
+                    {
+                        name: 'host',
+                        type: 'input',
+                        message: '请输入cdn服务器host地址:',
+                        default: 'https://static.example.com',
+                        validate: function(input) {
+                            return /^http/.test(input) ? true : '请输入一个服务器地址';
+                        },
+                        when: function(answers) {
+                            return answers.useCdn;
+                        }
+                    },
+                    {
+                        name: 'pathname',
+                        type: 'input',
+                        message: '请输入项目在cdn服务器上的存储文件夹名:',
+                        default: '/' + path.basename(projectName),
+                        validate: function(input) {
+                            return /\s|\//.test(input.replace(/^\//, ''))
+                                ? '文件夹名不能包含 空格、/ 等其它字符'
+                                : true;
+                        },
+                        when: function(answers) {
+                            return answers.useCdn;
+                        }
+                    },
+                    {
+                        name: 'useLocals',
+                        type: 'confirm',
+                        message: '是否要支持多语言/国际化？',
+                        default: false
+                    },
+                    {
+                        name: 'locals',
+                        type: 'input',
+                        message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
+                        default: 'zh_CN,en_US',
+                        validate: function(input) {
+                            return input ? true : '该字段不能为空';
+                        },
+                        when: function(answers) {
+                            return answers.useLocals;
+                        }
+                    },
+                    {
+                        name: 'libs',
+                        type: 'list',
+                        choices: [
+                            { name: '无框架依赖', value: 0 },
+                            { name: 'jquery 项目', value: 1 },
+                            { name: 'react 项目', value: 2 },
+                            { name: 'jquery + react 项目', value: 3 }
+                        ],
+                        message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
+                        default: 2
+                    },
+                    {
+                        name: 'supportDecorator',
+                        type: 'confirm',
+                        message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
+                        default: true
+                    },
+                    {
+                        name: 'proxy',
+                        type: 'input',
+                        message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
+                        validate: function(input) {
+                            return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+                        }
+                    },
+                    {
+                        name: 'isSpa',
+                        type: 'confirm',
+                        message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
+                        default: true
+                    },
+                    {
+                        name: 'enableSW',
+                        type: 'confirm',
+                        message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
+                        default: false
+                    }
+                );
+            }
+
+            return inquirer.prompt(questions).then(function(answers) {
+                Object.assign(projectCustom, answers);
+
+                if (projectCustom.type === 'application') {
+                    createApp(projectName);
+                } else {
+                    createLibrary(projectName);
+                }
+            });
         });
 }
 
 function createApp(name) {
     var root = path.resolve(name);
-    var appName = path.basename(root);
+    var appName = projectCustom.name;
     var pkgVendor = [];
 
     switch (projectCustom.libs) {
@@ -203,39 +255,20 @@ function createApp(name) {
 
     fs.ensureDirSync(name);
 
+    console.log();
     console.log('即将在 ' + chalk.green(root) + ' 下创建新的开发项目');
     console.log();
 
-    var packageJson = Object.assign(
-        {
-            name: appName,
-            author: projectCustom.author,
-            version: projectCustom.version,
-            private: true,
-            vendor: pkgVendor,
-            noRewrite: !projectCustom.isSpa,
-            proxy: projectCustom.proxy || null
-        },
-        pkgTemp
-    );
-
-    if (projectCustom.supportDecorator) {
-        packageJson.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
-    }
-
-    if (projectCustom.useCdn) {
-        packageJson.cdn = {
-            host: projectCustom.host,
-            path: '/' + projectCustom.pathname.replace(/^\//g, '')
-        };
-
-        packageJson.scripts.cdn = 'node scripts/cdn.js';
-        packageJson.scripts.pack += ' && npm run cdn';
-    }
-
-    if (projectCustom.locals) {
-        packageJson.locals = projectCustom.locals.split(/\s+|\s*,\s*/g);
-    }
+    var packageJson = {
+        name: appName,
+        version: projectCustom.version,
+        private: true,
+        description: projectCustom.description,
+        author: projectCustom.author,
+        vendor: pkgVendor,
+        noRewrite: !projectCustom.isSpa,
+        proxy: projectCustom.proxy || null
+    };
 
     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(packageJson, null, 2));
 
@@ -244,7 +277,75 @@ function createApp(name) {
     console.log('即将安装package依赖，这将花费几分钟时间...');
     console.log();
 
-    run(root, appName);
+    run(root, appName, function() {
+        console.log();
+        spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(root));
+        console.log();
+        console.log('在该项目，你可以运行以下几个命令：');
+        console.log();
+        console.log(chalk.cyan('  npm start'));
+        console.log('    启动本地服务，进行开发.');
+        console.log();
+        console.log(chalk.cyan('  npm run build:dev'));
+        console.log('    构建测试包，部署测试.');
+        console.log();
+        console.log(chalk.cyan('  npm run pack'));
+        console.log('    构建线上包，部署线上.');
+        console.log();
+        console.log('运行下面的命令切换到项目目录开始工作:');
+        console.log(chalk.green('  cd ' + path.relative(oldPath, root)));
+    });
+}
+
+function createLibrary(name) {
+    var root = path.resolve(name);
+    var appName = projectCustom.name;
+
+    fs.ensureDirSync(name);
+
+    console.log();
+    console.log('即将在 ' + chalk.green(root) + ' 下创建新的开发项目');
+    console.log();
+
+    var appPackage = {
+        name: appName,
+        version: projectCustom.version,
+        description: projectCustom.description,
+        author: projectCustom.author,
+        main: './dist/index.cjs.js',
+        module: './dist/index.esm.js',
+        engines: { node: '8.1.0' }
+    };
+
+    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(appPackage, null, 2));
+
+    process.chdir(root);
+
+    console.log('即将安装package依赖，这将花费几分钟时间...');
+    console.log();
+
+    run(root, appName, function() {
+        console.log();
+        spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(root));
+        console.log();
+        console.log('在该项目，你可以运行以下几个命令：');
+        console.log();
+        console.log(chalk.cyan('  npm run build:lint'));
+        console.log('    进行lint检查');
+        console.log();
+        console.log(chalk.cyan('  npm run build:declaration'));
+        console.log('    生成.d.ts文件');
+        console.log();
+        console.log(chalk.cyan('  npm run build:bundle'));
+        console.log('    生成发布包');
+        console.log();
+        console.log(chalk.cyan('  npm run build'));
+        console.log('    按顺序执行以上所有命令');
+        console.log();
+        console.log();
+        console.log('运行下面的命令切换到项目目录开始工作:');
+        console.log(chalk.green('  cd ' + path.relative(oldPath, root)));
+    });
 }
 
 function shouldUseCnpm() {
@@ -252,6 +353,7 @@ function shouldUseCnpm() {
         execSync('cnpm --version', {
             stdio: 'ignore'
         });
+
         return true;
     } catch (e) {
         return false;
@@ -283,8 +385,39 @@ function install(packageToInstall, saveDev, callback) {
     });
 }
 
-function run(appPath, appName) {
+function run(appPath, appName, onSuccess) {
+    var templatePath = path.join(ownPath, 'template', projectCustom.type);
+
+    if (fs.existsSync(templatePath)) {
+        fs.copySync(templatePath, appPath);
+    } else {
+        throw new Error(chalk.cyan(templatePath) + ' not exists!');
+    }
+
+    var templateDependenciesPath = path.join(appPath, 'dependencies.json');
+    var pkgTempPath = path.join(appPath, 'packageTemp.js');
     var appPackage = require(path.join(appPath, 'package.json'));
+    var pkgTemp = require(pkgTempPath);
+
+    Object.assign(appPackage, pkgTemp);
+
+    if (projectCustom.supportDecorator) {
+        appPackage.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
+    }
+
+    if (projectCustom.useCdn) {
+        appPackage.cdn = {
+            host: projectCustom.host,
+            path: '/' + projectCustom.pathname.replace(/^\//g, '')
+        };
+
+        appPackage.scripts.cdn = 'node scripts/cdn.js';
+        appPackage.scripts.pack += ' && npm run cdn';
+    }
+
+    if (projectCustom.locals) {
+        appPackage.locals = projectCustom.locals.split(/\s+|\s*,\s*/g);
+    }
 
     // Copy over some of the devDependencies
     appPackage.dependencies = appPackage.dependencies || {};
@@ -292,54 +425,43 @@ function run(appPath, appName) {
 
     fs.writeFileSync(path.join(appPath, 'package.json'), JSON.stringify(appPackage, null, 2));
 
-    var templatePath = path.join(ownPath, 'template');
+    var dotfiles = [
+        'tern-project',
+        'tern-webpack-config.js',
+        'editorconfig',
+        'babelrc',
+        'eslintrc',
+        'gitignore',
+        'npmignore'
+    ];
 
-    if (fs.existsSync(templatePath)) {
-        fs.copySync(templatePath, appPath);
+    dotfiles.forEach(function(file) {
+        if (fs.existsSync(path.join(appPath, file))) {
+            fs.move(path.join(appPath, file), path.join(appPath, '.' + file), { overwrite: true }, function(err) {
+                if (err) {
+                    if (err.code === 'EEXIST' && (file === 'gitignore' || file === 'npmignore')) {
+                        var data = fs.readFileSync(path.join(appPath, file), 'utf8');
+
+                        fs.appendFileSync(path.join(appPath, '.' + file), data);
+                        fs.unlinkSync(path.join(appPath, file));
+                    } else {
+                        spinner.fail('create ' + file + ' error!');
+                        throw err;
+                    }
+                }
+            });
+        }
+    });
+
+    if (fs.pathExistsSync(path.join(appPath, 'npm'))) {
+        var exportName = projectCustom.name.split('/').slice(-1)[0];
+
+        ['index.cjs.js', 'index.esm.js'].forEach(function(file) {
+            var data = fs.readFileSync(path.join(appPath, 'npm', file), 'utf8');
+
+            fs.outputFileSync(path.join(appPath, 'npm', file), data.replace(/\{name\}/g, exportName));
+        });
     }
-
-    fs.move(path.join(appPath, 'gitignore'), path.join(appPath, '.gitignore'), function(err) {
-        if (err) {
-            // Append if there's already a `.gitignore` file there
-            if (err.code === 'EEXIST') {
-                var data = fs.readFileSync(path.join(appPath, 'gitignore'));
-
-                fs.appendFileSync(path.join(appPath, '.gitignore'), data);
-                fs.unlinkSync(path.join(appPath, 'gitignore'));
-            } else {
-                throw err;
-            }
-        }
-    });
-
-    // for ternjs config
-    fs.move(path.join(appPath, 'tern-project'), path.join(appPath, '.tern-project'), { overwrite: true }, function(
-        err
-    ) {
-        if (err) {
-            spinner.fail('create ternjs config error!');
-        }
-    });
-    fs.move(
-        path.join(appPath, 'tern-webpack-config.js'),
-        path.join(appPath, '.tern-webpack-config.js'),
-        { overwrite: true },
-        function(err) {
-            if (err) {
-                spinner.fail('create ternjs config error!');
-            }
-        }
-    );
-    // editorconfig
-    fs.move(path.join(appPath, 'editorconfig'), path.join(appPath, '.editorconfig'), { overwrite: true }, function(
-        err
-    ) {
-        if (err) {
-            spinner.fail('create editorconfig error!');
-        }
-    });
-
-    var templateDependenciesPath = path.join(ownPath, 'dependencies.json');
 
     if (fs.existsSync(templateDependenciesPath)) {
         var templateDependencies = require(templateDependenciesPath).devDependencies;
@@ -357,37 +479,29 @@ function run(appPath, appName) {
 
                 var templateDependencies = require(templateDependenciesPath).dependencies;
 
-                install(
-                    Object.keys(templateDependencies).map(function(key) {
-                        return key + '@' + templateDependencies[key].replace(/^[\^~]/, '');
-                    }),
-                    false,
-                    function(code, command, args) {
-                        if (code !== 0) {
-                            console.error('`' + command + ' ' + args.join(' ') + '` 运行失败');
-                            return;
-                        }
+                if (templateDependencies) {
+                    install(
+                        Object.keys(templateDependencies).map(function(key) {
+                            return key + '@' + templateDependencies[key].replace(/^[\^~]/, '');
+                        }),
+                        false,
+                        function(code, command, args) {
+                            if (code !== 0) {
+                                console.error('`' + command + ' ' + args.join(' ') + '` 运行失败');
+                                return;
+                            }
 
-                        console.log();
-                        spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(appPath));
-                        console.log();
-                        console.log('在该项目，你可以运行以下几个命令：');
-                        console.log();
-                        console.log(chalk.cyan('  npm start'));
-                        console.log('    启动本地服务，进行开发.');
-                        console.log();
-                        console.log(chalk.cyan('  npm run build:dev'));
-                        console.log('    构建测试包，部署测试.');
-                        console.log();
-                        console.log(chalk.cyan('  npm run pack'));
-                        console.log('    构建线上包，部署线上.');
-                        console.log();
-                        console.log('运行下面的命令切换到项目目录开始工作:');
-                        console.log(chalk.green('  cd ' + path.relative(oldPath, appPath)));
-                    }
-                );
+                            onSuccess();
+                        }
+                    );
+                } else {
+                    onSuccess();
+                }
             }
         );
+
+        fs.removeSync(templateDependenciesPath);
+        fs.removeSync(pkgTempPath);
     }
 }
 

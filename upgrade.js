@@ -6,7 +6,6 @@ var _ = require('lodash');
 var ora = require('ora');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
-var pkgTemp = require('./packageTemp');
 
 var spinner = ora();
 
@@ -14,6 +13,66 @@ var ownPath = __dirname;
 
 function appUpgrade(projectName) {
     var root = path.resolve(projectName);
+
+    if (fs.pathExistsSync(path.join(root, 'scripts'))) {
+        upgradeAppProject(root);
+    } else {
+        upgradePackageProject(root);
+    }
+}
+
+function upgradePackageProject(root) {
+    var package = require(path.resolve(root, 'package.json'));
+    var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
+
+    inquirer
+        .prompt([
+            {
+                name: 'upgrade',
+                type: 'confirm',
+                message:
+                    '请确认是否要将 ' +
+                    package.name +
+                    ' 升级到最新？\n' +
+                    chalk.dim('1. 向package.json的devDependencies字段下写入需要的依赖') +
+                    '\n' +
+                    chalk.dim('2. 覆盖原来的构建配置 rollup.config.js') +
+                    '\n',
+                default: true
+            }
+        ])
+        .then(function(answers) {
+            if (answers.upgrade) {
+                fs.copySync(
+                    path.resolve(ownPath, 'template/package/rollup.config.js'),
+                    path.resolve(root, 'rollup.config.js'),
+                    {
+                        overwrite: true
+                    }
+                );
+                spinner.succeed(chalk.green('rollup.config.js 已写入！'));
+
+                process.chdir(root);
+
+                install(
+                    Object.keys(newDevDependencies).map(function(key) {
+                        return key + '@' + newDevDependencies[key];
+                    }),
+                    true,
+                    function() {
+                        console.log();
+                        spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
+                    }
+                );
+            } else {
+                spinner.fail('升级已取消！');
+            }
+        });
+}
+
+function upgradeAppProject(root) {
+    var pkgTemp = require(path.resolve(ownPath, 'template/application/packageTemp.js'));
+
     var packageJson = path.resolve(root, 'package.json');
     var gulpfile = path.resolve(root, 'gulpfile.js');
     var jsconfig = path.resolve(root, 'jsconfig.json');
@@ -35,7 +94,7 @@ function appUpgrade(projectName) {
     var package = require(packageJson);
 
     var currentDevDependencies = package.devDependencies || {};
-    var newDevDependencies = require(path.join(ownPath, 'dependencies.json')).devDependencies;
+    var newDevDependencies = require(path.join(ownPath, 'template/application/dependencies.json')).devDependencies;
 
     inquirer
         .prompt([
@@ -135,7 +194,7 @@ function appUpgrade(projectName) {
                     spinner.succeed(chalk.green('scripts构建目录已更新！'));
 
                     if (!fs.existsSync(tsconfig)) {
-                        fs.copySync(path.resolve(ownPath, 'template/tsconfig.json'), tsconfig, {
+                        fs.copySync(path.resolve(ownPath, 'template/application/tsconfig.json'), tsconfig, {
                             overwrite: true
                         });
                         spinner.succeed(chalk.green('tsconfig.json已写入！'));
@@ -152,7 +211,7 @@ function appUpgrade(projectName) {
                     }
 
                     if (!fs.existsSync(globalDeclare)) {
-                        fs.copySync(path.resolve(ownPath, 'template/global.d.ts'), globalDeclare, {
+                        fs.copySync(path.resolve(ownPath, 'template/application/global.d.ts'), globalDeclare, {
                             overwrite: true
                         });
                         spinner.succeed(chalk.green('global.d.ts已写入！'));
@@ -227,7 +286,7 @@ function appUpgrade(projectName) {
                         }
 
                         fs.copy(
-                            path.resolve(ownPath, 'template/app/utils/i18n/index.ts'),
+                            path.resolve(ownPath, 'template/application/app/utils/i18n/index.ts'),
                             path.resolve(root, 'app/utils/i18n/index.ts'),
                             {
                                 overwrite: true
@@ -236,7 +295,7 @@ function appUpgrade(projectName) {
 
                         spinner.succeed(chalk.red('已更新 utils/i18n 模块依赖！'));
 
-                        fs.copySync(path.resolve(ownPath, 'template/global.d.ts'), globalDeclare, {
+                        fs.copySync(path.resolve(ownPath, 'template/application/global.d.ts'), globalDeclare, {
                             overwrite: true
                         });
 
@@ -293,7 +352,7 @@ function appUpgrade(projectName) {
 }
 
 function copyScripts(root) {
-    fs.copySync(path.resolve(ownPath, 'template/scripts'), path.resolve(root, 'scripts'), {
+    fs.copySync(path.resolve(ownPath, 'template/application/scripts'), path.resolve(root, 'scripts'), {
         overwrite: true
     });
 }
