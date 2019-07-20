@@ -71,7 +71,10 @@ if (program.upgrade) {
             {
                 name: 'type',
                 type: 'list',
-                choices: [{ name: '普通项目(application)', value: 'application' }, { name: 'npm包项目(package)', value: 'package' }],
+                choices: [
+                    { name: '普通项目(application)', value: 'application' },
+                    { name: 'npm包项目(package)', value: 'package' }
+                ],
                 message: '请选择该项目用途？',
                 default: 'application'
             }
@@ -461,6 +464,17 @@ function run(appPath, appName, onSuccess) {
 
             fs.outputFileSync(path.join(appPath, 'npm', file), data.replace(/\{name\}/g, exportName));
         });
+    }
+
+    if (fs.pathExistsSync(path.join(appPath, 'README.md'))) {
+        var data = fs.readFileSync(path.join(appPath, 'README.md'), 'utf8');
+
+        fs.outputFileSync(
+            path.join(appPath, 'README.md'),
+            data
+                .replace(/\{name\}/g, projectCustom.name)
+                .replace(/\{description\}/g, projectCustom.description || 'created by tiger-new')
+        );
     }
 
     if (fs.existsSync(templateDependenciesPath)) {

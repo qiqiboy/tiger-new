@@ -11,7 +11,9 @@ const copy = require('rollup-plugin-copy');
 const { terser } = require('rollup-plugin-terser');
 const pkg = require('./package.json');
 
-const externalModules = [/*'@babel/runtime', 'regenerator-runtime'*/];
+const externalExclude = [
+    /*'@babel/runtime', 'regenerator-runtime'*/
+];
 
 const exportName = pkg.name.split('/').slice(-1)[0];
 
@@ -21,12 +23,12 @@ function createConfig(env, module) {
     return {
         input: 'src/index.ts',
         external: id =>
-            !id.startsWith('.') && !externalModules.some(name => id.startsWith(name)) && !path.isAbsolute(id),
+            !id.startsWith('.') && !externalExclude.some(name => id.startsWith(name)) && !path.isAbsolute(id),
         output: {
             file: `dist/${exportName}.${module}.${env}.js`,
             format: module,
             exports: 'named',
-            sourcemap: !isProd,
+            sourcemap: false,
             globals: {
                 react: 'React',
                 'react-dom': 'ReactDOM',
@@ -56,18 +58,11 @@ function createConfig(env, module) {
                 terser({
                     sourcemap: true,
                     output: { comments: false },
-                    compress:
-                        module === 'umd'
-                            ? {
-                                  warnings: false,
-                                  comparisons: false,
-                                  keep_infinity: true
-                              }
-                            : false,
+                    compress: false,
                     warnings: false,
                     ecma: 5,
                     ie8: false,
-                    toplevel: module !== 'umd'
+                    toplevel: true
                 }),
             filesize(),
             copy({

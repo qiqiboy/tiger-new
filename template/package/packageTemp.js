@@ -1,4 +1,5 @@
 module.exports = {
+    files: ['LICENSE', 'README.md', 'dist/', 'src/'],
     scripts: {
         build: 'npm run lint && npm run clear && npm run build:declaration && npm run build:bundle',
         'build:bundle': 'rollup -c',

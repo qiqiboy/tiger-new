@@ -1,6 +1,6 @@
-# tiger-new
+# {name}
 
-支持 `ES6` + `TypeScript` + `React` 的开发环境
+{description}
 
 <!-- vim-markdown-toc GFM -->
 
