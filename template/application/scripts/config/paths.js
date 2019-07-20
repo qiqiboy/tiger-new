@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const glob = require('glob');
 const execSync = require('child_process').execSync;
 const isDev = process.env.NODE_ENV === 'development';
@@ -37,7 +37,13 @@ const alias = Object.assign(
         types: resolveApp('app/types'),
         hooks: resolveApp('app/hooks')
     },
-    lodash.mapValues(pkg.alias, resolveApp)
+    lodash.mapValues(pkg.alias, function(relativePath) {
+        if (fs.pathExistsSync(resolveApp(relativePath))) {
+            return resolveApp(relativePath);
+        }
+
+        return relativePath;
+    })
 );
 
 // config after eject: we're in ./config/
