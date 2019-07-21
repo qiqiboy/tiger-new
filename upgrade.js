@@ -6,6 +6,7 @@ var _ = require('lodash');
 var ora = require('ora');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
+var ownPkg = require('./package.json');
 
 var spinner = ora();
 
@@ -329,6 +330,12 @@ function upgradeAppProject(root) {
                         package.scripts.cdn = 'node scripts/cdn.js';
                         package.scripts.pack = 'npm run build && npm run cdn';
                     }
+
+                    if (!package.engines) {
+                        package.engines = {};
+                    }
+
+                    package.engines['tiger-new'] = ownPkg.version;
 
                     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
 

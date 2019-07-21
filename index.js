@@ -30,6 +30,7 @@ var path = require('path');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
 var appUpgrade = require('./upgrade');
+var ownPkg = require('./package.json');
 
 var ownPath = __dirname;
 var oldPath = process.cwd();
@@ -401,6 +402,11 @@ function run(appPath, appName, onSuccess) {
     var pkgTempPath = path.join(appPath, 'packageTemp.js');
     var appPackage = require(path.join(appPath, 'package.json'));
     var pkgTemp = require(pkgTempPath);
+
+    appPackage.engines = {
+        node: '>=8.0.0',
+        'tiger-new': ownPkg.version
+    };
 
     Object.assign(appPackage, pkgTemp);
 
