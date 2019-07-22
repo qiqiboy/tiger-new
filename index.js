@@ -316,8 +316,9 @@ function createLibrary(name) {
         version: projectCustom.version,
         description: projectCustom.description,
         author: projectCustom.author,
-        main: './dist/index.cjs.js',
-        module: './dist/index.esm.js',
+        main: 'dist/index.cjs.js',
+        module: 'dist/index.esm.js',
+        types: 'dist/index.d.ts',
         engines: { node: '8.1.0' }
     };
 
