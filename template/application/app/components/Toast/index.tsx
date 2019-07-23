@@ -2,17 +2,16 @@ import React, { Component } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import Loading from 'components/Loading';
 import { Fade } from 'components/Transition';
+import { TransitionProps } from 'components/Transition/withTransition';
 import Portal from 'components/Portal';
 import classlist from 'utils/classlist';
 import './style.scss';
 
-export interface IToastProps {
+export interface ToastProps extends TransitionProps {
     visible: boolean;
     children: React.ReactNode;
     className?: string;
     backdrop?: 'static' | false | 'transparent';
-
-    [key: string]: any;
 }
 
 /**
@@ -24,7 +23,7 @@ export interface IToastProps {
  * Toast.loading(isShow) 控制全局的loading
  *
  */
-class Toast extends Component<IToastProps, { loaded: boolean }> {
+class Toast extends Component<ToastProps, { loaded: boolean }> {
     static defaultProps = {
         backdrop: 'transparent'
     };
@@ -61,6 +60,9 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
         );
     }
 
+    /**
+     * 显示toast提示
+     */
     static show = (content: React.ReactNode, timeout: number = 1500) => {
         if (content instanceof Error) {
             content = content.message;
@@ -75,7 +77,10 @@ class Toast extends Component<IToastProps, { loaded: boolean }> {
 
     static loadingInstance: any = null;
 
-    static loading = (visible: boolean, text: string = '') => {
+    /**
+     * 显示toast loading
+     */
+    static loading = (visible: boolean, text: string = ''): Promise<never> => {
         let result;
 
         if (visible) {
@@ -157,7 +162,7 @@ function open(content: React.ReactNode, others?: object) {
 
     return {
         close,
-        result: new Promise(resolve => {
+        result: new Promise<never>(resolve => {
             withResolve = resolve;
         }),
         render(newContent) {

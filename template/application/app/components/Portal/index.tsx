@@ -2,10 +2,12 @@ import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import './style.scss';
 
-class Portal extends Component<{
+export interface PortalProps {
     className?: string;
     children: React.ReactElement<any>;
-}> {
+}
+
+class Portal extends Component<PortalProps> {
     container: Element;
 
     componentWillUnmount() {

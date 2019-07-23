@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Transition from 'react-transition-group/Transition';
-import { TransitionProps } from './types';
+import { Transition } from 'react-transition-group';
+import { TransitionProps } from './withTransition';
 
-export interface ICollapseProps extends TransitionProps {
+export interface CollapseProps extends TransitionProps {
     direction?: 'v' | 'h';
 }
 
@@ -31,7 +31,7 @@ function triggerReflow(node) {
     node.offsetHeight;
 }
 
-class Collapse extends Component<ICollapseProps> {
+class Collapse extends Component<CollapseProps> {
     static defaultProps = {
         direction: 'v',
         timeout: 600,

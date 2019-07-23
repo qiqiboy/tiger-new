@@ -17,27 +17,32 @@
  *
  * 你还可以利用 withTransition 高阶组件，快速创建自定义动画组件，其基于CSSTransition组件，需要额外的css编写动画样式。
  */
-import withTransition from './withTransition';
+import React from 'react';
+import withTransition, { TransitionProps } from './withTransition';
 import './transition.scss';
 
 export { withTransition };
 
-export const Fade = withTransition({
+// @ts-ignore
+export const Fade: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-fade',
     timeout: 600
 });
 
-export const Zoom = withTransition({
+// @ts-ignore
+export const Zoom: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-zoom',
     timeout: 600
 });
 
-export const Flow = withTransition({
+// @ts-ignore
+export const Flow: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-flow',
     timeout: 600
 });
 
-export const Flip = withTransition({
+// @ts-ignore
+export const Flip: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-flip',
     timeout: 600
 });

@@ -1,11 +1,37 @@
 import React from 'react';
 import CSSTransition from 'react-transition-group/CSSTransition';
-import { CSSTransitionProps } from './types';
+import {
+    TransitionProps,
+    EndHandler,
+    EnterHandler,
+    ExitHandler,
+    TransitionActions,
+    TransitionChildren
+} from 'react-transition-group/Transition';
+
+export interface TransitionProps extends TransitionActions {
+    in?: boolean;
+    mountOnEnter?: boolean;
+    unmountOnExit?: boolean;
+    timeout?: number;
+    addEndListener?: EndHandler;
+    onEnter?: EnterHandler;
+    onEntering?: EnterHandler;
+    onEntered?: EnterHandler;
+    onExit?: ExitHandler;
+    onExiting?: ExitHandler;
+    onExited?: ExitHandler;
+    children: TransitionChildren;
+}
+
+export interface CSSTransitionProps extends TransitionProps {
+    classNames: string | CSSTransition.CSSTransitionClassNames;
+}
 
 const events = ['onEntering', 'onEntered', 'onExiting', 'onExited'];
 
-export default function withTransition(defaultProps: CSSTransitionProps) {
-    return class Transition extends React.Component<Partial<CSSTransitionProps>> {
+export default function withTransition(defaultProps: CSSTransitionProps): React.ComponentClass<TransitionProps> {
+    return class Transition extends React.Component<TransitionProps> {
         static defaultProps = {
             timeout: 600,
             unmountOnExit: true,
