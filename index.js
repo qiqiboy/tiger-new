@@ -390,6 +390,14 @@ function install(packageToInstall, saveDev, callback) {
     });
 }
 
+function getGitRepoUrl() {
+    let result = execSync('git ls-remote --get-url').toString().trim();
+
+    if (/^(git|http)/.test(result)) {
+        return result;
+    }
+}
+
 function run(appPath, appName, onSuccess) {
     var templatePath = path.join(ownPath, 'template', projectCustom.type);
 
@@ -427,6 +435,17 @@ function run(appPath, appName, onSuccess) {
 
     if (projectCustom.locals) {
         appPackage.locals = projectCustom.locals.split(/\s+|\s*,\s*/g);
+    }
+
+    if (fs.existsSync(path.join(appPath, '.git'))) {
+        var repoUrl = getGitRepoUrl();
+
+        if (repoUrl) {
+            appPackage.repository = {
+                type: 'git',
+                url: repoUrl
+            };
+        }
     }
 
     // Copy over some of the devDependencies

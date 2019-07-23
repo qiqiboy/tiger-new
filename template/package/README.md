@@ -2,6 +2,12 @@
 
 {description}
 
+## 安装
+
+```bash
+$ npm install {name} --save
+```
+
 ## 如何使用
 
 这是一个基础的 npm 包发布项目，默认`src`为源码目录，支持最新的`ES6` `TypeScript`等语法开发。

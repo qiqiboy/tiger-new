@@ -90,6 +90,14 @@ export function printf(text: string, ...args: Array<string | number>): string {
     });
 }
 
+type I18nParser = typeof __;
+declare global {
+    const __: I18nParser;
+    interface Window {
+        __: I18nParser;
+    }
+}
+
 window.__ = __;
 
 const i18n = {
