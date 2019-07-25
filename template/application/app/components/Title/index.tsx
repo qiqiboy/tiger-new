@@ -1,16 +1,16 @@
 import { Component } from 'react';
 
-interface ITitleProps {
+interface TitleProps {
     title: string;
 }
 
-class Title extends Component<ITitleProps> {
+class Title extends Component<TitleProps> {
     preTitle: string;
 
     componentDidMount() {
         this.preTitle = document.title;
 
-        document.title = this.props.title + ' - Tiger Trade';
+        document.title = this.props.title + ' - React App';
     }
 
     componentWillUnmount() {

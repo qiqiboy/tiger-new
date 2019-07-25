@@ -222,6 +222,31 @@ if (program.upgrade) {
                 );
             }
 
+            if (answers.type === 'package') {
+                questions.push(
+                    {
+                        name: 'entryFile',
+                        type: 'input',
+                        default: 'src/index.ts',
+                        message: '请输入项目入口文件:',
+                        validate: function(input) {
+                            return !!input || '该字段不能为空';
+                        }
+                    },
+                    {
+                        name: 'exportName',
+                        type: 'input',
+                        default: function(answers) {
+                            return answers.name.split('/').slice(-1)[0];
+                        },
+                        message: '请输入模块导出名称:',
+                        validate: function(input) {
+                            return /^[\w-]+$/.test(input) || '只能输入数字、字母和短横杠字符';
+                        }
+                    }
+                );
+            }
+
             return inquirer.prompt(questions).then(function(answers) {
                 Object.assign(projectCustom, answers);
 
@@ -319,7 +344,9 @@ function createLibrary(name) {
         main: 'dist/index.cjs.js',
         module: 'dist/index.esm.js',
         types: 'dist/index.d.ts',
-        engines: { node: '8.1.0' }
+        engines: { node: '8.1.0' },
+        entryFile: projectCustom.entryFile,
+        exportName: projectCustom.exportName
     };
 
     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(appPackage, null, 2));
@@ -391,7 +418,9 @@ function install(packageToInstall, saveDev, callback) {
 }
 
 function getGitRepoUrl() {
-    let result = execSync('git ls-remote --get-url').toString().trim();
+    let result = execSync('git ls-remote --get-url')
+        .toString()
+        .trim();
 
     if (/^(git|http)/.test(result)) {
         return result;
@@ -483,7 +512,7 @@ function run(appPath, appName, onSuccess) {
     });
 
     if (fs.pathExistsSync(path.join(appPath, 'npm'))) {
-        var exportName = projectCustom.name.split('/').slice(-1)[0];
+        var exportName = projectCustom.exportName;
 
         ['index.cjs.js', 'index.esm.js'].forEach(function(file) {
             var data = fs.readFileSync(path.join(appPath, 'npm', file), 'utf8');

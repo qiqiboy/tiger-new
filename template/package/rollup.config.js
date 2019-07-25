@@ -8,20 +8,31 @@ const babel = require('rollup-plugin-babel');
 const sourceMaps = require('rollup-plugin-sourcemaps');
 const filesize = require('rollup-plugin-filesize');
 const copy = require('rollup-plugin-copy');
+const sass = require('rollup-plugin-sass');
 const { terser } = require('rollup-plugin-terser');
 const pkg = require('./package.json');
 
+/**
+ * 如果希望将某些模块代码直接构建进输出文件，可以再这里指定这些模块名称
+ */
 const externalExclude = [
     /*'@babel/runtime', 'regenerator-runtime'*/
 ];
 
-const exportName = pkg.name.split('/').slice(-1)[0];
+const exportName = pkg.exportName || pkg.name.split('/').slice(-1)[0];
+/**
+ * 如果你希望编译后的代码里依然自动包含进去编译后的css，那么这里可以设置为 true
+ */
+const shouldPreserveCss = false;
 
 function createConfig(env, module) {
     const isProd = env === 'production';
 
     return {
-        input: 'src/index.ts',
+        /**
+         * 入口文件位置，如果你更改了entryFile，别忘了同时修改 npm/index.cjs.js 和 npm/index.esm.js 里的文件引用名称
+         */
+        input: pkg.entryFile || 'src/index.ts',
         external: id =>
             !id.startsWith('.') && !externalExclude.some(name => id.startsWith(name)) && !path.isAbsolute(id),
         output: {
@@ -29,6 +40,12 @@ function createConfig(env, module) {
             format: module,
             exports: 'named',
             sourcemap: false,
+            intro:
+                module !== 'umd' && shouldPreserveCss
+                    ? module === 'cjs'
+                        ? `require('./${exportName}.css');`
+                        : `import('./${exportName}.css');`
+                    : undefined,
             globals: {
                 react: 'React',
                 'react-dom': 'ReactDOM',
@@ -36,7 +53,10 @@ function createConfig(env, module) {
             }
         },
         treeshake: {
-            pureExternalModules: true
+            /**
+             * 如果你有引入一些有副作用的代码模块，或者构建后的代码运行异常，可以尝试将该项设置为 true
+             */
+            moduleSideEffects: false
         },
         plugins: [
             replace({
@@ -52,6 +72,9 @@ function createConfig(env, module) {
                 exclude: 'node_modules/**',
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
                 runtimeHelpers: true
+            }),
+            sass({
+                output: `dist/${exportName}.css`
             }),
             sourceMaps(),
             isProd &&
