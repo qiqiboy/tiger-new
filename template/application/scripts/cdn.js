@@ -123,7 +123,7 @@ function runCDN() {
         );
 
         if (!failNum) {
-            fs.outputFile(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 2));
+            fs.outputFileSync(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 2));
             console.log(chalk.blue('配置文件已经更新: ' + staticConfigFile));
             console.log();
             console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
@@ -135,6 +135,7 @@ function runCDN() {
             console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
         } else {
             console.log(chalk.red('文件未全部上传，请单独运行') + chalk.green(' npm run cdn ') + chalk.red('命令!'));
+            process.exit(1);
         }
 
         console.log();
