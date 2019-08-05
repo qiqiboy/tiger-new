@@ -90,7 +90,7 @@ function scanner() {
  * 读取excel文件，并转换为json语言包
  */
 function reader() {
-    glob.sync(path.join(paths.locals, 'xlsx', '*.xlsx')).forEach(file => {
+    glob.sync(path.join(paths.locals, 'xlsx', '!(~$)*.xlsx')).forEach(file => {
         const lang = path.basename(file, '.xlsx');
         const jsonDestination = path.join(paths.locals, lang + '.json');
 
@@ -120,7 +120,7 @@ function convertJson2Excel(jsonContent, lang, destination) {
 function convertExcel2Json(file, lang, destination) {
     const sheets = xlsx.parse(fs.readFileSync(file));
 
-    const jsonData = {};
+    const jsonData = require(destination) || {};
 
     sheets[0].data.slice(2).forEach(item => {
         if (item.length) {
