@@ -71,8 +71,7 @@ module.exports = {
     moduleFileExtensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx'],
     // 一些命令检测
     serve: hasInstall('serve'),
-    cnpm: hasInstall('cnpm'),
-    yarn: hasInstall('yarn')
+    npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
 };
 
 function hasInstall(command) {
