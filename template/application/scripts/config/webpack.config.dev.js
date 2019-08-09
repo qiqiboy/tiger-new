@@ -321,7 +321,8 @@ function getStyleLoaders(cssOptions, preProcessor) {
         loaders.push({
             loader: require.resolve(preProcessor),
             options: {
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                implementation: require('sass')
             }
         });
     }

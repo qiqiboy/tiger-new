@@ -454,7 +454,8 @@ function getStyleLoaders(cssOptions, preProcessor) {
             loader: require.resolve(preProcessor),
             options: {
                 sourceMap: shouldUseSourceMap,
-                javascriptEnabled: true
+                javascriptEnabled: true,
+                implementation: require('sass')
             }
         });
     }
