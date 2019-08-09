@@ -3,14 +3,14 @@ import Loading from 'components/Loading';
 import ErrorBox from 'components/ErrorBox';
 import './style.scss';
 
-type ILoader = () => Promise<any>;
+type Loader = () => Promise<any>;
 
-interface IConfig {
+interface PreloadConfig {
     prop?: string;
     filter?(data: any): any;
 }
 
-interface IState {
+interface PreloadState {
     loading: boolean;
     error: Error | null;
     data: any;
@@ -44,11 +44,11 @@ interface IState {
  *      }
  * });
  */
-export default function createWithPreload<T extends string = 'preload'>(loader: ILoader, config: IConfig = {}) {
+export default function createWithPreload<T extends string = 'preload'>(loader: Loader, config: PreloadConfig = {}) {
     return function withPreload<Self = {}>(
         WrappedComponent: React.ComponentType<Self>
     ): React.ComponentClass<Omit<Self, T>> {
-        return class extends Component<Self, IState> {
+        return class extends Component<Self, PreloadState> {
             static displayName = 'WithPreload-' + (WrappedComponent.displayName || WrappedComponent.name);
 
             readonly state = {

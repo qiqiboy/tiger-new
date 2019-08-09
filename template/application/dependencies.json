@@ -12,7 +12,7 @@
     "@types/react-dom": "16",
     "@types/react-is": "16",
     "@types/react-router-dom": "4",
-    "@types/react-transition-group": "2",
+    "@types/react-transition-group": "4",
     "@typescript-eslint/eslint-plugin": "1",
     "@typescript-eslint/parser": "1",
     "ali-oss": "6",

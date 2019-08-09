@@ -1,7 +1,7 @@
 import { useReducer } from 'react';
 
 function reducer(state, action) {
-    return Object.assign(state, action);
+    return { ...state, ...action };
 }
 
 /**

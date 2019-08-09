@@ -1,5 +1,6 @@
 import React from 'react';
-import CSSTransition from 'react-transition-group/CSSTransition';
+import { CSSTransition } from 'react-transition-group';
+import { CSSTransitionProps } from 'react-transition-group/CSSTransition';
 import {
     TransitionProps,
     EndHandler,
@@ -22,10 +23,6 @@ export interface TransitionProps extends TransitionActions {
     onExiting?: ExitHandler;
     onExited?: ExitHandler;
     children: TransitionChildren;
-}
-
-export interface CSSTransitionProps extends TransitionProps {
-    classNames: string | CSSTransition.CSSTransitionClassNames;
 }
 
 const events = ['onEntering', 'onEntered', 'onExiting', 'onExited'];
