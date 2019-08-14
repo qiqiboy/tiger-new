@@ -7,16 +7,6 @@ module.exports = {
         clear: 'rimraf dist',
         lint: "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'"
     },
-    babel: {
-        presets: [
-            [
-                'react-app',
-                {
-                    absoluteRuntime: false
-                }
-            ]
-        ]
-    },
     browserslist: ['>0.2%', 'not dead', 'not op_mini all'],
     husky: {
         hooks: {

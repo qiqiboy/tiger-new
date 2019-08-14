@@ -71,7 +71,81 @@ function createConfig(env, module) {
             babel({
                 exclude: 'node_modules/**',
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
-                runtimeHelpers: true
+                runtimeHelpers: true,
+                babelrc: false,
+                presets: [
+                    [
+                        '@babel/preset-env',
+                        {
+                            useBuiltIns: 'entry',
+                            corejs: 3,
+                            modules: false,
+                            exclude: ['transform-typeof-symbol']
+                        }
+                    ],
+                    [
+                        '@babel/preset-react',
+                        {
+                            development: false,
+                            useBuiltIns: true
+                        }
+                    ],
+                    ['@babel/preset-typescript']
+                ],
+                plugins: [
+                    'babel-plugin-macros',
+                    [
+                        '@babel/plugin-transform-destructuring',
+                        {
+                            // https://github.com/facebook/create-react-app/issues/5602
+                            loose: false,
+                            useBuiltIns: true,
+                            selectiveLoose: [
+                                'useState',
+                                'useEffect',
+                                'useContext',
+                                'useReducer',
+                                'useCallback',
+                                'useMemo',
+                                'useRef',
+                                'useImperativeHandle',
+                                'useLayoutEffect',
+                                'useDebugValue'
+                            ]
+                        }
+                    ],
+                    ['@babel/plugin-proposal-decorators', { legacy: true }],
+                    [
+                        '@babel/plugin-proposal-class-properties',
+                        {
+                            loose: true
+                        }
+                    ],
+                    [
+                        '@babel/plugin-proposal-object-rest-spread',
+                        {
+                            useBuiltIns: true
+                        }
+                    ],
+                    [
+                        '@babel/plugin-transform-runtime',
+                        {
+                            version: require('@babel/helpers/package.json').version,
+                            corejs: false,
+                            helpers: true,
+                            regenerator: true,
+                            useESModules: true,
+                            absoluteRuntime: false
+                        }
+                    ],
+                    isProd && [
+                        // Remove PropTypes from production build
+                        'babel-plugin-transform-react-remove-prop-types',
+                        {
+                            removeImport: true
+                        }
+                    ]
+                ].filter(Boolean)
             }),
             sass({
                 output: `dist/${exportName}.css`
