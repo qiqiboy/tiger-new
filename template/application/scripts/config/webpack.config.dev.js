@@ -303,12 +303,12 @@ function getStyleLoaders(cssOptions, preProcessor) {
         isBuilding
             ? {
                   loader: MiniCssExtractPlugin.loader,
-                  options: { publicPath: '../../' }
+                  options: { publicPath: '../../', sourceMap: true }
               }
             : require.resolve('style-loader'),
         {
             loader: require.resolve('css-loader'),
-            options: cssOptions
+            options: Object.assign({ sourceMap: true }, cssOptions)
         },
         {
             loader: require.resolve('postcss-loader'),
@@ -322,7 +322,8 @@ function getStyleLoaders(cssOptions, preProcessor) {
                         },
                         stage: 3
                     })
-                ]
+                ],
+                sourceMap: true
             }
         }
     ];
@@ -332,7 +333,8 @@ function getStyleLoaders(cssOptions, preProcessor) {
             loader: require.resolve(preProcessor),
             options: {
                 javascriptEnabled: true,
-                implementation: require('sass')
+                implementation: require('sass'),
+                sourceMap: true
             }
         });
     }

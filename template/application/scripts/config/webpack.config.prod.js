@@ -255,8 +255,7 @@ module.exports = {
                         test: /\.css$/,
                         exclude: /\.module\.css$/,
                         loader: getStyleLoaders({
-                            importLoaders: 1,
-                            sourceMap: shouldUseSourceMap
+                            importLoaders: 1
                         }),
                         sideEffects: true
                     },
@@ -264,7 +263,6 @@ module.exports = {
                         test: /\.module\.css$/,
                         loader: getStyleLoaders({
                             importLoaders: 1,
-                            sourceMap: shouldUseSourceMap,
                             modules: true,
                             getLocalIdent: getCSSModuleLocalIdent
                         })
@@ -274,8 +272,7 @@ module.exports = {
                         exclude: /\.module\.s[ac]ss$/,
                         loader: getStyleLoaders(
                             {
-                                importLoaders: 2,
-                                sourceMap: shouldUseSourceMap
+                                importLoaders: 2
                             },
                             'sass-loader'
                         ),
@@ -286,7 +283,6 @@ module.exports = {
                         loader: getStyleLoaders(
                             {
                                 importLoaders: 2,
-                                sourceMap: shouldUseSourceMap,
                                 modules: true,
                                 getLocalIdent: getCSSModuleLocalIdent
                             },
@@ -298,8 +294,7 @@ module.exports = {
                         exclude: /\.module\.less$/,
                         loader: getStyleLoaders(
                             {
-                                importLoaders: 2,
-                                sourceMap: shouldUseSourceMap
+                                importLoaders: 2
                             },
                             'less-loader'
                         ),
@@ -429,7 +424,12 @@ function getStyleLoaders(cssOptions, preProcessor) {
         },
         {
             loader: require.resolve('css-loader'),
-            options: cssOptions
+            options: Object.assign(
+                {
+                    sourceMap: shouldUseSourceMap
+                },
+                cssOptions
+            )
         },
         {
             loader: require.resolve('postcss-loader'),
