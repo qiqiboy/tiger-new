@@ -5,6 +5,7 @@ const resolve = require('resolve');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
@@ -255,6 +256,10 @@ module.exports = {
     },
     plugins: injects
         .concat([
+            isBuilding &&
+                new MiniCssExtractPlugin({
+                    filename: 'static/css/[name].[hash:8].css'
+                }),
             new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
             new ModuleNotFoundPlugin(paths.root),
             new webpack.EnvironmentPlugin(env.raw),
@@ -295,7 +300,12 @@ module.exports = {
 
 function getStyleLoaders(cssOptions, preProcessor) {
     const loaders = [
-        require.resolve('style-loader'),
+        isBuilding
+            ? {
+                  loader: MiniCssExtractPlugin.loader,
+                  options: { publicPath: '../../' }
+              }
+            : require.resolve('style-loader'),
         {
             loader: require.resolve('css-loader'),
             options: cssOptions
