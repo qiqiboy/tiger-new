@@ -305,7 +305,6 @@ module.exports = {
                         loader: getStyleLoaders(
                             {
                                 importLoaders: 2,
-                                sourceMap: shouldUseSourceMap,
                                 modules: true,
                                 getLocalIdent: getCSSModuleLocalIdent
                             },
@@ -341,6 +340,7 @@ module.exports = {
             new ModuleNotFoundPlugin(paths.root),
             new webpack.EnvironmentPlugin(env.raw),
             new ImageminPlugin({
+                cacheFolder: path.resolve(paths.appNodeModules, '.cache/imagemin'),
                 pngquant: {
                     // quality: '95-100'
                 }
