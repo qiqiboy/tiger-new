@@ -27,7 +27,7 @@ const publicPath = ensureSlash(cdnUrl, true);
 const publicUrl = ensureSlash(cdnUrl, false);
 const env = getClientEnvironment(publicUrl);
 
-const shouldUseRelativeAssetPaths = process.env.SKIP_CDN !== 'true' || !pkg.cdn;
+const shouldUseRelativeAssetPaths = process.env.SKIP_CDN === 'true' || !pkg.cdn;
 const shouldUseSourceMap = false;
 const shouldInlineRuntimeChunk = true;
 const shouldUseSW = !!pkg.pwa;
