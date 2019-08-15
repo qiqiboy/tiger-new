@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 declare module 'axios' {
     // tslint:disable-next-line
     interface AxiosRequestConfig {
-        useJson?: boolean;
+        useForm?: boolean;
         noToken?: boolean;
     }
 
@@ -80,7 +80,7 @@ axios.interceptors.request.use((config: AxiosRequestConfig) => {
     );
 
     // 增加对表单数组提交的支持
-    if (!config.useJson && (config.method === 'post' || config.method === 'put')) {
+    if (config.useForm && (config.method === 'post' || config.method === 'put')) {
         config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
         config.transformRequest = dataSerializer;
     }
