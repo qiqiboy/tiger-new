@@ -10,6 +10,7 @@
     "allowUnreachableCode": false,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": false,
@@ -21,8 +22,6 @@
     "declaration": true,
     "outDir": "dist"
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"],
   "exclude": ["node_modules", "dist", "build"]
 }

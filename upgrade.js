@@ -129,6 +129,15 @@ function upgradeAppProject(root) {
                     });
                 }
 
+                if (fs.existsSync(tsconfig)) {
+                    questions.push({
+                        name: 'updateTsconfig',
+                        type: 'confirm',
+                        message: '是否更新tsconfig.json？',
+                        default: false
+                    });
+                }
+
                 if (!package.prettier) {
                     questions.push({
                         name: 'addPrettier',
@@ -185,7 +194,7 @@ function upgradeAppProject(root) {
                     copyScripts(root);
                     spinner.succeed(chalk.green('scripts构建目录已更新！'));
 
-                    if (!fs.existsSync(tsconfig)) {
+                    if (!fs.existsSync(tsconfig) || answers.updateTsconfig) {
                         fs.copySync(path.resolve(ownPath, 'template/application/tsconfig.json'), tsconfig, {
                             overwrite: true
                         });

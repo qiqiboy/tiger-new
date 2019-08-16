@@ -12,6 +12,7 @@
     "allowUnreachableCode": false,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "noEmit": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
