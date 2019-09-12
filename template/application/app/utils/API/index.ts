@@ -25,7 +25,6 @@ export default apiCtx.keys().reduce((exports, file) => {
 >;
 
 function enhanced(config) {
-    const host = isDev ? config.HOST[0] : config.HOST[1];
     const createAPI = apis =>
         Object.keys(apis).reduce((result, key) => {
             const pathname = apis[key];
@@ -34,6 +33,7 @@ function enhanced(config) {
                 typeof pathname === 'string'
                     ? (...args) => {
                           let index = 0;
+                          const host = isDev ? config.HOST[0] : config.HOST[1];
 
                           return (
                               host +
@@ -50,4 +50,17 @@ function enhanced(config) {
         }, {});
 
     return createAPI(config.API);
+}
+
+/**
+ * 根据配置的HOST_ALIAS切换host
+ */
+export function setAlias(name: string) {
+    apiCtx.keys().forEach(file => {
+        const config = apiCtx(file);
+
+        if (config.HOST_ALIAS && name in config.HOST_ALIAS) {
+            config.HOST.splice(0, 2, ...config.HOST_ALIAS[name]);
+        }
+    });
 }

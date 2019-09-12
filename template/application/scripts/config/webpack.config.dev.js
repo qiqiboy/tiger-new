@@ -127,8 +127,10 @@ module.exports = {
                 use: [
                     {
                         options: {
+                            cache: true,
                             formatter: require.resolve('react-dev-utils/eslintFormatter'),
-                            eslintPath: require.resolve('eslint')
+                            eslintPath: require.resolve('eslint'),
+                            resolvePluginsRelativeTo: __dirname
                         },
                         loader: require.resolve('eslint-loader')
                     }
@@ -167,7 +169,7 @@ module.exports = {
                                     {
                                         loaderMap: {
                                             svg: {
-                                                ReactComponent: '@svgr/webpack?-prettier,-svgo![path]'
+                                                ReactComponent: '@svgr/webpack?-svgo,+titleProp,+ref![path]'
                                             }
                                         }
                                     }
