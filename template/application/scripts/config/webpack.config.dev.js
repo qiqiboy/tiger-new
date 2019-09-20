@@ -333,11 +333,17 @@ function getStyleLoaders(cssOptions, preProcessor) {
     if (preProcessor) {
         loaders.push({
             loader: require.resolve(preProcessor),
-            options: {
-                javascriptEnabled: true,
-                implementation: require('sass'),
-                sourceMap: true
-            }
+            options: Object.assign(
+                {},
+                { sourceMap: true },
+                preProcessor === 'less-loader'
+                    ? {
+                          javascriptEnabled: true
+                      }
+                    : {
+                          implementation: require('sass')
+                      }
+            )
         });
     }
 
