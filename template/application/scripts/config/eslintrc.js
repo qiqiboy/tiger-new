@@ -30,7 +30,12 @@ module.exports = {
                     }
                 ],
                 '@typescript-eslint/adjacent-overload-signatures': 2,
-                '@typescript-eslint/array-type': [1, 'array-simple'],
+                '@typescript-eslint/array-type': [
+                    1,
+                    {
+                        default: 'array-simple'
+                    }
+                ],
                 '@typescript-eslint/ban-types': 2,
                 '@typescript-eslint/class-name-casing': 2,
                 '@typescript-eslint/explicit-function-return-type': 0,
@@ -40,14 +45,14 @@ module.exports = {
                 '@typescript-eslint/member-delimiter-style': 2,
                 '@typescript-eslint/no-empty-interface': 1,
                 '@typescript-eslint/no-explicit-any': 0,
-                '@typescript-eslint/no-inferrable-types': 2,
+                '@typescript-eslint/no-inferrable-types': 0,
                 '@typescript-eslint/no-misused-new': 2,
                 '@typescript-eslint/no-non-null-assertion': 0,
-                '@typescript-eslint/no-object-literal-type-assertion': 0,
+                '@typescript-eslint/consistent-type-assertions': 2,
                 '@typescript-eslint/no-parameter-properties': 2,
-                '@typescript-eslint/no-triple-slash-reference': 2,
+                '@typescript-eslint/triple-slash-reference': 2,
                 '@typescript-eslint/no-var-requires': 2,
-                '@typescript-eslint/prefer-interface': 2,
+                '@typescript-eslint/consistent-type-definitions': [2, 'interface'],
                 '@typescript-eslint/prefer-namespace-keyword': 2,
                 '@typescript-eslint/type-annotation-spacing': 2
             }
