@@ -285,7 +285,10 @@ module.exports = {
                 watch: paths.appSrc,
                 silent: true
             }),
-            new webpack.BannerPlugin('@author ' + pkg.author)
+            new webpack.BannerPlugin({
+                banner: '@author ' + pkg.author,
+                entryOnly: true
+            })
         ])
         .filter(Boolean),
 

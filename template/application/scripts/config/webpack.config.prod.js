@@ -111,6 +111,7 @@ module.exports = {
     optimization: {
         minimizer: [
             new TerserPlugin({
+                extractComments: false,
                 terserOptions: {
                     parse: {
                         ecma: 8
@@ -126,7 +127,7 @@ module.exports = {
                     },
                     output: {
                         ecma: 5,
-                        comments: false,
+                        comments: /@(license|author)/i,
                         ascii_only: true
                     }
                 },
@@ -405,7 +406,10 @@ module.exports = {
                 silent: true,
                 formatter: typescriptFormatter
             }),
-            new webpack.BannerPlugin('@author ' + pkg.author)
+            new webpack.BannerPlugin({
+                banner: '@author ' + pkg.author,
+                entryOnly: true
+            })
         ])
         .filter(Boolean),
     node: {
