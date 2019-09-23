@@ -25,11 +25,6 @@ declare namespace NodeJS {
 }
 
 /**
- * From T delete a set of properties P
- */
-type Omit<T, P> = Pick<T, Exclude<keyof T, P>>;
-
-/**
  * create HOC(Higher Order Component)
  *
  */
