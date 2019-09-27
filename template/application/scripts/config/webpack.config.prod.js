@@ -266,8 +266,9 @@ module.exports = {
                         test: /\.module\.css$/,
                         loader: getStyleLoaders({
                             importLoaders: 1,
-                            modules: true,
-                            getLocalIdent: getCSSModuleLocalIdent
+                            modules: {
+                                    getLocalIdent: getCSSModuleLocalIdent
+                                }
                         })
                     },
                     {
@@ -286,8 +287,9 @@ module.exports = {
                         loader: getStyleLoaders(
                             {
                                 importLoaders: 2,
-                                modules: true,
-                                getLocalIdent: getCSSModuleLocalIdent
+                                modules: {
+                                    getLocalIdent: getCSSModuleLocalIdent
+                                }
                             },
                             'sass-loader'
                         )
@@ -308,8 +310,9 @@ module.exports = {
                         loader: getStyleLoaders(
                             {
                                 importLoaders: 2,
-                                modules: true,
-                                getLocalIdent: getCSSModuleLocalIdent
+                                modules: {
+                                    getLocalIdent: getCSSModuleLocalIdent
+                                }
                             },
                             'less-loader'
                         )
