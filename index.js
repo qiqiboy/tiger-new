@@ -343,7 +343,7 @@ function createLibrary(name) {
         author: projectCustom.author,
         main: 'dist/index.cjs.js',
         module: 'dist/index.esm.js',
-        types: 'dist/index.d.ts',
+        types: 'dist/' + path.basename(projectCustom.entryFile, path.extname(projectCustom.entryFile)) + '.d.ts',
         engines: { node: '8.1.0' },
         entryFile: projectCustom.entryFile,
         exportName: projectCustom.exportName
@@ -504,6 +504,7 @@ function run(appPath, appName, onSuccess) {
                         fs.unlinkSync(path.join(appPath, file));
                     } else {
                         spinner.fail('create ' + file + ' error!');
+
                         throw err;
                     }
                 }
@@ -543,6 +544,7 @@ function run(appPath, appName, onSuccess) {
             function(code, command, args) {
                 if (code !== 0) {
                     console.error('`' + command + ' ' + args.join(' ') + '` 运行失败');
+
                     return;
                 }
 
@@ -557,6 +559,7 @@ function run(appPath, appName, onSuccess) {
                         function(code, command, args) {
                             if (code !== 0) {
                                 console.error('`' + command + ' ' + args.join(' ') + '` 运行失败');
+
                                 return;
                             }
 
