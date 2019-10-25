@@ -217,7 +217,7 @@ class ComDemo extends Component<DemoProps> {
                                 name="demo3.multipleSelect"
                                 helper="We'll never share your email with anyone else."
                                 required
-                                controlId="demo3.select">
+                                controlId="demo3.multipleSelect">
                                 <Form.Control as="select" multiple>
                                     <option disabled value="">
                                         请选择

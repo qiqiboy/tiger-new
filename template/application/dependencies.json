@@ -74,6 +74,7 @@
     "webpack-dev-server": "3"
   },
   "dependencies": {
+    "@loadable/component": "5",
     "axios": "latest",
     "bootstrap": "4",
     "moment": "2",
@@ -85,7 +86,6 @@
     "react-bootstrap-formutil": "next",
     "react-dom": "16",
     "react-formutil": "latest",
-    "react-loadable": "latest",
     "react-router-dom": "latest",
     "react-transition-group": "4"
   }
