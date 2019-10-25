@@ -24,7 +24,7 @@ class ComDemo extends Component<DemoProps> {
 
     handleClick = () => Toast.show('重新请求!');
     handleSubmit = ev => {
-        ev.preventdefault();
+        ev.preventDefault();
 
         const { $invalid, $getFirstError } = this.props.$formutil;
 
@@ -66,7 +66,7 @@ class ComDemo extends Component<DemoProps> {
         }
 
         return (
-            <Form className="app-demo app-main" onSubmit={this.handleSubmit}>
+            <Form className="app-demo app-main" onSubmit={this.handleSubmit} noValidate>
                 <CardDeck>
                     <Card>
                         <Card.Body>
@@ -92,7 +92,9 @@ class ComDemo extends Component<DemoProps> {
                                 <Form.Check type="checkbox" label="Check me out" />
                             </FormGroup>
 
-                            <Button block>Submit</Button>
+                            <Button block htmlType="submit">
+                                Submit
+                            </Button>
                         </Card.Body>
                     </Card>
                     <Card>
@@ -162,7 +164,7 @@ class ComDemo extends Component<DemoProps> {
                                 </SwitchGroup>
                             </FormGroup>
 
-                            <FormGroup name="demo2.inlineSwitch" required>
+                            <FormGroup name="demo2.inlineSwitch" required feedback>
                                 <CheckboxGroup>
                                     <Form.Check
                                         inline
@@ -273,18 +275,18 @@ class ComDemo extends Component<DemoProps> {
                 />
 
                 <h3>Loading</h3>
-                <Loading size="sm" />
-                <Loading />
-                <Loading tip="加载中..." />
-                <Loading size="sm" color="success" />
-                <Loading color="success" />
-                <Loading tip="加载中..." color="success" />
-                <Loading size="sm" color="danger" />
-                <Loading color="danger" />
-                <Loading tip="加载中..." color="danger" />
-                <Loading size="sm" color="dark" />
-                <Loading color="dark" />
-                <Loading tip="加载中..." color="dark" />
+                <Loading inline size="sm" />
+                <Loading inline />
+                <Loading inline tip="加载中..." />
+                <Loading inline size="sm" color="success" />
+                <Loading inline color="success" />
+                <Loading inline tip="加载中..." color="success" />
+                <Loading inline size="sm" color="danger" />
+                <Loading inline color="danger" />
+                <Loading inline tip="加载中..." color="danger" />
+                <Loading inline size="sm" color="dark" type="grow" />
+                <Loading inline color="dark" type="grow" />
+                <Loading inline tip="加载中..." color="dark" type="grow" />
 
                 <h3>Button</h3>
                 <ButtonToolbar>
@@ -296,6 +298,7 @@ class ComDemo extends Component<DemoProps> {
                     <Button type="danger">Danger</Button>
                     <Button type="light">Light</Button>
                     <Button type="dark">Dark</Button>
+                    <Button type="blue">Blue</Button>
                     <Button type="link">Link</Button>
                 </ButtonToolbar>
                 <p />
@@ -323,6 +326,9 @@ class ComDemo extends Component<DemoProps> {
                     </Button>
                     <Button round type="dark">
                         Dark
+                    </Button>
+                    <Button round type="blue">
+                        Blue
                     </Button>
                     <Button round type="link">
                         Link
@@ -354,6 +360,9 @@ class ComDemo extends Component<DemoProps> {
                     <Button ghost type="dark">
                         Dark
                     </Button>
+                    <Button ghost type="blue">
+                        Blue
+                    </Button>
                     <Button ghost type="link">
                         Link
                     </Button>
@@ -384,27 +393,71 @@ class ComDemo extends Component<DemoProps> {
                     <Button ghost round type="dark">
                         Dark
                     </Button>
+                    <Button ghost round type="blue">
+                        Blue
+                    </Button>
                     <Button ghost round type="link">
                         Link
                     </Button>
                 </ButtonToolbar>
                 <br />
                 <ButtonToolbar>
-                    <Button loading={true}>Default Loading</Button>
-                    <Button loading={true} type="primary">
-                        Primary Loading
+                    <Button loading type="primary">
+                        Primary
                     </Button>
-                    <Button loading={true} type="success">
-                        Success Loading
+                    <Button ghost round loading type="secondary">
+                        Secondary
                     </Button>
-                    <Button loading={true} type="info">
-                        Info Loading
+                    <Button loading type="success">
+                        Success
                     </Button>
-                    <Button loading={true} type="warning">
-                        Warning Loading
+                    <Button loading type="info">
+                        Info
                     </Button>
-                    <Button loading={true} type="danger">
-                        Danger Loading
+                    <Button loading type="warning">
+                        Warning
+                    </Button>
+                    <Button loading type="light">
+                        Light
+                    </Button>
+                    <Button loading type="dark">
+                        Dark
+                    </Button>
+                    <Button loading type="blue">
+                        Blue
+                    </Button>
+                    <Button loading type="danger">
+                        Danger
+                    </Button>
+                </ButtonToolbar>
+                <br />
+                <ButtonToolbar>
+                    <Button ghost loading type="primary">
+                        Primary
+                    </Button>
+                    <Button ghost round loading type="secondary">
+                        Secondary
+                    </Button>
+                    <Button ghost loading type="success">
+                        Success
+                    </Button>
+                    <Button ghost loading type="info">
+                        Info
+                    </Button>
+                    <Button ghost loading type="warning">
+                        Warning
+                    </Button>
+                    <Button ghost loading type="light">
+                        Light
+                    </Button>
+                    <Button ghost loading type="dark">
+                        Dark
+                    </Button>
+                    <Button ghost loading type="blue">
+                        Blue
+                    </Button>
+                    <Button ghost loading type="danger">
+                        Danger
                     </Button>
                 </ButtonToolbar>
 

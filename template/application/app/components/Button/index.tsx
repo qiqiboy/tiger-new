@@ -7,7 +7,7 @@ export interface ButtonProps extends Omit<BSButtonProps, 'type' | 'variant'> {
     loading?: boolean; // 显示加载中状态
     round?: boolean; // 大圆角按钮
     ghost?: boolean; // 是否背景透明模式（幽灵模式）
-    type?: 'default' | 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light' | 'link'; // 风格定义，同variant
+    type?: 'default' | 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark' | 'light' | 'blue' | 'link'; // 风格定义，同variant
     htmlType?: string; // 传递给按钮dom节点的type属性，type="submit"
 }
 

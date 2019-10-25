@@ -4,7 +4,7 @@ import { Alert } from 'react-bootstrap';
 
 export interface ErrorBoxProps {
     error: Error | string;
-    onClick?: (ev: React.MouseEvent<Button>) => void;
+    onClick?: React.MouseEventHandler;
     title: string;
 }
 export interface ErrorBoxState {

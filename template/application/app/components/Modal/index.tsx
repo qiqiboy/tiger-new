@@ -1,6 +1,7 @@
 import React, { Children, cloneElement } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import { Modal, ModalProps as BSModalProps } from 'react-bootstrap';
+import { isValidElementType } from 'react-is';
 import './style.scss';
 
 const _Modal = Modal;
@@ -102,15 +103,10 @@ export const open = ((_Modal as INewModal).open = config => {
 
         let children;
 
-        if (typeof TheComponent === 'function') {
+        if (isValidElementType(TheComponent)) {
             children = <TheComponent />;
         } else {
             children = TheComponent;
-        }
-
-        // 如果关闭动画，则直接执行回调
-        if (visible === false && animation === false && callback) {
-            callback();
         }
 
         reactRender(
@@ -137,6 +133,12 @@ export const open = ((_Modal as INewModal).open = config => {
             </Modal>,
             div
         );
+
+        // 如果关闭动画，则直接执行回调
+        if (visible === false && animation === false && callback) {
+            callback();
+            destroy();
+        }
     }
 
     render(true);

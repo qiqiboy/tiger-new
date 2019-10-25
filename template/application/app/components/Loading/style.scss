@@ -1,10 +1,14 @@
 .loading-root {
-    display: inline-block;
+    display: block;
+    text-align: center;
+    margin: 0.5em;
     &.loading-with-tip {
-        text-align: center;
-        .spinner-border {
+        .spinner-self {
             display: block;
-            margin: 0 auto;
+            margin: 0 auto 0.3rem;
         }
+    }
+    &.loading-inline {
+        display: inline-block;
     }
 }
