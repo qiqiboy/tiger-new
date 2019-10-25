@@ -288,7 +288,6 @@ class ComDemo extends Component<DemoProps> {
 
                 <h3>Button</h3>
                 <ButtonToolbar>
-                    <Button>Default</Button>
                     <Button type="primary">Primary</Button>
                     <Button type="secondary">Secondary</Button>
                     <Button type="success">Success</Button>
@@ -301,7 +300,36 @@ class ComDemo extends Component<DemoProps> {
                 </ButtonToolbar>
                 <p />
                 <ButtonToolbar>
-                    <Button ghost>Default</Button>
+                    <Button round type="primary">
+                        Primary
+                    </Button>
+                    <Button round type="secondary">
+                        Secondary
+                    </Button>
+                    <Button round type="success">
+                        Success
+                    </Button>
+                    <Button round type="info">
+                        Info
+                    </Button>
+                    <Button round type="warning">
+                        Warning
+                    </Button>
+                    <Button round type="danger">
+                        Danger
+                    </Button>
+                    <Button round type="light">
+                        Light
+                    </Button>
+                    <Button round type="dark">
+                        Dark
+                    </Button>
+                    <Button round type="link">
+                        Link
+                    </Button>
+                </ButtonToolbar>
+                <p />
+                <ButtonToolbar>
                     <Button ghost type="primary">
                         Primary
                     </Button>
@@ -330,6 +358,36 @@ class ComDemo extends Component<DemoProps> {
                         Link
                     </Button>
                 </ButtonToolbar>
+                <p />
+                <ButtonToolbar>
+                    <Button ghost round type="primary">
+                        Primary
+                    </Button>
+                    <Button ghost round type="secondary">
+                        Secondary
+                    </Button>
+                    <Button ghost round type="success">
+                        Success
+                    </Button>
+                    <Button ghost round type="info">
+                        Info
+                    </Button>
+                    <Button ghost round type="warning">
+                        Warning
+                    </Button>
+                    <Button ghost round type="danger">
+                        Danger
+                    </Button>
+                    <Button ghost round type="light">
+                        Light
+                    </Button>
+                    <Button ghost round type="dark">
+                        Dark
+                    </Button>
+                    <Button ghost round type="link">
+                        Link
+                    </Button>
+                </ButtonToolbar>
                 <br />
                 <ButtonToolbar>
                     <Button loading={true}>Default Loading</Button>
@@ -355,7 +413,6 @@ class ComDemo extends Component<DemoProps> {
                     <Button
                         onClick={() =>
                             Modal.open({
-                                animation: 'slide',
                                 component: props => (
                                     <div style={{ padding: '30px' }}>
                                         文案文案文案文案文案文案

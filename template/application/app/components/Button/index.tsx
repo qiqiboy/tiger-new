@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, ButtonProps as BSButtonProps, Spinner } from 'react-bootstrap';
 import classlist from 'utils/classlist';
+import './style.scss';
 
 export interface ButtonProps extends Omit<BSButtonProps, 'type'> {
     loading?: boolean; // 显示加载中状态
@@ -11,16 +12,22 @@ export interface ButtonProps extends Omit<BSButtonProps, 'type'> {
 }
 
 class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<'button'>, 'type'>> {
+    static defaultProps = {
+        type: 'primary'
+    }
+
     public render() {
         const { children, loading, round, ghost, type, htmlType, ...props } = this.props;
         let variant;
 
         if (type === 'default') {
             variant = 'light';
-        } else if (ghost && type && !/^outline-/.test(type)) {
-            variant = 'outline-' + type;
         } else {
             variant = type;
+        }
+
+        if (ghost && variant && !/^outline-/.test(variant)) {
+            variant = 'outline-' + variant;
         }
 
         const overrideProps = {

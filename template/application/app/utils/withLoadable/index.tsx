@@ -17,7 +17,7 @@ interface LoadableState {
  * 如果一个文件中包含了多个组件，则可以传递第二个参数致命要渲染哪个组件
  * const AsyncComponent = withLoadable(() => import('xxx'), 'exportName');
  */
-function withLoadable<LoadableProps = any>(loader, name = 'default') {
+function withLoadable<LoadableProps = any>(loader, name = 'default'): React.ComponentClass<LoadableProps> {
     const LoadableComponent = loadable.lib(loader);
 
     class ReactLoadable extends Component<LoadableProps, LoadableState> {
@@ -39,7 +39,7 @@ function withLoadable<LoadableProps = any>(loader, name = 'default') {
                 />
             ) : (
                 <LoadableComponent fallback={<Loading className="loadable--loading" />}>
-                    {exports => createElement(exports[name], this.props)}
+                    {moduleExports => createElement(moduleExports[name], this.props)}
                 </LoadableComponent>
             );
         }
