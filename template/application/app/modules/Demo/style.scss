@@ -1,0 +1,5 @@
+.app-demo {
+    .btn-toolbar > * + * {
+        margin-left: 0.5em;
+    }
+}

@@ -270,7 +270,10 @@ module.exports = {
             new webpack.EnvironmentPlugin(env.raw),
             new CaseSensitivePathsPlugin(),
             new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+            new webpack.IgnorePlugin({
+                resourceRegExp: /^\.\/locale$/,
+                contextRegExp: /moment$/
+            }),
             new ForkTsCheckerWebpackPlugin({
                 typescript: resolve.sync('typescript', {
                     basedir: paths.appNodeModules

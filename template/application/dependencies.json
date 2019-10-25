@@ -8,7 +8,6 @@
     "@types/node": "12",
     "@types/prop-types": "15",
     "@types/react": "16",
-    "@types/react-bootstrap": "0.32",
     "@types/react-dom": "16",
     "@types/react-is": "16",
     "@types/react-router-dom": "4",
@@ -76,19 +75,18 @@
   },
   "dependencies": {
     "axios": "latest",
-    "bootstrap-sass": "3",
+    "bootstrap": "4",
     "moment": "2",
     "prop-types": "15",
     "react": "16",
     "react-animated-router": "latest",
     "react-awesome-snippets": "latest",
-    "react-bootstrap": "0.32",
-    "react-bootstrap-formutil": "latest",
-    "react-day-picker": "7",
+    "react-bootstrap": "latest",
+    "react-bootstrap-formutil": "next",
     "react-dom": "16",
     "react-formutil": "latest",
     "react-loadable": "latest",
-    "react-router-dom": "5",
+    "react-router-dom": "latest",
     "react-transition-group": "4"
   }
 }

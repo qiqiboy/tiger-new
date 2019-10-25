@@ -1,6 +1,6 @@
 import React, { Children, cloneElement } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
-import { Modal } from 'react-bootstrap';
+import { Modal, ModalProps as BSModalProps } from 'react-bootstrap';
 import './style.scss';
 
 const _Modal = Modal;
@@ -9,7 +9,7 @@ export default _Modal as INewModal;
 
 type INewModal = typeof Modal & {
     open: (
-        config: IConfig
+        config: ModalProps
     ) => ModalHandler & {
         result: Promise<any>;
         render(component: RenderCompoenent): void;
@@ -18,10 +18,10 @@ type INewModal = typeof Modal & {
 
 type RenderCompoenent = React.ComponentType<any> | React.ReactElement<any>;
 
-type IConfig = Omit<Modal.ModalProps, 'onHide' | 'animation'> & {
-    onHide?(handler: ModalHandler): void;
+type ModalProps = Omit<BSModalProps, 'animation'> & {
+    className?: string;
     component: RenderCompoenent;
-    animation?: 'slide' | 'fade';
+    animation?: boolean | 'slide' | 'fade';
 };
 
 export interface ModalHandler {
@@ -29,7 +29,9 @@ export interface ModalHandler {
     dismiss(reason?: any): void;
 }
 
-const defaultSettings = {};
+const defaultSettings = {
+    animation: true
+};
 
 /**
  * @desc 给react-bootstrap的Modal扩展一个open方法，用来方便的创建更灵活的modal。
@@ -61,10 +63,6 @@ export const open = ((_Modal as INewModal).open = config => {
 
     const settings = { ...defaultSettings, ...config };
 
-    if (config.onHide) {
-        settings.onHide = () => config.onHide!({ close, dismiss });
-    }
-
     const div = document.createElement('div');
 
     document.body.appendChild(div);
@@ -79,12 +77,20 @@ export const open = ((_Modal as INewModal).open = config => {
         }
     }
 
-    function close(data) {
+    function close(data?) {
         render(false, () => withResolve(data));
     }
 
-    function dismiss(reason) {
+    function dismiss(reason?) {
         render(false, () => withReject(reason));
+    }
+
+    function onHide() {
+        dismiss();
+
+        if (settings.onHide) {
+            settings.onHide();
+        }
     }
 
     function render(visible, callback?: () => void) {
@@ -102,11 +108,22 @@ export const open = ((_Modal as INewModal).open = config => {
             children = TheComponent;
         }
 
+        // 如果关闭动画，则直接执行回调
+        if (visible === false && animation === false && callback) {
+            callback();
+        }
+
         reactRender(
             <Modal
-                onHide={dismiss}
+                onHide={onHide}
                 {...props}
-                className={[props.className, `animation-${animation}`].filter(Boolean).join(' ')}
+                animation={Boolean(animation)}
+                className={[
+                    props.className,
+                    animation && `animation-${typeof animation === 'string' ? animation : 'fade'}`
+                ]
+                    .filter(Boolean)
+                    .join(' ')}
                 show={visible}
                 onExited={() => {
                     if (!callback) {

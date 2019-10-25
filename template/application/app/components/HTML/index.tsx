@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 
-interface HTMLProps extends React.HTMLAttributes<HTMLDivElement> {
+interface HTMLProps extends React.ComponentProps<'div'> {
     html: string;
-    [key: string]: any;
 }
 
 class HTML extends Component<HTMLProps> {

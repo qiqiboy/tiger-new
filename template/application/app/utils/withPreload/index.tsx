@@ -89,7 +89,7 @@ export default function createWithPreload<T extends string = 'preload'>(loader: 
                 if (loading) {
                     return (
                         <div className="with-preload-container">
-                            <Loading label="loading.." />
+                            <Loading tip="loading.." />
                         </div>
                     );
                 }
@@ -97,7 +97,7 @@ export default function createWithPreload<T extends string = 'preload'>(loader: 
                 if (error) {
                     return (
                         <div className="with-preload-container">
-                            <ErrorBox error={error} onClick={this.getData} />
+                            <ErrorBox error={error!} onClick={this.getData} />
                         </div>
                     );
                 }

@@ -7,7 +7,7 @@
     position: fixed;
     top: 45%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-55%, -50%);
     background-color: rgba(0, 0, 0, 0.9);
     color: #fff;
     border-radius: 6px;
@@ -36,5 +36,4 @@
 
 .toast-loading-root {
     min-height: 80px;
-    top: 50%;
 }

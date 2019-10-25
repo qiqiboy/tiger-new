@@ -1,57 +1,12 @@
 @import './variables';
-@import '~bootstrap-sass/assets/stylesheets/bootstrap';
+@import '~bootstrap/scss/bootstrap';
 // @import './rem.scss';
 
 html,
 body {
     height: 100%;
+    font-size: 14px;
 }
 #wrap {
     min-height: 100%;
-}
-
-// 进度条的细微调整
-// 激活状态下条纹更明显
-.progress-bar {
-    color: #333;
-}
-.progress-bar-striped {
-    background-image: linear-gradient(
-        45deg,
-        rgba(255, 255, 255, 0.25) 25%,
-        transparent 25%,
-        transparent 50%,
-        rgba(255, 255, 255, 0.25) 50%,
-        rgba(255, 255, 255, 0.25) 75%,
-        transparent 75%,
-        transparent
-    );
-}
-
-// 去掉输入框阴影
-.form-control {
-    box-shadow: none;
-    background-clip: padding-box;
-}
-
-// 去掉按钮的outline
-.btn:focus,
-.btn:active:focus {
-    outline: none;
-}
-
-// form-group
-.help-block {
-    font-size: 13px;
-    .hide-error > & {
-        display: none;
-    }
-}
-.form-control-feedback {
-    color: #a6adbc;
-}
-
-// label
-.label-primary {
-    color: #555;
 }

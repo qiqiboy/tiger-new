@@ -267,8 +267,8 @@ module.exports = {
                         loader: getStyleLoaders({
                             importLoaders: 1,
                             modules: {
-                                    getLocalIdent: getCSSModuleLocalIdent
-                                }
+                                getLocalIdent: getCSSModuleLocalIdent
+                            }
                         })
                     },
                     {
@@ -355,7 +355,10 @@ module.exports = {
                 filename: 'static/css/[name].[contenthash:8].css'
             }),
             new webpack.HashedModuleIdsPlugin(),
-            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+            new webpack.IgnorePlugin({
+                resourceRegExp: /^\.\/locale$/,
+                contextRegExp: /moment$/
+            }),
             shouldUseSW &&
                 new SWPrecacheWebpackPlugin({
                     cacheId: pkg.name,

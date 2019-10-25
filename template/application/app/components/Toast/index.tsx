@@ -84,7 +84,7 @@ class Toast extends Component<ToastProps, { loaded: boolean }> {
         let result;
 
         if (visible) {
-            const LoadingElement = <Loading type="circle" label={text} />;
+            const LoadingElement = <Loading tip={text} />;
 
             if (!Toast.loadingInstance) {
                 Toast.loadingInstance = open(LoadingElement, {

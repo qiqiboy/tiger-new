@@ -1,23 +1,22 @@
 import React, { Component } from 'react';
-import MessageBox from '../MessageBox';
 import Button from 'components/Button';
-import './style.scss';
+import { Alert } from 'react-bootstrap';
 
-export interface IErrorBoxProps {
+export interface ErrorBoxProps {
     error: Error | string;
     onClick?: (ev: React.MouseEvent<Button>) => void;
     title: string;
 }
-export interface IErrorBoxState {
+export interface ErrorBoxState {
     loading: boolean;
 }
 
-class ErrorBox extends Component<IErrorBoxProps, IErrorBoxState> {
+class ErrorBox extends Component<ErrorBoxProps, ErrorBoxState> {
     static defaultProps = {
         title: '发生了错误'
     };
 
-    readonly state = {} as IErrorBoxState;
+    readonly state = {} as ErrorBoxState;
 
     onBtnClick = async ev => {
         const { onClick } = this.props;
@@ -50,28 +49,20 @@ class ErrorBox extends Component<IErrorBoxProps, IErrorBoxState> {
         const msg = error instanceof Error ? error.message : error;
 
         return (
-            <MessageBox
-                className="error-box-root"
-                message={
-                    <div className="error-box-body">
-                        <h4 className="error-title">{title}</h4>
-                        {typeof msg === 'object' ? msg : <p>{msg}</p>}
-                        {onClick && (
-                            <p>
-                                <Button
-                                    onClick={this.onBtnClick}
-                                    bsStyle="danger"
-                                    bsSize="small"
-                                    loading={this.state.loading}
-                                    disabled={this.state.loading}>
-                                    重试
-                                </Button>
-                            </p>
-                        )}
-                    </div>
-                }
-                type="danger"
-            />
+            <Alert variant="danger" className="errorbox-root">
+                {title && <Alert.Heading>{title}</Alert.Heading>}
+                {typeof msg === 'object' ? msg : <p>{msg}</p>}
+                {onClick && (
+                    <Button
+                        onClick={this.onBtnClick}
+                        type="danger"
+                        size="sm"
+                        loading={this.state.loading}
+                        disabled={this.state.loading}>
+                        重试
+                    </Button>
+                )}
+            </Alert>
         );
     }
 }

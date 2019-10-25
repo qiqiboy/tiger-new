@@ -116,7 +116,7 @@ function createDialog(type) {
 
         return Modal.open({
             backdrop: 'static',
-            bsSize: 'sm',
+            size: 'sm',
             className: 'modal-dialog-root',
             component: ({ close, dismiss }) => (
                 <Dialog

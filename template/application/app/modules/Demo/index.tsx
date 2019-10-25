@@ -1,33 +1,42 @@
 import React, { Component } from 'react';
-import { ButtonToolbar, ToggleButtonGroup, ToggleButton, Jumbotron } from 'react-bootstrap';
-import moment from 'moment';
-import { withForm, $Formutil, FormGroup } from 'react-bootstrap-formutil';
+import { ButtonToolbar, ToggleButtonGroup, ToggleButton, Jumbotron, Card, CardDeck, Form } from 'react-bootstrap';
+import { withForm, $Formutil, FormGroup, CheckboxGroup, RadioGroup, SwitchGroup } from 'react-bootstrap-formutil';
 import Debug from 'components/Debug';
-import MessageBox from 'components/MessageBox';
 import ErrorBox from 'components/ErrorBox';
 import Loading from 'components/Loading';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
 import Dialog from 'components/Dialog';
 import Toast from 'components/Toast';
-import Switch from 'components/Switch';
-import FAQ from 'components/FAQ';
-import DatePicker from 'components/DatePicker';
-import Iframe from 'components/Iframe';
 import { Fade, Zoom, Flow, Flip, Collapse } from 'components/Transition';
+import './style.scss';
 
-interface IProps {
+interface DemoProps {
     $formutil: $Formutil<any>;
 }
 
 // @ts-ignore
-class ComDemo extends Component<IProps> {
+class ComDemo extends Component<DemoProps> {
     readonly state = {
         visible: false,
         iframe: false
     };
 
     handleClick = () => Toast.show('重新请求!');
+    handleSubmit = ev => {
+        ev.preventdefault();
+
+        const { $invalid, $getFirstError } = this.props.$formutil;
+
+        if ($invalid) {
+            Dialog.alert($getFirstError());
+
+            this.props.$formutil.$batchDirty(true);
+        } else {
+            Dialog.alert('Submitted!');
+        }
+    };
+
     render() {
         let Transition;
         let direction;
@@ -57,65 +66,206 @@ class ComDemo extends Component<IProps> {
         }
 
         return (
-            <div className="demo app-main">
-                <h3>Switch</h3>
-                <FormGroup name="switch-primary" $defaultValue="a" checked="a" unchecked="b">
-                    <Switch />
-                </FormGroup>
-                <FormGroup name="switch-danger" $defaultValue="a" checked="a" unchecked="b">
-                    <Switch type="danger">Danger</Switch>
-                </FormGroup>
-                <FormGroup name="switch-success" $defaultValue="a" checked="a" unchecked="b">
-                    <Switch type="success">Success</Switch>
-                </FormGroup>
-                <FormGroup name="switch-info" $defaultValue="b" checked="a" unchecked="b">
-                    <Switch type="info" disabled>
-                        Info
-                    </Switch>
-                </FormGroup>
-                <FormGroup name="switch-warning" $defaultValue="a" checked="a" unchecked="b">
-                    <Switch type="warning" disabled>
-                        Warning
-                    </Switch>
-                </FormGroup>
+            <Form className="app-demo app-main" onSubmit={this.handleSubmit}>
+                <CardDeck>
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>登录表单 - 纵向 - demo1</Card.Title>
+                            <FormGroup
+                                label="Email address"
+                                name="demo1.email"
+                                helper="We'll never share your email with anyone else."
+                                required
+                                controlId="demo1.formBasicEmail">
+                                <Form.Control type="email" placeholder="Enter email" />
+                            </FormGroup>
 
-                <h3>DatePicker</h3>
-                <FormGroup
-                    name="datepicker"
-                    label="出生日期"
-                    required
-                    $parser={value => value.format('YYYY-MM-DD')}
-                    $formatter={value => (value ? moment(value) : null)}>
-                    <DatePicker
-                        initialDate={moment().subtract(30, 'year')}
-                        maxDate={moment().subtract(18, 'year')}
-                        minDate={moment().subtract(65, 'year')}
-                    />
-                </FormGroup>
+                            <FormGroup
+                                label="Password"
+                                name="demo1.password"
+                                required
+                                controlId="demo1.formBasicPassword">
+                                <Form.Control type="password" placeholder="Password" />
+                            </FormGroup>
 
-                <h3>
-                    FAQ{' '}
-                    <FAQ>
-                        <h5>老虎小知识</h5>
-                        这里显示一个问号图标，点击后出现浮窗详细内容解释。
-                        这里显示一个问号图标，点击后出现浮窗详细内容解释。
-                        这里显示一个问号图标，点击后出现浮窗详细内容解释。
-                        这里显示一个问号图标，点击后出现浮窗详细内容解释。
-                        这里显示一个问号图标，点击后出现浮窗详细内容解释。
-                    </FAQ>
-                </h3>
+                            <FormGroup name="demo1.checkme" controlId="demo1.formBasicCheckbox">
+                                <Form.Check type="checkbox" label="Check me out" />
+                            </FormGroup>
 
-                <h3>MessageBox</h3>
-                <MessageBox
-                    type="warning"
-                    message="需要在最后一步上传包含您填写的地址【房产证】的文件，无法提供将会影响后续的开户进展和交易功能。"
-                />
-                <MessageBox message="danger" type="danger" />
-                <MessageBox message="info" type="info" />
-                <MessageBox message="success" type="success" />
-                <MessageBox message="default: 可以通过 icon 自定义图标" type="default" icon="thumbs-up" />
-                <MessageBox message="default: icon=null 不显示图标" type="default" icon={null} />
+                            <Button block>Submit</Button>
+                        </Card.Body>
+                    </Card>
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>单选组和多选组 - demo2</Card.Title>
+                            <FormGroup name="demo2.checkbox" required>
+                                <CheckboxGroup>
+                                    <Form.Check
+                                        custom
+                                        checked
+                                        value="1"
+                                        type="checkbox"
+                                        id="demo2.checkbox.1"
+                                        label={`Check this custom checkbox`}
+                                    />
 
+                                    <Form.Check
+                                        custom
+                                        disabled
+                                        value="2"
+                                        type="checkbox"
+                                        label="disabled checkbox"
+                                        id="demo2.checkbox.2"
+                                    />
+                                </CheckboxGroup>
+                            </FormGroup>
+                            <FormGroup name="demo2.radio" required>
+                                <RadioGroup>
+                                    <Form.Check
+                                        custom
+                                        checked
+                                        value="1"
+                                        type="radio"
+                                        id="demo2.radio.1"
+                                        label={`Check this custom radio`}
+                                    />
+
+                                    <Form.Check
+                                        custom
+                                        disabled
+                                        value="2"
+                                        type="radio"
+                                        label="disabled radio"
+                                        id="demo2.radio.2"
+                                    />
+                                </RadioGroup>
+                            </FormGroup>
+                            <FormGroup name="demo2.switch" required>
+                                <SwitchGroup>
+                                    <Form.Check
+                                        custom
+                                        value="1"
+                                        checked
+                                        type="switch"
+                                        id="demo2.switch.1"
+                                        label={`Check this custom switch`}
+                                    />
+
+                                    <Form.Check
+                                        custom
+                                        disabled
+                                        value="2"
+                                        type="switch"
+                                        label="disabled switch"
+                                        id="demo2.switch.2"
+                                    />
+                                </SwitchGroup>
+                            </FormGroup>
+
+                            <FormGroup name="demo2.inlineSwitch" required>
+                                <CheckboxGroup>
+                                    <Form.Check
+                                        inline
+                                        value="1"
+                                        checked
+                                        type="switch"
+                                        id="demo2.inlineSwitch.1"
+                                        label="inline 1"
+                                    />
+
+                                    <Form.Check
+                                        inline
+                                        disabled
+                                        value="2"
+                                        type="switch"
+                                        label="inline 2"
+                                        id="demo2.inlineSwitch.2"
+                                    />
+                                </CheckboxGroup>
+                            </FormGroup>
+                        </Card.Body>
+                    </Card>
+                    <Card>
+                        <Card.Body>
+                            <Card.Title>其他组件 - demo3</Card.Title>
+                            <FormGroup label="input" name="demo3.input" required controlId="demo3.input">
+                                <Form.Control type="email" placeholder="Enter email" />
+                            </FormGroup>
+
+                            <FormGroup label="textarea" name="demo3.textarea" required controlId="demo3.textarea">
+                                <Form.Control as="textarea" />
+                            </FormGroup>
+
+                            <FormGroup
+                                label="select"
+                                name="demo3.select"
+                                helper="We'll never share your email with anyone else."
+                                required
+                                controlId="demo3.select">
+                                <Form.Control as="select">
+                                    <option disabled value="">
+                                        请选择
+                                    </option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </Form.Control>
+                            </FormGroup>
+
+                            <FormGroup
+                                label="select"
+                                name="demo3.multipleSelect"
+                                helper="We'll never share your email with anyone else."
+                                required
+                                controlId="demo3.select">
+                                <Form.Control as="select" multiple>
+                                    <option disabled value="">
+                                        请选择
+                                    </option>
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </Form.Control>
+                            </FormGroup>
+
+                            <FormGroup
+                                name="demo3.toggleButtonCheckbox"
+                                required
+                                controlId="demo3.toggleButtonCheckbox"
+                                $defaultValue={[2]}>
+                                <ToggleButtonGroup type="checkbox">
+                                    <ToggleButton value={1}>Option 1</ToggleButton>
+                                    <ToggleButton value={2}>Option 2</ToggleButton>
+                                    <ToggleButton value={3}>Option 3</ToggleButton>
+                                </ToggleButtonGroup>
+                            </FormGroup>
+
+                            <FormGroup
+                                name="demo3.toggleButtonRadio"
+                                required
+                                controlId="demo3.toggleButtonRadio"
+                                $defaultValue={2}>
+                                <ToggleButtonGroup type="radio" name="demo3.toggleButtonRadio">
+                                    <ToggleButton value={1}>Option 1</ToggleButton>
+                                    <ToggleButton value={2}>Option 2</ToggleButton>
+                                    <ToggleButton value={3}>Option 3</ToggleButton>
+                                </ToggleButtonGroup>
+                            </FormGroup>
+
+                            <FormGroup name="demo3.checkbox" required controlId="demo3.checkbox">
+                                <Form.Check custom type="checkbox" label="checkbox" />
+                            </FormGroup>
+
+                            <FormGroup name="demo3.radio" required controlId="demo3.radio">
+                                <Form.Check custom type="radio" label="radio" />
+                            </FormGroup>
+
+                            <FormGroup name="demo3.switch" required controlId="demo3.switch">
+                                <Form.Check type="switch" label="switch" />
+                            </FormGroup>
+                        </Card.Body>
+                    </Card>
+                </CardDeck>
                 <h3>ErrorBox</h3>
                 <ErrorBox
                     error={new Error('这里显示错误信息，并且可以通过 onClick 传递重试按钮回调')}
@@ -123,35 +273,79 @@ class ComDemo extends Component<IProps> {
                 />
 
                 <h3>Loading</h3>
+                <Loading size="sm" />
                 <Loading />
-                <Loading label="加载中..." />
+                <Loading tip="加载中..." />
+                <Loading size="sm" color="success" />
+                <Loading color="success" />
+                <Loading tip="加载中..." color="success" />
+                <Loading size="sm" color="danger" />
+                <Loading color="danger" />
+                <Loading tip="加载中..." color="danger" />
+                <Loading size="sm" color="dark" />
+                <Loading color="dark" />
+                <Loading tip="加载中..." color="dark" />
 
                 <h3>Button</h3>
                 <ButtonToolbar>
                     <Button>Default</Button>
-                    <Button bsStyle="primary">Primary</Button>
-                    <Button bsStyle="success">Success</Button>
-                    <Button bsStyle="info">Info</Button>
-                    <Button bsStyle="warning">Warning</Button>
-                    <Button bsStyle="danger">Danger</Button>
-                    <Button bsStyle="link">Link</Button>
+                    <Button type="primary">Primary</Button>
+                    <Button type="secondary">Secondary</Button>
+                    <Button type="success">Success</Button>
+                    <Button type="info">Info</Button>
+                    <Button type="warning">Warning</Button>
+                    <Button type="danger">Danger</Button>
+                    <Button type="light">Light</Button>
+                    <Button type="dark">Dark</Button>
+                    <Button type="link">Link</Button>
+                </ButtonToolbar>
+                <p />
+                <ButtonToolbar>
+                    <Button ghost>Default</Button>
+                    <Button ghost type="primary">
+                        Primary
+                    </Button>
+                    <Button ghost type="secondary">
+                        Secondary
+                    </Button>
+                    <Button ghost type="success">
+                        Success
+                    </Button>
+                    <Button ghost type="info">
+                        Info
+                    </Button>
+                    <Button ghost type="warning">
+                        Warning
+                    </Button>
+                    <Button ghost type="danger">
+                        Danger
+                    </Button>
+                    <Button ghost type="light">
+                        Light
+                    </Button>
+                    <Button ghost type="dark">
+                        Dark
+                    </Button>
+                    <Button ghost type="link">
+                        Link
+                    </Button>
                 </ButtonToolbar>
                 <br />
                 <ButtonToolbar>
                     <Button loading={true}>Default Loading</Button>
-                    <Button loading={true} bsStyle="primary">
+                    <Button loading={true} type="primary">
                         Primary Loading
                     </Button>
-                    <Button loading={true} bsStyle="success">
+                    <Button loading={true} type="success">
                         Success Loading
                     </Button>
-                    <Button loading={true} bsStyle="info">
+                    <Button loading={true} type="info">
                         Info Loading
                     </Button>
-                    <Button loading={true} bsStyle="warning">
+                    <Button loading={true} type="warning">
                         Warning Loading
                     </Button>
-                    <Button loading={true} bsStyle="danger">
+                    <Button loading={true} type="danger">
                         Danger Loading
                     </Button>
                 </ButtonToolbar>
@@ -161,15 +355,16 @@ class ComDemo extends Component<IProps> {
                     <Button
                         onClick={() =>
                             Modal.open({
+                                animation: 'slide',
                                 component: props => (
                                     <div style={{ padding: '30px' }}>
                                         文案文案文案文案文案文案
-                                        <a onClick={props.close} href="javascript:;">
+                                        <Button type="link" onClick={props.close}>
                                             close
-                                        </a>
+                                        </Button>
                                     </div>
                                 )
-                            })
+                            }).result.then(() => console.log('close'), () => console.log('dismiss'))
                         }>
                         Modal
                     </Button>
@@ -208,7 +403,7 @@ class ComDemo extends Component<IProps> {
                 </FormGroup>
                 <p>
                     <Button
-                        bsStyle="primary"
+                        type="primary"
                         onClick={() =>
                             this.setState({
                                 visible: !this.state.visible
@@ -227,23 +422,9 @@ class ComDemo extends Component<IProps> {
                     </Jumbotron>
                 </Transition>
 
-                <h3>Iframe</h3>
-                <p>
-                    <Button
-                        bsStyle="primary"
-                        onClick={() =>
-                            this.setState({
-                                iframe: true
-                            })
-                        }>
-                        show iframe
-                    </Button>
-                </p>
-                <Iframe in={this.state.iframe} src={window.location.href} onClose={() => this.setState({ iframe: false })} />
-
                 <h3>Debug</h3>
                 <Debug data={this.props.$formutil.$params} />
-            </div>
+            </Form>
         );
     }
 }
