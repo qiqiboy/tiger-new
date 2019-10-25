@@ -3,7 +3,7 @@ import { Button, ButtonProps as BSButtonProps, Spinner } from 'react-bootstrap';
 import classlist from 'utils/classlist';
 import './style.scss';
 
-export interface ButtonProps extends Omit<BSButtonProps, 'type'> {
+export interface ButtonProps extends Omit<BSButtonProps, 'type' | 'variant'> {
     loading?: boolean; // 显示加载中状态
     round?: boolean; // 大圆角按钮
     ghost?: boolean; // 是否背景透明模式（幽灵模式）

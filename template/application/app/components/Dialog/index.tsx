@@ -73,9 +73,8 @@ class Dialog extends Component<IDialogProps, IDialogState> {
                 <Modal.Footer>
                     {type === 'confirm' && (
                         <Button
-                            type="default"
+                            type="light"
                             round
-                            ghost
                             loading={loading}
                             disabled={loading}
                             onClick={this.onBtnClick.bind(this, 'onCancel')}>
