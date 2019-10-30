@@ -10,9 +10,9 @@
     transform: translate(-55%, -50%);
     background-color: rgba(0, 0, 0, 0.9);
     color: #fff;
-    border-radius: 6px;
-    padding: 10px;
-    min-width: 150px;
+    border-radius: 0.5rem;
+    padding: 0.7rem;
+    min-width: 10rem;
     max-width: 80%;
     display: flex;
     align-items: center;
@@ -35,5 +35,5 @@
 }
 
 .toast-loading-root {
-    min-height: 80px;
+    min-height: 5rem;
 }

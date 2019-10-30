@@ -1,34 +1,30 @@
 .modal-dialog-root {
     .modal-dialog {
         width: auto;
-        max-width: 400px;
+        max-width: 25rem;
         margin: 100px auto 0;
         padding: 0 30px;
     }
 
     .modal-content {
-        border-radius: 20px;
+        border-radius: 1.3rem;
         border: 0;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        padding: 16px;
+        box-shadow: 0 0 0.3rem rgba(0, 0, 0, 0.5);
+        padding: 1rem;
         color: #4f5364;
     }
 
     .modal-header {
-        padding: 0 0 20px;
+        padding: 0 0 1rem;
         border-bottom: 0;
-        .modal-title {
-            font-size: 16px;
-            text-align: center;
-        }
     }
 
     .modal-body {
-        padding: 0 0 15px;
+        padding: 0 0 1rem;
     }
 
     .modal-footer {
-        padding: 0 10px;
+        padding: 0 0.7rem;
         display: flex;
         justify-content: center;
         border-top: 0;

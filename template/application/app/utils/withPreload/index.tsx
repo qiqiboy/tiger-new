@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Loading from 'components/Loading';
 import ErrorBox from 'components/ErrorBox';
-import './style.scss';
 
 type Loader = () => Promise<any>;
 
@@ -87,19 +86,11 @@ export default function createWithPreload<T extends string = 'preload'>(loader: 
                 const { loading, error, data } = this.state;
 
                 if (loading) {
-                    return (
-                        <div className="with-preload-container">
-                            <Loading tip="loading.." />
-                        </div>
-                    );
+                    return <Loading tip="loading.." />;
                 }
 
                 if (error) {
-                    return (
-                        <div className="with-preload-container">
-                            <ErrorBox error={error!} onClick={this.getData} />
-                        </div>
-                    );
+                    return <ErrorBox error={error!} onClick={this.getData} />;
                 }
 
                 const injectProps = {

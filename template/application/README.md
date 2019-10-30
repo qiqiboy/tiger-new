@@ -7,17 +7,12 @@
 - [目录结构](#目录结构)
 - [公共组件](#公共组件)
     + [`<Button />`](#button-)
-    + [`<FAQ />`](#faq-)
     + [`<Debug />`](#debug-)
     + [`<Dialog />`](#dialog-)
     + [`<Modal />`](#modal-)
     + [`<Toast />`](#toast-)
-    + [`<MessageBox />`](#messagebox-)
     + [`<ErrorBox />`](#errorbox-)
     + [`<Loading />`](#loading-)
-    + [`<Switch />`](#switch-)
-    + [`<Portal />`](#portal-)
-    + [`<DatePicker />`](#datepicker-)
     + [`<Transition />`](#transition-)
     + [`utils/API`](#utilsapi)
     + [`utils/i18n`](#utilsi18n)
@@ -51,37 +46,38 @@
 
 ### 公共组件
 
-项目组件框架主要基于[`react-bootstrap`](https://5c507d49471426000887a6a7--react-bootstrap.netlify.com/getting-started/introduction) + [`bootstrap@3`](https://getbootstrap.com/docs/3.3/getting-started/)，我们在此基础上，也添加及扩展了一些自定义的组件等。
+项目组件框架主要基于[`react-bootstrap`](https://react-bootstrap.github.io/components/alerts) + [`bootstrap@4.x`](https://getbootstrap.com)，我们在此基础上，也添加及扩展了一些自定义的组件等。
 
 **特别需要强调的是，你应该总是用`compoennts`目录下的 Button、Modal 来代替`react-bootstrap`中的同名组件！！**
 
-> 首次生成项目后，你可以运行该项目来查看项目中公共组件的调用示例。
-
-> 注意：`components` 目录下的组件为基础组件，例如输入型组件 `Switch`、`Telcodes` 等，如果要使用于表单，也需要和 `react-bootstrap-formutil` 中的 `FormGroup` 搭配使用！
-
-> 而 `components/forms` 下的组件，则为表单子组件（可以理解为组合成大表单的片段），无需搭配 `FormGroup`。
-
 #### `<Button />`
 
-基于`react-bootstrap`中的 Button 组件实现。相比与原来的 Button，增加了 `loading` 设置。
+与默认的`Button`相比，增加了`loading` `ghost` `round`属性，另外`size`也支持`xs`尺寸
 
-其它属性参考：[Button](https://react-bootstrap.github.io/components/buttons/#buttons-props)
+```typescript
+interface ButtonProps extends Omit<BSButtonProps, 'type' | 'variant' | 'size'> {
+    loading?: boolean; // 显示加载中状态
+    round?: boolean; // 大圆角按钮
+    ghost?: boolean; // 是否背景透明模式（幽灵模式）
+    type?:
+        | 'default'
+        | 'primary'
+        | 'secondary'
+        | 'success'
+        | 'danger'
+        | 'warning'
+        | 'info'
+        | 'dark'
+        | 'light'
+        | 'blue'
+        | 'link'; // 风格定义，同variant
+    size?: 'lg' | 'sm' | 'xs';
+    htmlType?: string; // 传递给按钮dom节点的type属性，type="submit"
+}
 
-```javascript
-<Button loading bsStyle="primary">
+<Button loading type="primary" htmlType="submit">
     提交中
-</Button>
-```
-
-#### `<FAQ />`
-
-通过一个小问号，用户点击后在弹出面板中显示一段内容解释说明
-
-```javascript
-<FAQ>
-    <h5>名词解释</h5>
-    <p>...</p>
-</FAQ>
+</Button>;
 ```
 
 #### `<Debug />`
@@ -90,8 +86,15 @@
 
 该组件无需在上线前移除，`NODE_ENV=production`下会停止渲染。另外也可以通过`disabled`属性来控制其是否渲染。
 
-```javascript
-<Debug data={any} disabled />
+```typescript
+interface DebugProps {
+    data: object;
+    title: string;
+    maxHeight?: number;
+    disabled?: boolean;
+}
+
+<Debug data={any} disabled />;
 ```
 
 #### `<Dialog />`
@@ -140,19 +143,17 @@ Toast.show('任意文本');
 Toast.loading(true / false);
 ```
 
-#### `<MessageBox />`
-
-显示一段信息描述，支持情景配置。
-
-```javascript
-<MessageBox msg="any" type="primary" />
-```
-
 #### `<ErrorBox />`
 
 显示错误信息等
 
-```javascript
+```typescript
+ErrorBoxProps {
+    error: Error | string;
+    onClick?: React.MouseEventHandler;
+    title: string;
+}
+
 <ErrorBox error={Error} />
 ```
 
@@ -160,38 +161,16 @@ Toast.loading(true / false);
 
 显示加载中状态
 
-```javascript
-<Loading label="加载中" />
-```
+```typescript
+interface LoadingProps extends Omit<SpinnerProps, 'variant' | 'animation'> {
+    type?: SpinnerProps['animation'];
+    color?: SpinnerProps['variant'];
+    tip?: React.ReactNode; // 加载中的文字
+    className?: string;
+    inline?: boolean;
+}
 
-#### `<Switch />`
-
-开关组件，一般用于和 `FormGroup` 配合使用
-
-```javascript
-<FormGroup name="switch" checked="yes" unchecked="no">
-    <Switch />
-</FormGroup>
-```
-
-#### `<Portal />`
-
-创建组件树外的组件。一般情况下，可以考虑使用 `Modal` 来创建弹窗
-
-```javascript
-<Portal>
-    <div>这个节点将渲染到react节点树以外</div>
-</Portal>
-```
-
-#### `<DatePicker />`
-
-日期选择组件，一般用于和 `FormGroup` 配合使用。可以通过`minDate` `maxDate`来设置可选择的最大最小时间
-
-```javascript
-<FormGroup name="birthday" checked="yes" unchecked="no">
-    <DatePicker />
-</FormGroup>
+<Loading tip="加载中" />;
 ```
 
 #### `<Transition />`

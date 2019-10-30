@@ -289,6 +289,13 @@ class ComDemo extends Component<DemoProps> {
                 <Loading inline tip="加载中..." color="dark" type="grow" />
 
                 <h3>Button</h3>
+                <ButtonToolbar className="align-items-center">
+                    <Button type="primary" size="xs">Extra Small</Button>
+                    <Button type="primary" size="sm">Small</Button>
+                    <Button type="primary">Normal</Button>
+                    <Button type="primary" size="lg">Large</Button>
+                </ButtonToolbar>
+                <p />
                 <ButtonToolbar>
                     <Button type="primary">Primary</Button>
                     <Button type="secondary">Secondary</Button>
@@ -405,7 +412,7 @@ class ComDemo extends Component<DemoProps> {
                     <Button loading type="primary">
                         Primary
                     </Button>
-                    <Button ghost round loading type="secondary">
+                    <Button loading type="secondary">
                         Secondary
                     </Button>
                     <Button loading type="success">
@@ -432,31 +439,31 @@ class ComDemo extends Component<DemoProps> {
                 </ButtonToolbar>
                 <br />
                 <ButtonToolbar>
-                    <Button ghost loading type="primary">
+                    <Button ghost round loading type="primary">
                         Primary
                     </Button>
                     <Button ghost round loading type="secondary">
                         Secondary
                     </Button>
-                    <Button ghost loading type="success">
+                    <Button ghost round loading type="success">
                         Success
                     </Button>
-                    <Button ghost loading type="info">
+                    <Button ghost round loading type="info">
                         Info
                     </Button>
-                    <Button ghost loading type="warning">
+                    <Button ghost round loading type="warning">
                         Warning
                     </Button>
-                    <Button ghost loading type="light">
+                    <Button ghost round loading type="light">
                         Light
                     </Button>
-                    <Button ghost loading type="dark">
+                    <Button ghost round loading type="dark">
                         Dark
                     </Button>
-                    <Button ghost loading type="blue">
+                    <Button ghost round loading type="blue">
                         Blue
                     </Button>
-                    <Button ghost loading type="danger">
+                    <Button ghost round loading type="danger">
                         Danger
                     </Button>
                 </ButtonToolbar>

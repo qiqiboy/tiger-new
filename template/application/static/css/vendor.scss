@@ -2,10 +2,17 @@
 @import '~bootstrap/scss/bootstrap';
 // @import './rem.scss';
 
+// add .btn-xs
+.btn-xs {
+  @include button-size(0.15rem, 0.35rem, 0.75rem, 1.3, 0.15rem);
+}
+
 html,
 body {
     height: 100%;
-    font-size: 14px;
+    @if not variable-exists('remRootSize') {
+        font-size: 14px;
+    }
 }
 #wrap {
     min-height: 100%;
