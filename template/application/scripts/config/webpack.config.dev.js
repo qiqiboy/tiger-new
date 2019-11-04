@@ -149,7 +149,9 @@ module.exports = {
                                 loader: require.resolve('html-loader'),
                                 options: {
                                     url(url) {
-                                        return !/\.(webp|png|jpeg|jpg|gif|svg|mp3|wmv|mp4|ogg|webm)$/.test(url);
+                                        return !/\.(webp|png|jpeg|jpg|gif|svg|mp3|wmv|mp4|ogg|webm|s[ac]ss|css|less|m?[tj]sx?)$/.test(
+                                            url
+                                        );
                                     },
                                     import: true
                                 }

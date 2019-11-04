@@ -27,15 +27,25 @@ const shouldPreserveCss = false;
 
 function createConfig(env, module) {
     const isProd = env === 'production';
+    // for umd globals
+    const globals = {
+        react: 'React',
+        'react-dom': 'ReactDOM',
+        'prop-types': 'PropTypes'
+    };
 
     return {
         /**
          * 入口文件位置，如果你更改了entryFile，别忘了同时修改 npm/index.cjs.js 和 npm/index.esm.js 里的文件引用名称
          */
         input: pkg.entryFile || 'src/index.ts',
-        external: id =>
-            !id.startsWith('.') && !externalExclude.some(name => id.startsWith(name)) && !path.isAbsolute(id),
+        external:
+            module === 'umd'
+                ? Object.keys(globals)
+                : id =>
+                      !externalExclude.some(name => id.startsWith(name)) && !id.startsWith('.') && !path.isAbsolute(id),
         output: {
+            name: exportName,
             file: `dist/${exportName}.${module}.${env}.js`,
             format: module,
             exports: 'named',
@@ -46,11 +56,7 @@ function createConfig(env, module) {
                         ? `require('./${exportName}.css');`
                         : `import('./${exportName}.css');`
                     : undefined,
-            globals: {
-                react: 'React',
-                'react-dom': 'ReactDOM',
-                'prop-types': 'PropTypes'
-            }
+            globals
         },
         treeshake: {
             /**
@@ -174,5 +180,7 @@ module.exports = [
     createConfig('development', 'cjs'),
     createConfig('production', 'cjs'),
     createConfig('development', 'esm'),
-    createConfig('production', 'esm')
+    createConfig('production', 'esm'),
+    createConfig('development', 'umd'),
+    createConfig('production', 'umd')
 ];
