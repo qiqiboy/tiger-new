@@ -515,7 +515,7 @@ function run(appPath, appName, onSuccess) {
     if (fs.pathExistsSync(path.join(appPath, 'npm'))) {
         var exportName = projectCustom.exportName;
 
-        ['index.cjs.js', 'index.esm.js'].forEach(function(file) {
+        ['index.cjs.js', 'index.esm.js', 'index.umd.js'].forEach(function(file) {
             var data = fs.readFileSync(path.join(appPath, 'npm', file), 'utf8');
 
             fs.outputFileSync(path.join(appPath, 'npm', file), data.replace(/\{name\}/g, exportName));
