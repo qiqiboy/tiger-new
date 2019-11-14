@@ -1,8 +1,7 @@
 import React from 'react';
 import { CSSTransition } from 'react-transition-group';
-import { CSSTransitionProps } from 'react-transition-group/CSSTransition';
+import { CSSTransitionClassNames } from 'react-transition-group/CSSTransition';
 import {
-    TransitionProps,
     EndHandler,
     EnterHandler,
     ExitHandler,
@@ -12,6 +11,7 @@ import {
 
 export interface TransitionProps extends TransitionActions {
     in?: boolean;
+    classNames?: string | CSSTransitionClassNames;
     mountOnEnter?: boolean;
     unmountOnExit?: boolean;
     timeout?: number;
@@ -27,7 +27,9 @@ export interface TransitionProps extends TransitionActions {
 
 const events = ['onEntering', 'onEntered', 'onExiting', 'onExited'];
 
-export default function withTransition(defaultProps: CSSTransitionProps): React.ComponentClass<TransitionProps> {
+export default function withTransition(
+    defaultProps: Omit<TransitionProps, 'children'> & { classNames: string | CSSTransitionClassNames }
+): React.ComponentClass<TransitionProps> {
     return class Transition extends React.Component<TransitionProps> {
         static defaultProps = {
             timeout: 600,

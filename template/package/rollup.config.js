@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'production';
 
 const path = require('path');
+const fs = require('fs');
 const commonjs = require('rollup-plugin-commonjs');
 const replace = require('rollup-plugin-replace');
 const nodeResolve = require('rollup-plugin-node-resolve');
@@ -153,9 +154,10 @@ function createConfig(env, module) {
                     ]
                 ].filter(Boolean)
             }),
-            sass({
-                output: `dist/${exportName}.css`
-            }),
+            module !== 'umd' &&
+                sass({
+                    output: `dist/${exportName}.css`
+                }),
             sourceMaps(),
             isProd &&
                 terser({
@@ -176,11 +178,8 @@ function createConfig(env, module) {
     };
 }
 
-module.exports = [
-    createConfig('development', 'cjs'),
-    createConfig('production', 'cjs'),
-    createConfig('development', 'esm'),
-    createConfig('production', 'esm'),
-    createConfig('development', 'umd'),
-    createConfig('production', 'umd')
-];
+module.exports = ['cjs', 'esm', 'umd'].reduce((configQueue, module) => {
+    return fs.existsSync(`./npm/index.${module}.js`)
+        ? configQueue.concat(createConfig('development', module), createConfig('production', module))
+        : configQueue;
+}, []);

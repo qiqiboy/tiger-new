@@ -23,25 +23,21 @@ import './transition.scss';
 
 export { withTransition };
 
-// @ts-ignore
 export const Fade: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-fade',
     timeout: 600
 });
 
-// @ts-ignore
 export const Zoom: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-zoom',
     timeout: 600
 });
 
-// @ts-ignore
 export const Flow: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-flow',
     timeout: 600
 });
 
-// @ts-ignore
 export const Flip: React.ComponentClass<TransitionProps> = withTransition({
     classNames: 'transition-flip',
     timeout: 600

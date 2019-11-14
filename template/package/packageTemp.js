@@ -57,6 +57,6 @@ module.exports = {
         extends: 'stylelint-config-recommended'
     },
     peerDependencies: {
-        '@babel/runtime': '^7.0.0'
+        '@babel/runtime': '>7.0.0'
     }
 };
