@@ -163,7 +163,7 @@ function createRsync(file) {
                         spinner.warn(chalk.yellow('已上传：' + relative));
                     }
                 });
-        }, 100 * throttleDelay++);
+        }, 200 * throttleDelay++);
     });
 }
 
@@ -183,6 +183,6 @@ function createOSS(file) {
                     resolve(false);
                     spinner.fail(chalk.red('上传失败(' + error + ')：' + objectName));
                 });
-        }, 100 * throttleDelay++);
+        }, 200 * throttleDelay++);
     });
 }

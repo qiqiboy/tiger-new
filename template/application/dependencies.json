@@ -18,7 +18,7 @@
     "babel-eslint": "10",
     "babel-loader": "8",
     "babel-plugin-named-asset-import": "0.3",
-    "babel-preset-react-app": "9",
+    "babel-preset-react-app": "9.1.0-next.85",
     "case-sensitive-paths-webpack-plugin": "2.2",
     "chalk": "3",
     "check-dependencies": "1",
