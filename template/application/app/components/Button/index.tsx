@@ -32,7 +32,7 @@ class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<
     };
 
     public render() {
-        const { children, loading, round, ghost, type, htmlType, ...props } = this.props;
+        const { children, loading, round, ghost, type, htmlType, pressEffect, ...props } = this.props;
         let variant;
 
         if (type === 'default') {
@@ -71,7 +71,7 @@ class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<
                     </>
                 )}
                 {children}
-                <WaterWave press="down" disabled={props.disabled} effect={props.pressEffect} />
+                <WaterWave press="down" disabled={props.disabled} effect={pressEffect} />
             </Button>
         );
     }
