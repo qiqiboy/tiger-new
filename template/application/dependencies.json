@@ -87,6 +87,7 @@
     "react-dom": "16",
     "react-formutil": "latest",
     "react-router-dom": "latest",
-    "react-transition-group": "4"
+    "react-transition-group": "4",
+    "water-wave": "latest"
   }
 }

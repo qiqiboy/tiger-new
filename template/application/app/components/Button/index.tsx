@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Button, ButtonProps as BSButtonProps, Spinner } from 'react-bootstrap';
+import WaterWave, { WaterWaveProps } from 'water-wave';
+import 'water-wave/style.css';
 import classlist from 'utils/classlist';
 import './style.scss';
 
@@ -21,6 +23,7 @@ export interface ButtonProps extends Omit<BSButtonProps, 'type' | 'variant' | 's
         | 'link'; // 风格定义，同variant
     size?: 'lg' | 'sm' | 'xs';
     htmlType?: string; // 传递给按钮dom节点的type属性，type="submit"
+    pressEffect?: WaterWaveProps['effect'];
 }
 
 class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<'button'>, 'type'>> {
@@ -68,6 +71,7 @@ class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<
                     </>
                 )}
                 {children}
+                <WaterWave press="down" disabled={props.disabled} effect={props.pressEffect} />
             </Button>
         );
     }
