@@ -7,7 +7,9 @@ module.exports = {
         count: 'node scripts/count.js',
         'count:js': 'node scripts/count.js --js',
         'i18n-scan': 'node scripts/i18n.js --scan',
-        'i18n-read': 'node scripts/i18n.js --read'
+        'i18n-read': 'node scripts/i18n.js --read',
+        tsc:
+            "node -pe \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && tsc -p .git-tsconfig.json --checkJs false"
     },
     babel: {
         presets: ['react-app'],
@@ -17,7 +19,8 @@ module.exports = {
     husky: {
         hooks: {
             'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
-            'pre-commit': 'lint-staged'
+            'pre-commit':
+                "lint-staged && export StagedFiles=$(git diff --name-only --relative --staged | grep -E '.tsx?$') && if [ -n \"$StagedFiles\"  ]; then echo 'TS checking...' && npm run tsc; fi"
         }
     },
     eslintConfig: {

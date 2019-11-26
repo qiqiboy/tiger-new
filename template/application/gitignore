@@ -1,8 +1,3 @@
-.DS_Store
-Thumbs.db
-/dump.rdb
-/buildDev
-
 # Created by https://www.gitignore.io/api/vim,node,code,webstorm
 # Edit at https://www.gitignore.io/?templates=vim,node,code,webstorm
 
@@ -137,3 +132,10 @@ crashlytics-build.properties
 fabric.properties
 
 # End of https://www.gitignore.io/api/vim,node,code,webstorm
+
+# Custom rules
+.DS_Store
+Thumbs.db
+/dump.rdb
+/buildDev
+.git-tsconfig.json

@@ -322,6 +322,21 @@ function upgradeAppProject(root) {
                         }
                     }
 
+                    if (!package.scripts.tsc) {
+                        package.scripts.tsc = pkgTemp.scripts.tsc;
+
+                        try {
+                            var gitignorePath = path.join(root, '.gitignore');
+                            var gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
+
+                            fs.outputFileSync(gitignorePath, gitignoreContent + '\n# git pre-commit tsc lint\n' + '.git-tsconfig.json');
+                        } catch (err) {}
+                    }
+
+                    if (package.husky.hooks['pre-commit'] === 'lint-staged') {
+                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
+                    }
+
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
                         package.scripts.pack = 'npm run build && npm run cdn';
