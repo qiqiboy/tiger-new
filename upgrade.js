@@ -330,7 +330,12 @@ function upgradeAppProject(root) {
                             var gitignorePath = path.join(root, '.gitignore');
                             var gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
 
-                            fs.outputFileSync(gitignorePath, gitignoreContent + '\n# git pre-commit tsc lint\n' + '.git-tsconfig.json');
+                            if (gitignoreContent.split(/\n+/g).indexOf('.git-tsconfig.json') < 0) {
+                                fs.outputFileSync(
+                                    gitignorePath,
+                                    gitignoreContent.replace(/[\s\n]+$/, '') + '\n\n# git pre-commit tsc lint\n' + '.git-tsconfig.json'
+                                );
+                            }
                         } catch (err) {}
                     }
 
