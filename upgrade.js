@@ -322,8 +322,9 @@ function upgradeAppProject(root) {
                         }
                     }
 
-                    if (!package.scripts.tsc) {
+                    if (!package.scripts.tsc || /^node -pe/.test(package.scripts.tsc)) {
                         package.scripts.tsc = pkgTemp.scripts.tsc;
+                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
 
                         try {
                             var gitignorePath = path.join(root, '.gitignore');
@@ -331,10 +332,6 @@ function upgradeAppProject(root) {
 
                             fs.outputFileSync(gitignorePath, gitignoreContent + '\n# git pre-commit tsc lint\n' + '.git-tsconfig.json');
                         } catch (err) {}
-                    }
-
-                    if (package.husky.hooks['pre-commit'] === 'lint-staged') {
-                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
                     }
 
                     if (package.cdn) {

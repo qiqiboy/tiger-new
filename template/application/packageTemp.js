@@ -9,7 +9,7 @@ module.exports = {
         'i18n-scan': 'node scripts/i18n.js --scan',
         'i18n-read': 'node scripts/i18n.js --read',
         tsc:
-            "node -pe \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && tsc -p .git-tsconfig.json --checkJs false"
+            "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --checkJs false"
     },
     babel: {
         presets: ['react-app'],
@@ -20,7 +20,7 @@ module.exports = {
         hooks: {
             'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
             'pre-commit':
-                "lint-staged && export StagedFiles=$(git diff --name-only --relative --staged | grep -E '.tsx?$') && if [ -n \"$StagedFiles\"  ]; then echo 'TS checking...' && npm run tsc; fi"
+                "lint-staged && export StagedFiles=$(git diff --name-only --relative --staged | grep -E '.tsx?$') && if [ -n \"$StagedFiles\"  ]; then npm run tsc; fi"
         }
     },
     eslintConfig: {
