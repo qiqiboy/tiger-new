@@ -20,7 +20,7 @@ module.exports = {
         hooks: {
             'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
             'pre-commit':
-                "lint-staged && export StagedFiles=$(git diff --name-only --relative --staged | grep -E '.tsx?$') && if [ -n \"$StagedFiles\"  ]; then npm run tsc; fi"
+                "lint-staged && export StagedFiles=$(git diff --name-only --relative --staged | grep -E '.tsx?$') && if [ -n \"$StagedFiles\" ]; then npm run tsc; fi"
         }
     },
     eslintConfig: {

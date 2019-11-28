@@ -201,6 +201,24 @@ export const API = {
 
 // app.js
 API.CUSTOM.userStatus(); // 获取到接口地址
+
+API.CUSTOM.userStatus.get(); // 直接发起get请求，当然也可以用其他post、put、delete等axios支持的请求方发
+```
+
+每个 API 实例的接口定义如下：
+
+```typescript
+interface APIInstance {
+    (...args: Array<string | number>): string;
+
+    request<T = any>(config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+    get<T = any>(config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+    delete(config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise;
+    head(config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise;
+    post<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+    put<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+    patch<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+}
 ```
 
 #### `utils/i18n`
