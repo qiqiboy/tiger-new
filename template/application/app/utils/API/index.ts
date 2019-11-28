@@ -33,11 +33,7 @@ export default apiCtx.keys().reduce((exports, file) => {
     exports[path.basename(file, path.extname(file))] = enhanced(apiCtx(file));
 
     return exports;
-}, {}) as API<
-    APICollection & {
-        [key: string]: any;
-    }
->;
+}, {}) as API<APICollection>;
 
 function enhanced(config) {
     const createAPI = apis =>

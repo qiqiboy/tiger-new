@@ -26,16 +26,6 @@ if (terminalArg === '--scan') {
     reader();
 }
 
-function sortByPinyin(obj) {
-    const allKeys = Object.keys(obj);
-    const orderedKeys = allKeys.sort();
-
-    return orderedKeys.reduce((orderedObj, key) => {
-        orderedObj[key] = obj[key];
-
-        return orderedObj;
-    }, {});
-}
 
 function ensureLocalsConfig() {
     if (Array.isArray(pkg.locals) === false) {
@@ -82,12 +72,17 @@ function scanner() {
 
         const translation = i18nJson[key].translation;
         const existConfig = fs.existsSync(jsonDestination) ? JSON.parse(fs.readFileSync(jsonDestination)) : {};
-        const newConfig = Object.assign(translation, lodash.pickBy(existConfig, (value, key) => key in translation));
-        const orderedConfig = sortByPinyin(newConfig);
+        const newConfig = lodash.pickBy(existConfig, (value, key) => key in translation);
 
-        fs.outputFile(path.join(paths.locals, key + '.json'), JSON.stringify(orderedConfig, '\n', 2));
+        lodash.each(translation, (value, key) => {
+            if (!(key in newConfig)) {
+                newConfig[key] = value;
+            }
+        });
 
-        convertJson2Excel(orderedConfig, key, path.join(excelDestination));
+        fs.outputFile(path.join(paths.locals, key + '.json'), JSON.stringify(newConfig, '\n', 2));
+
+        convertJson2Excel(newConfig, key, path.join(excelDestination));
 
         spinner.succeed('输出 ' + chalk.bold(chalk.green(key)) + ' 到 ' + chalk.cyan(excelDestination));
     });
