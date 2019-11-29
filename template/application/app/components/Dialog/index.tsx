@@ -3,18 +3,19 @@ import Modal from 'components/Modal';
 import Button from 'components/Button';
 import './style.scss';
 
-export interface IDialogProps {
-    title?: React.ReactNode;
-    content: React.ReactNode;
+export interface DialogProps {
+    title?: React.ReactChild;
+    content: React.ReactChild;
     type?: 'alert' | 'confirm';
-    onOk?(ev: any): any;
-    onCancel?(ev: any): any;
+    onOk?(event: React.MouseEvent<Button>): any;
+    onCancel?(event: React.MouseEvent<Button>): any;
     btnOk?: string;
     btnCancel?: string;
 }
 
-export interface IDialogState {
-    loading: boolean;
+export interface DialogState {
+    okLoading: boolean;
+    cancelLoading: boolean;
 }
 
 /**
@@ -23,14 +24,15 @@ export interface IDialogState {
  *
  * onOk和onCancel作为参数传递时，如果返回值是promise，则会在promise被resolve后才关闭对话框
  */
-class Dialog extends Component<IDialogProps, IDialogState> {
+class Dialog extends Component<DialogProps, DialogState> {
     static defaultProps = {
         btnOk: '确定',
         btnCancel: '取消'
     };
 
     readonly state = {
-        loading: false
+        okLoading: false,
+        cancelLoading: false
     };
 
     onBtnClick = (prop, ev) => {
@@ -38,16 +40,17 @@ class Dialog extends Component<IDialogProps, IDialogState> {
 
         if (typeof callback === 'function') {
             const result = callback(ev);
+            const loadingKey = prop === 'onOk' ? 'okLoading' : 'cancelLoading';
 
             if (result && typeof result.then === 'function') {
                 this.setState({
-                    loading: true
-                });
+                    [loadingKey]: true
+                } as any);
 
                 const stop = () =>
                     this.setState({
-                        loading: false
-                    });
+                        [loadingKey]: false
+                    } as any);
 
                 result.then(stop, stop);
             }
@@ -56,7 +59,7 @@ class Dialog extends Component<IDialogProps, IDialogState> {
 
     public render() {
         const { title, content, btnOk, btnCancel, type } = this.props;
-        const { loading } = this.state;
+        const { okLoading, cancelLoading } = this.state;
 
         return (
             <div className="dialog-root">
@@ -75,8 +78,8 @@ class Dialog extends Component<IDialogProps, IDialogState> {
                         <Button
                             type="light"
                             round
-                            loading={loading}
-                            disabled={loading}
+                            loading={cancelLoading}
+                            disabled={okLoading || cancelLoading}
                             onClick={this.onBtnClick.bind(this, 'onCancel')}>
                             {btnCancel}
                         </Button>
@@ -84,8 +87,8 @@ class Dialog extends Component<IDialogProps, IDialogState> {
                     <Button
                         round
                         type="primary"
-                        loading={loading}
-                        disabled={loading}
+                        loading={okLoading}
+                        disabled={okLoading || cancelLoading}
                         onClick={this.onBtnClick.bind(this, 'onOk')}>
                         {btnOk}
                     </Button>
@@ -101,8 +104,10 @@ class Dialog extends Component<IDialogProps, IDialogState> {
 }
 
 function createDialog(type) {
-    return (config: IDialogProps | string | React.ReactElement<any>, title?: React.ReactNode) => {
-        if (typeof config === 'string' || isValidElement(config)) {
+    function DialogFunction(config: DialogProps): Promise<any>;
+    function DialogFunction(config: React.ReactChild, title?: React.ReactChild): Promise<any>;
+    function DialogFunction(config, title?) {
+        if (isValidElement(config) || typeof config !== 'object') {
             config = {
                 content: config,
                 title
@@ -111,7 +116,7 @@ function createDialog(type) {
 
         config.type = type;
 
-        const { onOk, onCancel } = config as IDialogProps;
+        const { onOk, onCancel } = config as DialogProps;
 
         return Modal.open({
             backdrop: 'static',
@@ -119,7 +124,7 @@ function createDialog(type) {
             className: 'modal-dialog-root',
             component: ({ close, dismiss }) => (
                 <Dialog
-                    {...config as IDialogProps}
+                    {...(config as DialogProps)}
                     onOk={ev => {
                         let result;
 
@@ -149,7 +154,9 @@ function createDialog(type) {
                 />
             )
         }).result;
-    };
+    }
+
+    return DialogFunction;
 }
 
 export default Dialog;
