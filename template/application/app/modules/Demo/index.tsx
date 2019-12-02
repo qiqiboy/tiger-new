@@ -290,10 +290,16 @@ class ComDemo extends Component<DemoProps> {
 
                 <h3>Button</h3>
                 <ButtonToolbar className="align-items-center">
-                    <Button type="primary" size="xs">Extra Small</Button>
-                    <Button type="primary" size="sm">Small</Button>
+                    <Button type="primary" size="xs">
+                        Extra Small
+                    </Button>
+                    <Button type="primary" size="sm">
+                        Small
+                    </Button>
                     <Button type="primary">Normal</Button>
-                    <Button type="primary" size="lg">Large</Button>
+                    <Button type="primary" size="lg">
+                        Large
+                    </Button>
                 </ButtonToolbar>
                 <p />
                 <ButtonToolbar>
@@ -481,7 +487,10 @@ class ComDemo extends Component<DemoProps> {
                                         </Button>
                                     </div>
                                 )
-                            }).result.then(() => console.log('close'), () => console.log('dismiss'))
+                            }).result.then(
+                                () => console.log('close'),
+                                () => console.log('dismiss')
+                            )
                         }>
                         Modal
                     </Button>
@@ -491,7 +500,18 @@ class ComDemo extends Component<DemoProps> {
                         }>
                         Dialog.alert
                     </Button>
-                    <Button onClick={() => Dialog.confirm({ content: '选择对话框' })}>Dialog.confirm</Button>
+                    <Button onClick={() => Dialog.confirm({ content: '选择对话框' })}>Dialog.confirm</Button>{' '}
+                    <Button
+                        onClick={() =>
+                            Dialog.confirm({
+                                content: '选择对话框',
+                                onOk() {
+                                    return new Promise(resolve => setTimeout(resolve, 3000));
+                                }
+                            })
+                        }>
+                        Dialog Promise
+                    </Button>
                 </ButtonToolbar>
 
                 <h3>Toast</h3>
