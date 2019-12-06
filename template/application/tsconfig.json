@@ -4,7 +4,7 @@
     "allowJs": true,
     "checkJs": true,
     "module": "ESNext",
-    "lib": ["esnext", "dom"],
+    "lib": ["ESNext", "DOM"],
     "jsx": "react",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
