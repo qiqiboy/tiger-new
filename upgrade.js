@@ -251,6 +251,10 @@ function upgradeAppProject(root) {
                         package.commitlint = pkgTemp.commitlint;
                     }
 
+                    if (!package.husky.hooks['pre-push']) {
+                        package.husky.hooks['pre-push'] = pkgTemp.husky.hooks['pre-push'];
+                    }
+
                     if (answers.supportDecorator) {
                         if (!package.babel.plugins) {
                             package.babel.plugins = [];
@@ -333,7 +337,9 @@ function upgradeAppProject(root) {
                             if (gitignoreContent.split(/\n+/g).indexOf('.git-tsconfig.json') < 0) {
                                 fs.outputFileSync(
                                     gitignorePath,
-                                    gitignoreContent.replace(/[\s\n]+$/, '') + '\n\n# git pre-commit tsc lint\n' + '.git-tsconfig.json'
+                                    gitignoreContent.replace(/[\s\n]+$/, '') +
+                                        '\n\n# git pre-commit tsc lint\n' +
+                                        '.git-tsconfig.json'
                                 );
                             }
                         } catch (err) {}

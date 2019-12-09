@@ -20,7 +20,9 @@ module.exports = {
         hooks: {
             'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
             'pre-commit':
-                'lint-staged && export StagedFiles=$(git diff --name-only --relative --staged | grep -E \'.tsx?$\') && if [ -n "$StagedFiles" ]; then npm run tsc; fi'
+                'lint-staged && export StagedFiles=$(git diff --name-only --diff-filter AM --relative --staged | grep -E \'.tsx?$\') && if [ -n "$StagedFiles" ]; then npm run tsc; fi',
+            'pre-push':
+                'CF=$(git diff --diff-filter AM --name-only @{u}..) || CF=$(git diff --diff-filter AM --name-only origin/master...HEAD); FILES=$(echo "$CF" | grep \'^app/\' | grep \'.[jt]sx\\{0,1\\}$\'); echo $FILES; if [ -n "$FILES" ]; then node_modules/.bin/eslint $(echo $FILES) --max-warnings 0; fi'
         }
     },
     eslintConfig: {

@@ -26,7 +26,6 @@ if (terminalArg === '--scan') {
     reader();
 }
 
-
 function ensureLocalsConfig() {
     if (Array.isArray(pkg.locals) === false) {
         spinner.fail(chalk.red('未在 package.json 中找到相关语言包配置！'));
