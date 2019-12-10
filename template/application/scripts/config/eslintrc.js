@@ -145,13 +145,6 @@ module.exports = {
         'no-with': 2,
         'no-useless-escape': 2,
         'no-useless-concat': 2,
-        'no-unused-expressions': [
-            2,
-            {
-                allowTernary: true,
-                allowShortCircuit: true
-            }
-        ],
         'no-unused-vars': [
             1,
             {

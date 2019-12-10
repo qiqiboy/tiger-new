@@ -26,8 +26,15 @@ declare namespace NodeJS {
 
 /**
  * create HOC(Higher Order Component)
- *
  */
 type HOC<InjectProps> = <SelfProps>(
     Component: React.ComponentType<SelfProps & InjectProps>
 ) => React.ComponentType<Omit<SelfProps, keyof InjectProps>>;
+
+/**
+ * add [].lastItem, [].lastIndex
+ */
+interface Array<T> {
+    lastItem: T;
+    lastIndex: number;
+}
