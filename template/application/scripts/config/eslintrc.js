@@ -40,10 +40,10 @@ module.exports = {
                 '@typescript-eslint/class-name-casing': 2,
                 '@typescript-eslint/explicit-function-return-type': 0,
                 '@typescript-eslint/explicit-member-accessibility': 0,
-                '@typescript-eslint/indent': 0,
                 '@typescript-eslint/interface-name-prefix': 0,
                 '@typescript-eslint/member-delimiter-style': 2,
                 '@typescript-eslint/no-empty-interface': 1,
+                '@typescript-eslint/no-extra-non-null-assertion': 2,
                 '@typescript-eslint/no-explicit-any': 0,
                 '@typescript-eslint/no-inferrable-types': 0,
                 '@typescript-eslint/no-misused-new': 2,
@@ -54,7 +54,7 @@ module.exports = {
                 '@typescript-eslint/no-var-requires': 2,
                 '@typescript-eslint/consistent-type-definitions': [2, 'interface'],
                 '@typescript-eslint/prefer-namespace-keyword': 2,
-                '@typescript-eslint/type-annotation-spacing': 2
+                '@typescript-eslint/type-annotation-spacing': 1
             }
         }
     ],
@@ -142,6 +142,7 @@ module.exports = {
         'no-self-compare': 2,
         'no-sequences': 2,
         yoda: 1,
+        'no-unexpected-multiline': 1,
         'no-with': 2,
         'no-useless-escape': 2,
         'no-useless-concat': 2,
