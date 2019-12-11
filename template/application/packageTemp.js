@@ -66,5 +66,6 @@ module.exports = {
     },
     stylelint: {
         extends: 'stylelint-config-recommended'
-    }
+    },
+    engines: { node: '>=8.10.0' }
 };

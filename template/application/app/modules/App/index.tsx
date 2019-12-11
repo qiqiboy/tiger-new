@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import withLoadable from 'utils/withLoadable';
+import { hot } from 'react-hot-loader/root';
 
 const Demo = withLoadable(() => import('../Demo'));
 
@@ -19,4 +20,4 @@ class App extends Component {
     }
 }
 
-export default App;
+export default hot(App);

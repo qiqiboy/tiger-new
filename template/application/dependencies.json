@@ -60,7 +60,7 @@
     "prettier": "1.19",
     "raf-dom": "1.1",
     "raw-loader": "3",
-    "react-dev-utils": "9",
+    "react-dev-utils": "10",
     "react-hot-loader": "4",
     "rsync": "0.6",
     "sass-loader": "8",

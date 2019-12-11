@@ -350,11 +350,9 @@ function upgradeAppProject(root) {
                         package.scripts.pack = 'npm run build && npm run cdn';
                     }
 
-                    if (!package.engines) {
-                        package.engines = {};
-                    }
-
-                    package.engines['tiger-new'] = ownPkg.version;
+                    package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
+                        'tiger-new': ownPkg.version
+                    });
 
                     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
 

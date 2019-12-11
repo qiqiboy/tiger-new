@@ -214,6 +214,7 @@ function createDevServerConfig(proxy, allowedHost) {
         contentBase: paths.appPublic,
         watchContentBase: true,
         hot: true,
+        transportMode: 'ws',
         injectClient: false,
         publicPath: config.output.publicPath,
         quiet: true,

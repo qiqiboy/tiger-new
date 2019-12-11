@@ -344,7 +344,6 @@ function createLibrary(name) {
         main: 'dist/index.cjs.js',
         module: 'dist/index.esm.js',
         types: 'dist/' + path.basename(projectCustom.entryFile, path.extname(projectCustom.entryFile)) + '.d.ts',
-        engines: { node: '8.1.0' },
         entryFile: projectCustom.entryFile,
         exportName: projectCustom.exportName
     };
@@ -441,12 +440,9 @@ function run(appPath, appName, onSuccess) {
     var appPackage = require(path.join(appPath, 'package.json'));
     var pkgTemp = require(pkgTempPath);
 
-    appPackage.engines = {
-        node: '>=8.0.0',
-        'tiger-new': ownPkg.version
-    };
-
     Object.assign(appPackage, pkgTemp);
+
+    appPackage.engines['tiger-new'] = ownPkg.version;
 
     if (projectCustom.supportDecorator) {
         appPackage.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);

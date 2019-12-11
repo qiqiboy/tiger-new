@@ -76,7 +76,8 @@ module.exports = {
         chunkFilename: 'static/js/[name].[hash:8].js',
         publicPath: publicPath,
         crossOriginLoading: 'anonymous',
-        devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')
+        devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
+        globalObject: 'this'
     },
     optimization: {
         runtimeChunk: 'single',

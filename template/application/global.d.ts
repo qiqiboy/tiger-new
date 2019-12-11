@@ -1,5 +1,4 @@
 // 声明资源文件类型
-declare module '*.svg';
 declare module '*.png';
 declare module '*.jpg';
 declare module '*.jpeg';
@@ -14,13 +13,23 @@ declare module '*.scss';
 declare module '*.less';
 
 /**
+ * .svg with SVGR feature
+ */
+declare module '*.svg' {
+    export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>;
+
+    const src: string;
+    export default src;
+}
+
+/**
  * process.env.XX
  */
 declare namespace NodeJS {
     interface ProcessEnv {
-        NODE_ENV: string;
-        BASE_NAME: string;
-        PUBLIC_URL: string;
+        readonly NODE_ENV: 'development' | 'production';
+        readonly BASE_NAME: string;
+        readonly PUBLIC_URL: string;
     }
 }
 
@@ -35,6 +44,6 @@ type HOC<InjectProps> = <SelfProps>(
  * add [].lastItem, [].lastIndex
  */
 interface Array<T> {
-    lastItem: T;
-    lastIndex: number;
+    readonly lastItem: T;
+    readonly lastIndex: number;
 }

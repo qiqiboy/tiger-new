@@ -106,7 +106,8 @@ module.exports = {
         publicPath: publicPath,
         crossOriginLoading: 'anonymous',
         devtoolModuleFilenameTemplate: info =>
-            path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/')
+            path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/'),
+        globalObject: 'this'
     },
     optimization: {
         minimizer: [
@@ -144,6 +145,9 @@ module.exports = {
                               annotation: true
                           }
                         : false
+                },
+                cssProcessorPluginOptions: {
+                    preset: ['default', { minifyFontValues: { removeQuotes: false } }]
                 }
             })
         ],
