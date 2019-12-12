@@ -289,7 +289,6 @@ module.exports = {
                     checkJs: false
                 },
                 reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
-                watch: paths.appSrc,
                 silent: true
             }),
             new webpack.BannerPlugin({

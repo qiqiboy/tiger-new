@@ -47,7 +47,7 @@ const babelOption = {
     compact: false,
     presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
     cacheDirectory: true,
-    cacheCompression: true,
+    cacheCompression: false,
     sourceMaps: false
 };
 
@@ -250,7 +250,7 @@ module.exports = {
                                 ]
                             ],
                             cacheDirectory: true,
-                            cacheCompression: true,
+                            cacheCompression: false,
                             compact: true
                         }
                     },
@@ -414,7 +414,6 @@ module.exports = {
                     checkJs: false
                 },
                 reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
-                watch: paths.appSrc,
                 silent: true,
                 formatter: typescriptFormatter
             }),
