@@ -330,7 +330,7 @@ module.exports = {
                     {
                         test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
                         loader: require.resolve('file-loader'),
-                        query: {
+                        options: {
                             name: 'static/media/[name].[hash:8].[ext]'
                         }
                     },
@@ -404,7 +404,6 @@ module.exports = {
                 typescript: resolve.sync('typescript', {
                     basedir: paths.appNodeModules
                 }),
-                tslint: false,
                 async: false,
                 useTypescriptIncrementalApi: true,
                 checkSyntacticErrors: true,

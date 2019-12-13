@@ -53,6 +53,7 @@ module.exports = {
                 '@typescript-eslint/triple-slash-reference': 2,
                 '@typescript-eslint/no-var-requires': 2,
                 '@typescript-eslint/consistent-type-definitions': [2, 'interface'],
+                '@typescript-eslint/no-namespace': 2,
                 '@typescript-eslint/prefer-namespace-keyword': 2,
                 '@typescript-eslint/type-annotation-spacing': 1
             }
