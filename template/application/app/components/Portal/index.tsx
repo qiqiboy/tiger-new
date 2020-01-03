@@ -4,7 +4,7 @@ import './style.scss';
 
 export interface PortalProps {
     className?: string;
-    children: React.ReactElement<any>;
+    children: React.ReactNode;
 }
 
 class Portal extends Component<PortalProps> {

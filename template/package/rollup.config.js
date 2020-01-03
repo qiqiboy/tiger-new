@@ -80,6 +80,7 @@ function createConfig(env, module) {
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
                 runtimeHelpers: true,
                 babelrc: false,
+                configFile: false,
                 presets: [
                     [
                         '@babel/preset-env',
@@ -151,7 +152,13 @@ function createConfig(env, module) {
                         {
                             removeImport: true
                         }
-                    ]
+                    ],
+                    // Adds Numeric Separators
+                    require('@babel/plugin-proposal-numeric-separator').default,
+                    // Adds syntax support for optional chaining (.?)
+                    require('@babel/plugin-proposal-optional-chaining').default,
+                    // Adds syntax support for default value using ?? operator
+                    require('@babel/plugin-proposal-nullish-coalescing-operator').default
                 ].filter(Boolean)
             }),
             module !== 'umd' &&

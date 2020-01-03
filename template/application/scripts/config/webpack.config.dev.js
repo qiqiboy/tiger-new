@@ -265,7 +265,8 @@ module.exports = {
         .concat([
             isBuilding &&
                 new MiniCssExtractPlugin({
-                    filename: 'static/css/[name].[hash:8].css'
+                    filename: 'static/css/[name].[hash:8].css',
+                    ignoreOrder: !!pkg.ignoreCssOrderWarnings || process.env.IGNORE_CSS_ORDER_WARNINGS === 'true'
                 }),
             new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
             new ModuleNotFoundPlugin(paths.root),
@@ -313,7 +314,7 @@ function getStyleLoaders(cssOptions, preProcessor) {
         isBuilding
             ? {
                   loader: MiniCssExtractPlugin.loader,
-                  options: { publicPath: '../../', sourceMap: true }
+                  options: { publicPath: '../../', sourceMap: true, esModule: true }
               }
             : require.resolve('style-loader'),
         {

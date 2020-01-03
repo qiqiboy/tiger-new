@@ -255,6 +255,7 @@ $ PROXY='https://api.twitter.com/' npm start
 -   `HTTPS` 配置使用 https；需要有本地的 SSL 证书
 -   `PROXY` 配置本地代理服务器
 -   `DANGEROUSLY_DISABLE_HOST_CHECK` 关闭 host 检测；`DANGEROUSLY_DISABLE_HOST_CHECK=false`将允许任意的 host 访问
+-   `IGNORE_CSS_ORDER_WARNINGS` 禁止`mini-css-extract-plugin`插件输出`conflicting order`警告信息
 -   `BASE_NAME` 指定项目的`basename`，例如`BASE_NAME=/account`
 -   `SKIP_CDN` 跳过 CDN 上传阶段；`SKIP_CDN=true npm run pack`即表示本次构建不上传 cdn，仅本地构建
 -   `BUILD_DIR` 指定项目构建输出目录；不传递该变量情况下，`prodcution`环境输出到`build`目录，`development`环境输出到`buildDev`目录

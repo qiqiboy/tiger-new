@@ -5,13 +5,16 @@ module.exports = {
         'build:bundle': 'rollup -c',
         'build:declaration': 'tsc --emitDeclarationOnly',
         clear: 'rimraf dist',
-        lint: "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'"
+        lint: "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'",
+        tsc:
+            "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --noEmit --checkJs false"
     },
     browserslist: ['>0.2%', 'not dead', 'not op_mini all'],
     husky: {
         hooks: {
             'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
-            'pre-commit': 'lint-staged'
+            'pre-commit':
+                'lint-staged && export StagedFiles=$(git diff --diff-filter AM --name-only --relative --staged | grep -E \'^src/.*\\.m?[jt]sx?$\') && if [ -n "$StagedFiles"  ]; then npm run tsc ; fi'
         }
     },
     eslintConfig: {
@@ -58,5 +61,6 @@ module.exports = {
     },
     peerDependencies: {
         '@babel/runtime': '>7.0.0'
-    }
+    },
+    engines: { node: '>=8.10.0' }
 };

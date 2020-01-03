@@ -358,7 +358,8 @@ module.exports = {
                 }
             }),
             new MiniCssExtractPlugin({
-                filename: 'static/css/[name].[contenthash:8].css'
+                filename: 'static/css/[name].[contenthash:8].css',
+                ignoreOrder: !!pkg.ignoreCssOrderWarnings || process.env.IGNORE_CSS_ORDER_WARNINGS === 'true'
             }),
             new webpack.HashedModuleIdsPlugin(),
             new webpack.IgnorePlugin({
@@ -436,7 +437,12 @@ function getStyleLoaders(cssOptions, preProcessor) {
     const loaders = [
         {
             loader: MiniCssExtractPlugin.loader,
-            options: Object.assign({}, shouldUseRelativeAssetPaths ? { publicPath: '../../' } : undefined)
+            options: Object.assign(
+                {
+                    esModule: true
+                },
+                shouldUseRelativeAssetPaths ? { publicPath: '../../' } : undefined
+            )
         },
         {
             loader: require.resolve('css-loader'),
