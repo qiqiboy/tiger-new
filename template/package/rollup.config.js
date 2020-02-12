@@ -102,37 +102,11 @@ function createConfig(env, module) {
                 ],
                 plugins: [
                     'babel-plugin-macros',
-                    [
-                        '@babel/plugin-transform-destructuring',
-                        {
-                            // https://github.com/facebook/create-react-app/issues/5602
-                            loose: false,
-                            useBuiltIns: true,
-                            selectiveLoose: [
-                                'useState',
-                                'useEffect',
-                                'useContext',
-                                'useReducer',
-                                'useCallback',
-                                'useMemo',
-                                'useRef',
-                                'useImperativeHandle',
-                                'useLayoutEffect',
-                                'useDebugValue'
-                            ]
-                        }
-                    ],
                     ['@babel/plugin-proposal-decorators', { legacy: true }],
                     [
                         '@babel/plugin-proposal-class-properties',
                         {
                             loose: true
-                        }
-                    ],
-                    [
-                        '@babel/plugin-proposal-object-rest-spread',
-                        {
-                            useBuiltIns: true
                         }
                     ],
                     [
@@ -154,11 +128,7 @@ function createConfig(env, module) {
                         }
                     ],
                     // Adds Numeric Separators
-                    require('@babel/plugin-proposal-numeric-separator').default,
-                    // Adds syntax support for optional chaining (.?)
-                    require('@babel/plugin-proposal-optional-chaining').default,
-                    // Adds syntax support for default value using ?? operator
-                    require('@babel/plugin-proposal-nullish-coalescing-operator').default
+                    require('@babel/plugin-proposal-numeric-separator').default
                 ].filter(Boolean)
             }),
             module !== 'umd' &&
