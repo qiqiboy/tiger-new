@@ -24,6 +24,7 @@ function appUpgrade(projectName) {
 
 function upgradePackageProject(root) {
     var package = require(path.resolve(root, 'package.json'));
+    var pkgTemp = require(path.resolve(ownPath, 'template/package/packageTemp.js'));
     var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
 
     inquirer
@@ -53,6 +54,18 @@ function upgradePackageProject(root) {
                 );
                 spinner.succeed(chalk.green('rollup.config.js 已写入！'));
 
+                if (!fs.existsSync(path.resolve(root, 'jest'))) {
+                    fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
+                        overwrite: true
+                    });
+                }
+
+                if (!package.scripts.test) {
+                    package.scripts.test = pkgTemp.scripts.test;
+                }
+
+                fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
+
                 process.chdir(root);
 
                 install(
@@ -78,6 +91,7 @@ function upgradeAppProject(root) {
     var gulpfile = path.resolve(root, 'gulpfile.js');
     var jsconfig = path.resolve(root, 'jsconfig.json');
     var tsconfig = path.resolve(root, 'tsconfig.json');
+    var setupTests = path.resolve(root, 'setupTests.ts');
     var tsconfigLocal = path.resolve(root, 'tsconfig.local.json');
     var tslint = path.resolve(root, 'tslint.json');
     var globalDeclare = path.resolve(root, 'global.d.ts');
@@ -223,6 +237,12 @@ function upgradeAppProject(root) {
                         spinner.succeed(chalk.red('gulpfile.js 已删除！'));
                     }
 
+                    if (!fs.existsSync(setupTests)) {
+                        fs.copySync(path.resolve(ownPath, 'template/application/setupTests.ts'), setupTests, {
+                            overwrite: true
+                        });
+                    }
+
                     console.log();
 
                     if (!package.husky) {
@@ -348,6 +368,10 @@ function upgradeAppProject(root) {
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
                         package.scripts.pack = 'npm run build && npm run cdn';
+                    }
+
+                    if (!package.scripts.test) {
+                        package.scripts.test = pkgTemp.scripts.test;
                     }
 
                     package.engines = Object.assign({}, package.engines, pkgTemp.engines, {

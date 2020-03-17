@@ -283,12 +283,11 @@ module.exports = {
                 async: true,
                 useTypescriptIncrementalApi: true,
                 checkSyntacticErrors: true,
-                tsconfig: paths.appTsConfig,
+                tsconfig: paths.webpackTsConfig,
                 compilerOptions: {
                     jsx: 'preserve',
                     checkJs: false
                 },
-                reportFiles: ['**/*.(ts|tsx)', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
                 silent: true
             }),
             new webpack.BannerPlugin({

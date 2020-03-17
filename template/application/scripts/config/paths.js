@@ -57,11 +57,13 @@ module.exports = {
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('app'),
     appTsConfig: resolveApp('tsconfig.json'),
+    webpackTsConfig: resolveApp('.webpack-tsconfig.json'),
     staticSrc: resolveApp('static'),
     locals: resolveApp('locals'),
     proxySetup: resolveApp('setupProxy.js'),
     appNodeModules: resolveApp('node_modules'),
     ownNodeModules: resolveApp('node_modules'),
+    jestConfigFile: resolveApp('scripts/config/jest.config.js'),
     nodePaths: nodePaths,
     alias: alias,
     entries: entries,
@@ -85,3 +87,20 @@ function hasInstall(command) {
         return false;
     }
 }
+
+const tsconfig = require(module.exports.appTsConfig);
+
+fs.outputJsonSync(
+    module.exports.webpackTsConfig,
+    {
+        extends: './tsconfig.json',
+        compilerOptions: {
+            allowJs: false,
+            checkJs: false
+        },
+        exclude: tsconfig.exclude.concat('setupTests.ts', 'tests', '**/*.test.*', '**/*.spec.*', '**/__tests__')
+    },
+    {
+        spaces: '  '
+    }
+);

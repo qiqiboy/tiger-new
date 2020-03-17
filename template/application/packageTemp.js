@@ -8,6 +8,7 @@ module.exports = {
         'count:js': 'node scripts/count.js --js',
         'i18n-scan': 'node scripts/i18n.js --scan',
         'i18n-read': 'node scripts/i18n.js --read',
+        test: 'node scripts/test.js',
         tsc:
             "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts', 'app/utils/i18n/*'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --checkJs false"
     },
