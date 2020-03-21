@@ -23,6 +23,5 @@
     "declaration": true,
     "outDir": "dist"
   },
-  "include": ["*.d.ts", "src"],
-  "exclude": ["node_modules", "dist", "build"]
+  "exclude": ["dist", "build"]
 }

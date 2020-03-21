@@ -6,6 +6,7 @@ module.exports = {
         'build:declaration': 'tsc --emitDeclarationOnly',
         clear: 'rimraf dist',
         lint: "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'",
+        test: 'node jest/test.js',
         tsc:
             "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --noEmit --checkJs false"
     },
@@ -16,6 +17,9 @@ module.exports = {
             'pre-commit':
                 'lint-staged && export StagedFiles=$(git diff --diff-filter AM --name-only --relative --staged | grep -E \'^src/.*\\.m?[jt]sx?$\') && if [ -n "$StagedFiles"  ]; then npm run tsc ; fi'
         }
+    },
+    babel: {
+        presets: ['react-app']
     },
     eslintConfig: {
         extends: ['react-app']
@@ -59,8 +63,6 @@ module.exports = {
     stylelint: {
         extends: 'stylelint-config-recommended'
     },
-    peerDependencies: {
-        '@babel/runtime': '>7.0.0'
-    },
+    peerDependencies: {},
     engines: { node: '>=8.10.0' }
 };

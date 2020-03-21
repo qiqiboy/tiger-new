@@ -27,5 +27,5 @@
       "*": ["*", "app/*"]
     }
   },
-  "exclude": ["scripts", "node_modules", "dist", "build", "buildDev"]
+  "exclude": ["scripts", "dist", "build", "buildDev"]
 }
