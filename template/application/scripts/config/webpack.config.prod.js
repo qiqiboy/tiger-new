@@ -337,7 +337,8 @@ module.exports = {
                         exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/, /\.(txt|htm)$/],
                         loader: require.resolve('file-loader'),
                         options: {
-                            name: 'static/images/[name].[hash:8].[ext]'
+                            name: 'static/images/[name].[hash:8].[ext]',
+                            esModule: false
                         }
                     }
                 ]

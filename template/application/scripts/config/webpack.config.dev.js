@@ -178,7 +178,7 @@ module.exports = {
                                         }
                                     }
                                 ],
-                                !isBuilding && 'react-hot-loader/babel', // ensure react-hot-loader is disabled
+                                !isBuilding && 'react-hot-loader/babel' // ensure react-hot-loader is disabled
                             ].filter(Boolean),
                             cacheDirectory: true,
                             cacheCompression: false
@@ -257,7 +257,8 @@ module.exports = {
                         exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/, /\.(txt|htm)$/],
                         loader: require.resolve('file-loader'),
                         options: {
-                            name: 'static/images/[name].[hash:8].[ext]'
+                            name: 'static/images/[name].[hash:8].[ext]',
+                            esModule: false
                         }
                     }
                 ]
