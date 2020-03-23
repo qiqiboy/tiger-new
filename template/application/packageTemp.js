@@ -14,7 +14,7 @@ module.exports = {
     },
     babel: {
         presets: ['react-app'],
-        plugins: ['react-hot-loader/babel']
+        plugins: []
     },
     browserslist: ['>0.2%', 'not dead', 'not op_mini all', 'ie >= 10'],
     husky: {
@@ -47,6 +47,7 @@ module.exports = {
         trailingComma: 'none',
         jsxBracketSameLine: true,
         semi: true,
+        arrowParens: 'avoid',
         singleQuote: true,
         overrides: [
             {
@@ -58,15 +59,14 @@ module.exports = {
         ]
     },
     'lint-staged': {
-        '{app,static}/**/*.{js,jsx,mjs,ts,tsx}': [
+        '{app,tests,static}/**/*.{js,jsx,mjs,ts,tsx}': [
             'node_modules/.bin/prettier --write',
-            'node_modules/.bin/eslint --fix',
-            'git add'
+            'node_modules/.bin/eslint --fix'
         ],
-        '{app,static}/**/*.{css,scss,less,json,html,md}': ['node_modules/.bin/prettier --write', 'git add']
+        '{app,tests,static}/**/*.{css,scss,less,json,html,md}': ['node_modules/.bin/prettier --write']
     },
     stylelint: {
         extends: 'stylelint-config-recommended'
     },
-    engines: { node: '>=8.10.0' }
+    engines: { node: '>=10.0.0' }
 };

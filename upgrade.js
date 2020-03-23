@@ -275,10 +275,11 @@ function upgradeAppProject(root) {
                         package.husky.hooks['pre-push'] = pkgTemp.husky.hooks['pre-push'];
                     }
 
+                    if (!package.babel.plugins) {
+                        package.babel.plugins = [];
+                    }
+
                     if (answers.supportDecorator) {
-                        if (!package.babel.plugins) {
-                            package.babel.plugins = [];
-                        }
                         package.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
                     }
 
@@ -290,11 +291,15 @@ function upgradeAppProject(root) {
                         package['browserslist'] = pkgTemp['browserslist'];
                     }
 
-                    if (package.babel.plugins && package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
+                    if (package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
                         package.babel.plugins.splice(package.babel.plugins.indexOf('transform-decorators-legacy'), 1, [
                             '@babel/plugin-proposal-decorators',
                             { legacy: true }
                         ]);
+                    }
+
+                    if (package.babel.plugins.indexOf('react-hot-loader/babel') > -1) {
+                        package.babel.plugins.splice(package.babel.plugins.indexOf('react-hot-loader/babel'), 1);
                     }
 
                     if (answers.addLocals) {
@@ -335,6 +340,10 @@ function upgradeAppProject(root) {
                         }
                     }
 
+                    if (package.prettier) {
+                        package.prettier.arrowParens = 'avoid';
+                    }
+
                     if (!package['lint-staged']) {
                         package['lint-staged'] = pkgTemp['lint-staged'];
                     } else {
@@ -344,6 +353,16 @@ function upgradeAppProject(root) {
 
                             Object.assign(package['lint-staged'], pkgTemp['lint-staged']);
                         }
+
+                        package['lint-staged'] = _.mapKeys(package['lint-staged'], (value, key) => {
+                            value.splice(value.indexOf('git add'), 1);
+
+                            if (!/\{,tests\}/.test(key)) {
+                                return key.replace(/^\{(.*)\}\//, '{$1,tests}/');
+                            }
+
+                            return key;
+                        });
                     }
 
                     if (!package.scripts.tsc || /^node -pe/.test(package.scripts.tsc)) {

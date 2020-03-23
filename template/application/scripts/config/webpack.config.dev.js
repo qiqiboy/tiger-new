@@ -65,7 +65,9 @@ module.exports = {
     devtool: 'cheap-module-source-map',
     entry: Object.assign(
         {
-            _vendor_: [require.resolve('./polyfills'), !isBuilding && hotDev].filter(Boolean).concat(pkg.vendor || [])
+            _vendor_: [require.resolve('./polyfills'), !isBuilding && hotDev, !isBuilding && 'react-hot-loader/patch']
+                .filter(Boolean)
+                .concat(pkg.vendor || [])
         },
         paths.entries
     ),
@@ -175,8 +177,9 @@ module.exports = {
                                             }
                                         }
                                     }
-                                ]
-                            ],
+                                ],
+                                !isBuilding && 'react-hot-loader/babel', // ensure react-hot-loader is disabled
+                            ].filter(Boolean),
                             cacheDirectory: true,
                             cacheCompression: false
                         }
