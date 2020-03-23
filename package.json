@@ -1,6 +1,6 @@
 {
   "name": "tiger-new",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "tiger fed cli",
   "main": "index.js",
   "dependencies": {

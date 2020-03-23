@@ -27,7 +27,7 @@ declare module '*.svg' {
  */
 declare namespace NodeJS {
     interface ProcessEnv {
-        readonly NODE_ENV: 'development' | 'production';
+        readonly NODE_ENV: 'development' | 'production' | 'test';
         readonly BASE_NAME: string;
         readonly PUBLIC_URL: string;
     }

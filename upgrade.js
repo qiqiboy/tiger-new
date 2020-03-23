@@ -355,9 +355,11 @@ function upgradeAppProject(root) {
                         }
 
                         package['lint-staged'] = _.mapKeys(package['lint-staged'], (value, key) => {
-                            value.splice(value.indexOf('git add'), 1);
+                            if (value.indexOf('git add') > -1) {
+                                value.splice(value.indexOf('git add'), 1);
+                            }
 
-                            if (!/\{,tests\}/.test(key)) {
+                            if (!/\,tests/.test(key)) {
                                 return key.replace(/^\{(.*)\}\//, '{$1,tests}/');
                             }
 

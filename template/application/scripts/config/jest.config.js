@@ -2,6 +2,24 @@ const fs = require('fs-extra');
 const path = require('path');
 const paths = require('./paths');
 const lodash = require('lodash');
+const glob = require('glob');
+
+const excludeDirs = ['node_modules', 'build', 'buildDev', 'dist'];
+
+const rootFiles = glob.sync('*.*').reduce((mapper, name) => {
+    mapper[`^${name}$`] = `<rootDir>/${name}`;
+
+    return mapper;
+}, {});
+const rootDirs = glob
+    .sync('*/')
+    .map(name => name.replace(/\/$/, ''))
+    .filter(name => !excludeDirs.includes(name))
+    .reduce((mapper, name) => {
+        mapper[`^${name}/(.+)`] = `<rootDir>/${name}/$1`;
+
+        return mapper;
+    }, {});
 
 module.exports = {
     rootDir: paths.root,
@@ -31,12 +49,14 @@ module.exports = {
 
             return result;
         },
-        {
-            '^react-native$': 'react-native-web',
-            '^.+\\.module\\.(css|sass|scss|less)$': 'identity-obj-proxy',
-            '^libs/(.+)': '<rootDir>/libs/$1',
-            '^static/(.+)': '<rootDir>/static/$1'
-        }
+        Object.assign(
+            {
+                '^react-native$': 'react-native-web',
+                '^.+\\.module\\.(css|sass|scss|less)$': 'identity-obj-proxy'
+            },
+            rootFiles,
+            rootDirs
+        )
     ),
     moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node'],
     verbose: true,
