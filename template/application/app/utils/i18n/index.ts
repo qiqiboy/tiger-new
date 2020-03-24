@@ -39,7 +39,12 @@ const mayLang =
     (Array.isArray(queryObj.lang) ? queryObj.lang[0] : queryObj.lang) || localStorage.getItem(LOCAL_LANG_FLAG);
 
 // 确保得到的语言标识符是允许的、合法的，否则则尝试根据浏览器语言设置默认语言
-export let language: string = allowedLangs.includes(mayLang as string) ? (mayLang as string) : getBrowserLang();
+export let language: string =
+    process.env.NODE_ENV === 'test'
+        ? 'zh_CN'
+        : allowedLangs.includes(mayLang as string)
+            ? (mayLang as string)
+            : getBrowserLang();
 
 // 如果本地的语言标识符与当前不一致，则更新本地存储
 if (localLang !== language) {

@@ -1,14 +1,12 @@
-import path from 'path';
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import 'utils/http';
 
 // 导入接口定义
-import { API as PORTAL } from './apis/PORTAL';
+import * as PORTAL from './apis/PORTAL';
 
-interface APICollection {
-    // 这里需要传递接口结构声明
-    PORTAL: typeof PORTAL;
-}
+const APICollection = {
+    PORTAL
+};
 
 interface APIInstance {
     (...args: Array<string | number>): string;
@@ -22,18 +20,19 @@ interface APIInstance {
     patch<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
 }
 
+type APIPicker<T extends any> = {
+    [P in keyof T]: API<T[P]['API']>;
+};
 type API<T> = { [P in keyof T]: T[P] extends object ? API<T[P]> : APIInstance };
 
 const isDev = process.env.NODE_ENV === 'development' || process.env.REACT_APP_ENV === 'development';
-// @ts-ignore
-const apiCtx = require.context('./apis', false, /\.[jt]sx?$/);
 const axiosMethods = ['request', 'get', 'post', 'put', 'delete', 'delete', 'patch'];
 
-export default apiCtx.keys().reduce((exports, file) => {
-    exports[path.basename(file, path.extname(file))] = enhanced(apiCtx(file));
+export default Object.keys(APICollection).reduce((exports, host) => {
+    exports[host] = enhanced(APICollection[host]);
 
     return exports;
-}, {}) as API<APICollection>;
+}, {}) as APIPicker<typeof APICollection>;
 
 function enhanced(config) {
     const createAPI = apis =>
@@ -91,8 +90,8 @@ function enhanced(config) {
  * 根据配置的HOST_ALIAS切换host
  */
 export function setAlias(name: string) {
-    apiCtx.keys().forEach(file => {
-        const config = apiCtx(file);
+    Object.keys(APICollection).forEach(host => {
+        const config = APICollection[host];
 
         if (config.HOST_ALIAS && name in config.HOST_ALIAS) {
             config.HOST.splice(0, 2, ...config.HOST_ALIAS[name]);
