@@ -47,7 +47,7 @@
     "glob": "7",
     "html-loader": "next",
     "html-webpack-plugin": "next",
-    "husky": "4",
+    "husky": "3",
     "i18next-scanner": "2",
     "identity-obj-proxy": "3",
     "imagemin-webpack-plugin": "2",

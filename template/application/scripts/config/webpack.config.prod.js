@@ -330,7 +330,8 @@ module.exports = {
                         test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
                         loader: require.resolve('file-loader'),
                         options: {
-                            name: 'static/media/[name].[hash:8].[ext]'
+                            name: 'static/media/[name].[hash:8].[ext]',
+                            esModule: false
                         }
                     },
                     {
