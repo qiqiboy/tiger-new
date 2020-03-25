@@ -15,6 +15,7 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const pkg = require(paths.appPackageJson);
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
+const htmlAttrsOptions = require('./htmlAttrsOptions');
 
 const publicPath = isBuilding ? path.join(pkg.noRewrite ? '.' : process.env.BASE_NAME || '', '/') : '/';
 const publicUrl = publicPath.slice(0, -1);
@@ -150,14 +151,7 @@ module.exports = {
                             },
                             {
                                 loader: require.resolve('html-loader'),
-                                options: {
-                                    url(url) {
-                                        return !/\.(webp|png|jpeg|jpg|gif|svg|mp3|wmv|mp4|ogg|webm|s[ac]ss|css|less|m?[tj]sx?)$/.test(
-                                            url
-                                        );
-                                    },
-                                    import: true
-                                }
+                                options: htmlAttrsOptions
                             }
                         ]
                     },

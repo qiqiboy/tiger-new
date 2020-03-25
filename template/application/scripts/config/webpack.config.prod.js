@@ -20,6 +20,7 @@ const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const pkg = require(paths.appPackageJson);
+const htmlAttrsOptions = require('./htmlAttrsOptions');
 
 const relativeRoot = path.join(pkg.noRewrite ? '.' : process.env.BASE_NAME || '/');
 const cdnUrl = process.env.SKIP_CDN !== 'true' && pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
@@ -219,14 +220,7 @@ module.exports = {
                             },
                             {
                                 loader: require.resolve('html-loader'),
-                                options: {
-                                    url(url) {
-                                        return !/\.(webp|png|jpeg|jpg|gif|svg|mp3|wmv|mp4|ogg|webm|s[ac]ss|css|less|m?[tj]sx?)$/.test(
-                                            url
-                                        );
-                                    },
-                                    import: true
-                                }
+                                options: htmlAttrsOptions
                             }
                         ]
                     },
