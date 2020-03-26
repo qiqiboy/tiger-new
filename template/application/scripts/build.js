@@ -43,6 +43,8 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
 checkMissDependencies(spinner)
     .then(() => {
+        spinner.start();
+
         return measureFileSizesBeforeBuild(paths.appBuild);
     })
     .then(previousFileSizes => {

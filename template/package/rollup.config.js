@@ -2,11 +2,10 @@ process.env.NODE_ENV = 'production';
 
 const path = require('path');
 const fs = require('fs');
-const commonjs = require('rollup-plugin-commonjs');
+const commonjs = require('@rollup/plugin-commonjs');
 const replace = require('@rollup/plugin-replace');
 const nodeResolve = require('@rollup/plugin-node-resolve');
 const babel = require('rollup-plugin-babel');
-const sourceMaps = require('rollup-plugin-sourcemaps');
 const filesize = require('rollup-plugin-filesize');
 const copy = require('rollup-plugin-copy');
 const sass = require('rollup-plugin-sass');
@@ -135,7 +134,6 @@ function createConfig(env, module) {
                 sass({
                     output: `dist/${exportName}.css`
                 }),
-            sourceMaps(),
             isProd &&
                 terser({
                     sourcemap: true,
@@ -148,8 +146,13 @@ function createConfig(env, module) {
                 }),
             filesize(),
             copy({
-                targets: [`npm/index.${module}.js`],
-                verbose: true
+                targets: [
+                    {
+                        src: `npm/index.${module}.js`,
+                        dest: 'dist'
+                    }
+                ],
+                verbose: false
             })
         ].filter(Boolean)
     };
