@@ -20,13 +20,12 @@ interface APIInstance {
     patch<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
 }
 
-type APIPicker<T extends any> = {
-    [P in keyof T]: API<T[P]['API']>;
-};
+type APIPicker<T extends any> = { [P in keyof T]: API<T[P]['API']> };
 type API<T> = { [P in keyof T]: T[P] extends object ? API<T[P]> : APIInstance };
 
 const isDev = process.env.NODE_ENV === 'development' || process.env.REACT_APP_ENV === 'development';
-const axiosMethods = ['request', 'get', 'post', 'put', 'delete', 'delete', 'patch'];
+
+export const axiosMethods = ['request', 'get', 'post', 'put', 'delete', 'head', 'patch'];
 
 export default Object.keys(APICollection).reduce((exports, host) => {
     exports[host] = enhanced(APICollection[host]);

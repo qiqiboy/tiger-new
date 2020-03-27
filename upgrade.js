@@ -64,6 +64,12 @@ function upgradePackageProject(root) {
                     package.scripts.test = pkgTemp.scripts.test;
                 }
 
+                if (!package.prettier) {
+                    package.prettier = pkgTemp.prettier;
+                } else if (!package.prettier.arrowParens) {
+                    package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
+                }
+
                 fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
 
                 process.chdir(root);
@@ -243,6 +249,16 @@ function upgradeAppProject(root) {
                         });
                     }
 
+                    if (!fs.existsSync(path.resolve(root, 'tests/__mocks__/axios'))) {
+                        fs.copySync(
+                            path.resolve(ownPath, 'template/application/tests/__mocks__/axios'),
+                            path.resolve(root, 'tests/__mocks__/axios'),
+                            {
+                                overwrite: true
+                            }
+                        );
+                    }
+
                     console.log();
 
                     if (!package.husky) {
@@ -340,8 +356,8 @@ function upgradeAppProject(root) {
                         }
                     }
 
-                    if (package.prettier) {
-                        package.prettier.arrowParens = 'avoid';
+                    if (!package.prettier.arrowParens) {
+                        package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
                     }
 
                     if (!package['lint-staged']) {

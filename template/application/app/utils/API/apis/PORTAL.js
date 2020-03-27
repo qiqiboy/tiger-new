@@ -8,7 +8,7 @@ export const HOST = ['https://dev.com', 'https://prod.com'];
  *      key1: ['https://1.dev.com', 'https://1.prod.com'],
  *      key2: ['https://2.dev.com', 'https://2.prod.com']
  *  }
-*/
+ */
 
 export const API = {
     // 用户状态

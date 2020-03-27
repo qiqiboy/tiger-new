@@ -118,7 +118,7 @@ function createError(responseError: AxiosError): Promise<any> {
     let error_msg!: ErrorMsg;
     let response: AxiosResponse = {} as AxiosResponse;
 
-    const pickError = function(data: IData) {
+    const pickError = function (data: IData) {
         if (data && typeof data === 'object') {
             const msg =
                 data.error_msg ||

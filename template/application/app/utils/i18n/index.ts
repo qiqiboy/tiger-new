@@ -43,8 +43,8 @@ export let language: string =
     process.env.NODE_ENV === 'test'
         ? 'zh_CN'
         : allowedLangs.includes(mayLang as string)
-            ? (mayLang as string)
-            : getBrowserLang();
+        ? (mayLang as string)
+        : getBrowserLang();
 
 // 如果本地的语言标识符与当前不一致，则更新本地存储
 if (localLang !== language) {
