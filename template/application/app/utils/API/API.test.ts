@@ -19,3 +19,15 @@ test('should call axios same name method', async () => {
     expect(axios.get).toBeCalledWith(API.PORTAL.userStatus());
     expect(data).toBe('done');
 });
+
+test('should throw a error use mockException', async () => {
+    axios.mockException(API.PORTAL.userStatus(), new Error('abc'));
+
+    try {
+        await API.PORTAL.userStatus.get();
+    } catch (error) {
+        expect(error).toEqual(new Error('abc'));
+    }
+
+    axios.mockException(API.PORTAL.userStatus(), null);
+});
