@@ -95,7 +95,7 @@ fs.outputJsonSync(
     {
         extends: './tsconfig.json',
         compilerOptions: {
-            allowJs: false,
+            allowJs: true,
             checkJs: false
         },
         exclude: tsconfig.exclude.concat('setupTests.ts', 'tests', '**/*.test.*', '**/*.spec.*', '**/__tests__')
