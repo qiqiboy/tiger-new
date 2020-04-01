@@ -6,12 +6,6 @@ import head from './head.mock';
 import patch from './patch.mock';
 import request from './request.mock';
 
-declare module 'axios' {
-    interface AxiosInstance {
-        mockException(url: string, error: Error | null | false): void;
-    }
-}
-
 const exceptions: {
     [key: string]: Error;
 } = {};

@@ -2,13 +2,15 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 declare module 'axios' {
-    // tslint:disable-next-line
+    interface AxiosInstance {
+        mockException(url: string, error: Error | null | false): void;
+    }
+
     interface AxiosRequestConfig {
         useForm?: boolean;
         noToken?: boolean;
     }
 
-    // tslint:disable-next-line
     interface AxiosResponse {
         [key: string]: any;
     }

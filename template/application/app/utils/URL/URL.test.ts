@@ -24,7 +24,11 @@ test('should parse a url', () => {
 });
 
 test('should merge url partials into a output', () => {
-    expect(URL.merge('https://example.com:80/p1/p2?a=1&b=2&a=3&d=4#a=1&b=2', '?s=1')).toBe('?a=1&a=3&b=2&d=4&s=1');
+    expect(URL.merge('https://example.com:80/p1/p2?a=1&b=2&a=3&d=4#a=1&b=2', '?s=1')).toBe(
+        'https://example.com:80/p1/p2?a=1&a=3&b=2&d=4&s=1#a=1&b=2'
+    );
+
+    expect(URL.merge('https://example.com:80/p1/p2?a=1&b=2&a=3&d=4#a=1&b=2', '?s=1', true)).toBe('?s=1');
 
     expect(
         URL.merge('https://example.com:80/p1/p2?a=1&b=2&a=3&d=4#a=1&b=2', {
@@ -34,8 +38,20 @@ test('should merge url partials into a output', () => {
         })
     ).toBe('https://example.com:80/p1/p2?a=1&a=3&b=2&d=4&s=1#a=1&b=2');
 
+    expect(
+        URL.merge(
+            'https://example.com:80/p1/p2?a=1&b=2&a=3&d=4#a=1&b=2',
+            {
+                query: {
+                    s: '1'
+                }
+            },
+            true
+        )
+    ).toBe('https://example.com:80/p1/p2?s=1#a=1&b=2');
+
     expect(URL.merge('https://example.com:80/p1/p2?a=1&b=2&a=3&d=4#a=1&b=2', 'https://new-host.com/new-path/')).toBe(
-        'https://new-host.com/new-path/?a=1&a=3&b=2&d=4'
+        'https://new-host.com/new-path/?a=1&a=3&b=2&d=4#a=1&b=2'
     );
 });
 
