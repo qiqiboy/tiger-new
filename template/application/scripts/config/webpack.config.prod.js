@@ -22,7 +22,7 @@ const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const pkg = require(paths.appPackageJson);
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 
-const relativeRoot = path.join(pkg.noRewrite ? '.' : process.env.BASE_NAME || '/');
+const relativeRoot = path.join(pkg.noRewrite ? '.' : process.env.PUBLIC_URL || process.env.BASE_NAME || '/');
 const cdnUrl = process.env.SKIP_CDN !== 'true' && pkg.cdn ? pkg.cdn.host + pkg.cdn.path : relativeRoot;
 const publicPath = ensureSlash(cdnUrl, true);
 const publicUrl = ensureSlash(cdnUrl, false);

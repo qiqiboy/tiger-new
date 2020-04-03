@@ -17,7 +17,8 @@ const pkg = require(paths.appPackageJson);
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 
-const publicPath = isBuilding ? path.join(pkg.noRewrite ? '.' : process.env.BASE_NAME || '', '/') : '/';
+const homePage = process.env.PUBLIC_URL || process.env.BASE_NAME || '';
+const publicPath = isBuilding ? (pkg.noRewrite ? '.' : homePage.replace(/\/+$/, '')) + '/' : '/';
 const publicUrl = publicPath.slice(0, -1);
 const env = getClientEnvironment(publicUrl);
 const injects = [];
