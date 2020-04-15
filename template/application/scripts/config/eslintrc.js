@@ -72,7 +72,12 @@ module.exports = {
         'react/no-unsafe': [2, { checkAliases: true }],
         'react/no-deprecated': 2,
         'react/no-string-refs': [1, { noTemplateLiterals: true }],
-        'jsx-a11y/anchor-is-valid': 0,
+        'jsx-a11y/anchor-is-valid': [
+            1,
+            {
+                aspects: ['invalidHref', 'preferButton']
+            }
+        ],
         'import/no-anonymous-default-export': [
             2,
             {
@@ -87,7 +92,6 @@ module.exports = {
         ],
         eqeqeq: [1, 'smart'],
         radix: 0,
-        'no-script-url': 0,
         'linebreak-style': [1, 'unix'],
         indent: 0, // process by prettier
         semi: 0, // process by prettier

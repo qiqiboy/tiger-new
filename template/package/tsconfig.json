@@ -19,7 +19,6 @@
     "suppressImplicitAnyIndexErrors": true,
     "skipLibCheck": true,
     "noUnusedLocals": true,
-    "importHelpers": true,
     "declaration": true,
     "outDir": "dist"
   },
