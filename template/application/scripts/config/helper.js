@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: 0 */
 const getProcessForPort = require('react-dev-utils/getProcessForPort');
 const clearConsole = require('react-dev-utils/clearConsole');
 const detect = require('detect-port-alt');
@@ -8,9 +7,9 @@ const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware')
 const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
 const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
 const forkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
+const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware');
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
-const config = require('./webpack.config.dev');
 const paths = require('./paths');
 const chalk = require('chalk');
 const fs = require('fs');
@@ -47,6 +46,7 @@ function choosePort(host, defaultPort, spinner) {
                 inquirer.prompt(question).then(answer => {
                     if (answer.shouldChangePort) {
                         resolve(port);
+                        spinner.start();
                     } else {
                         resolve(null);
                     }
@@ -63,14 +63,14 @@ function choosePort(host, defaultPort, spinner) {
     );
 }
 
-function createCompiler(webpack, config, appName, urls, devSocket, spinner) {
+function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, webpack, spinner }) {
     let compiler;
     let stime = Date.now();
 
     try {
         compiler = webpack(config);
     } catch (err) {
-        console.log(chalk.red('启动编译失败！'));
+        spinner.fail(chalk.red('启动编译失败！'));
         console.log();
         console.log(err.message || err);
         console.log();
@@ -130,14 +130,29 @@ function createCompiler(webpack, config, appName, urls, devSocket, spinner) {
             const messages = await tsMessagesPromise;
 
             clearTimeout(delayedMsg);
-            statsData.errors.push(...messages.errors);
+
+            if (tscCompileOnError) {
+                statsData.warnings.push(...messages.errors);
+            } else {
+                statsData.errors.push(...messages.errors);
+            }
+
             statsData.warnings.push(...messages.warnings);
 
-            stats.compilation.errors.push(...messages.errors);
+            if (tscCompileOnError) {
+                stats.compilation.warnings.push(...messages.errors);
+            } else {
+                stats.compilation.errors.push(...messages.errors);
+            }
+
             stats.compilation.warnings.push(...messages.warnings);
 
             if (messages.errors.length > 0) {
-                devSocket.errors(messages.errors);
+                if (tscCompileOnError) {
+                    devSocket.warnings(messages.errors);
+                } else {
+                    devSocket.errors(messages.errors);
+                }
             } else if (messages.warnings.length > 0) {
                 devSocket.warnings(messages.warnings);
             }
@@ -201,6 +216,59 @@ function createCompiler(webpack, config, appName, urls, devSocket, spinner) {
     return compiler;
 }
 
+// Ensure the certificate and key provided are valid and if not
+// throw an easy to debug error
+function validateKeyAndCerts({ cert, key, keyFile, crtFile }) {
+    let encrypted;
+
+    try {
+        // publicEncrypt will throw an error with an invalid cert
+        encrypted = crypto.publicEncrypt(cert, Buffer.from('test'));
+    } catch (err) {
+        throw new Error(`The certificate "${chalk.yellow(crtFile)}" is invalid.\n${err.message}`);
+    }
+
+    try {
+        // privateDecrypt will throw an error with an invalid key
+        crypto.privateDecrypt(key, encrypted);
+    } catch (err) {
+        throw new Error(`The certificate key "${chalk.yellow(keyFile)}" is invalid.\n${err.message}`);
+    }
+}
+
+// Read file and throw an error if it doesn't exist
+function readEnvFile(file, type) {
+    if (!fs.existsSync(file)) {
+        throw new Error(
+            `You specified ${chalk.cyan(type)} in your env, but the file "${chalk.yellow(file)}" can't be found.`
+        );
+    }
+
+    return fs.readFileSync(file);
+}
+
+// Get the https config
+// Return cert files if provided in env, otherwise just true or false
+function getHttpsConfig() {
+    const { SSL_CRT_FILE, SSL_KEY_FILE, HTTPS } = process.env;
+    const isHttps = HTTPS === 'true';
+
+    if (isHttps && SSL_CRT_FILE && SSL_KEY_FILE) {
+        const crtFile = path.resolve(paths.appPath, SSL_CRT_FILE);
+        const keyFile = path.resolve(paths.appPath, SSL_KEY_FILE);
+        const config = {
+            cert: readEnvFile(crtFile, 'SSL_CRT_FILE'),
+            key: readEnvFile(keyFile, 'SSL_KEY_FILE')
+        };
+
+        validateKeyAndCerts({ ...config, keyFile, crtFile });
+
+        return config;
+    }
+
+    return isHttps;
+}
+
 function createDevServerConfig(proxy, allowedHost) {
     return {
         headers: {
@@ -212,33 +280,38 @@ function createDevServerConfig(proxy, allowedHost) {
         compress: true,
         clientLogLevel: 'none',
         contentBase: paths.appPublic,
+        contentBasePublicPath: paths.publicUrlOrPath,
         watchContentBase: true,
         hot: true,
         transportMode: 'ws',
         injectClient: false,
-        publicPath: config.output.publicPath,
+        publicPath: paths.publicUrlOrPath.slice(0, -1),
         quiet: true,
         watchOptions: {
             ignored: ignoredFiles(paths.appSrc)
         },
-        https: process.env.HTTPS === 'true',
+        https: getHttpsConfig(),
         host: process.env.HOST || '0.0.0.0',
         overlay: false,
         historyApiFallback: pkg.noRewrite
             ? false
             : {
-                  disableDotRule: true
+                  disableDotRule: true,
+                  index: paths.publicUrlOrPath
               },
         public: allowedHost,
         proxy,
         before(app, server) {
+            app.use(evalSourceMapMiddleware(server));
+            app.use(errorOverlayMiddleware());
+
             if (fs.existsSync(paths.proxySetup)) {
                 require(paths.proxySetup)(app);
             }
-
-            app.use(evalSourceMapMiddleware(server));
-            app.use(errorOverlayMiddleware());
-            app.use(noopServiceWorkerMiddleware('/'));
+        },
+        after(app) {
+            app.use(redirectServedPath(paths.publicUrlOrPath));
+            app.use(noopServiceWorkerMiddleware(paths.publicUrlOrPath));
         }
     };
 }
@@ -340,9 +413,52 @@ function prepareProxy(proxy) {
     ];
 }
 
+function printBuildError(err) {
+    const message = err != null && err.message;
+    const stack = err != null && err.stack;
+
+    // Add more helpful message for Terser error
+    if (stack && typeof message === 'string' && message.indexOf('from Terser') !== -1) {
+        try {
+            const matched = /(.+)\[(.+):(.+),(.+)\]\[.+\]/.exec(stack);
+
+            if (!matched) {
+                throw new Error('Using errors for control flow is bad.');
+            }
+
+            const problemPath = matched[2];
+            const line = matched[3];
+            const column = matched[4];
+
+            console.log(
+                '代码压缩有异常: \n\n',
+                chalk.yellow(`\t${problemPath}:${line}${column !== '0' ? ':' + column : ''}`),
+                '\n'
+            );
+        } catch (ignored) {
+            console.log('代码压缩出现异常.', err);
+        }
+    } else {
+        console.log((message || err) + '\n');
+    }
+
+    console.log();
+}
+
+function printServeCommand() {
+    const usedEnvs = ['NODE_ENV', 'BUILD_DIR', 'BASE_NAME', 'PUBLIC_URL'].filter(name => Boolean(process.env[name]));
+
+    console.log(
+        (usedEnvs.length ? usedEnvs.map(name => name + '=' + process.env[name]).join(' ') + ' ' : '') +
+            chalk.cyan('npm run serve')
+    );
+}
+
 module.exports = {
     choosePort,
     prepareProxy,
     createCompiler,
-    createDevServerConfig
+    createDevServerConfig,
+    printBuildError,
+    printServeCommand
 };

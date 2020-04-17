@@ -43,7 +43,7 @@ module.exports = {
     ],
     modulePaths: [],
     moduleNameMapper: lodash.reduce(
-        paths.alias,
+        paths.moduleAlias,
         (result, value, key) => {
             result[`^${key}/(.*)$`] = `${value}/$1`;
 

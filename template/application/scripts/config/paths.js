@@ -3,32 +3,45 @@ const path = require('path');
 const fs = require('fs-extra');
 const glob = require('glob');
 const execSync = require('child_process').execSync;
+const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const isDev = process.env.NODE_ENV === 'development';
 const lodash = require('lodash');
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
+const nodePaths = (process.env.NODE_PATH || '').split(path.delimiter).filter(Boolean).map(resolveApp);
 const pkg = require(resolveApp('package.json'));
+const publicUrlOrPath = getPublicUrlOrPath(
+    process.env.NODE_ENV === 'development' && process.env.WEBPACK_BUILDING !== 'true',
+    pkg.noRewrite ? '.' : pkg.homepage,
+    process.env.NODE_ENV === 'production' && process.env.SKIP_CDN !== 'true' && pkg.cdn
+        ? pkg.cdn.host + pkg.cdn.path
+        : process.env.PUBLIC_URL || process.env.BASE_NAME
+);
+const moduleFileExtensions = ['mjs', 'js', 'ts', 'tsx', 'jsx'];
 
-function resolveApp(relativePath) {
-    return path.resolve(appDirectory, relativePath);
+const webModuleFileExtensions = moduleFileExtensions.map(ext => 'web.' + ext).concat(moduleFileExtensions, 'json');
+const nodeModuleFileExtensions = moduleFileExtensions.map(ext => 'node.' + ext).concat(moduleFileExtensions, 'json');
+
+function resolveApp(...relativePaths) {
+    return path.resolve(appDirectory, ...relativePaths);
 }
 
-const nodePaths = (process.env.NODE_PATH || '')
-    .split(path.delimiter)
-    .filter(Boolean)
-    .map(resolveApp);
-
-const entries = {};
+let useNodeEnv = false;
+const jsEntries = {};
 
 glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function(file) {
-    const basename = path.basename(file).replace(/\.[jt]sx?$/, '');
+    const basename = path.basename(file).replace(/(\.web|\.node)?\.[jt]sx?$/, '');
 
-    entries[basename] = file;
+    jsEntries[basename] = file;
 });
 
-const alias = Object.assign(
+const htmlEntries = glob.sync(resolveApp('public/!(_)*.html')).map(function(file) {
+    return path.basename(file, '.html');
+});
+
+const moduleAlias = Object.assign(
     {
         components: resolveApp('app/components'),
         modules: resolveApp('app/modules'),
@@ -46,14 +59,16 @@ const alias = Object.assign(
     })
 );
 
-// config after eject: we're in ./config/
+const appBuildName = process.env.BUILD_DIR || (isDev ? 'buildDev' : 'build');
+
 module.exports = {
     dotenv: resolveApp('.env'),
     root: resolveApp(''),
-    appBuild: resolveApp(process.env.BUILD_DIR || (isDev ? 'buildDev' : 'build')),
+    appBuild: resolveApp(appBuildName, useNodeEnv ? 'web' : ''),
+    appNodeBuild: resolveApp(appBuildName, 'node'),
     appPublic: resolveApp('public'),
-    appHtml: resolveApp('public/index.html'),
-    appIndexJs: Object.values(entries)[0] || resolveApp('app/index.js'),
+    appHtml: resolveApp('public/' + htmlEntries[0] + '.html'),
+    appIndexJs: Object.values(jsEntries)[0],
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('app'),
     appTsConfig: resolveApp('tsconfig.json'),
@@ -65,15 +80,16 @@ module.exports = {
     ownNodeModules: resolveApp('node_modules'),
     jestConfigFile: resolveApp('scripts/config/jest.config.js'),
     nodePaths: nodePaths,
-    alias: alias,
-    entries: entries,
-    pageEntries: glob.sync(resolveApp('public/!(_)*.html')).map(function(file) {
-        return path.basename(file, '.html');
-    }),
-    moduleFileExtensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx'],
+    publicUrlOrPath,
+    webModuleFileExtensions,
+    nodeModuleFileExtensions,
+    moduleAlias,
+    entries: jsEntries,
+    pageEntries: htmlEntries,
     // 一些命令检测
     serve: hasInstall('serve'),
-    npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall)
+    npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
+    useNodeEnv
 };
 
 function hasInstall(command) {

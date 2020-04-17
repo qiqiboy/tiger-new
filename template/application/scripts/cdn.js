@@ -9,6 +9,7 @@ const glob = require('glob');
 const paths = require('./config/paths');
 const ora = require('ora');
 const pkg = require(paths.appPackageJson);
+const { printServeCommand } = require('./config/helper');
 
 const staticFileName = 'static.config.json';
 const staticConfigFile = path.resolve(paths.root, staticFileName);
@@ -69,6 +70,7 @@ function removeFileNameHash(fileName) {
     const pipes = fileName.split('.');
 
     pipes.splice(-2, 1);
+
     return pipes.join('.');
 }
 
@@ -95,6 +97,7 @@ function runCDN() {
             if (oldStaticConfig[relative]) {
                 spinner.succeed(chalk.green('已存在：' + relative));
                 exitsNum++;
+
                 return false;
             }
 
@@ -128,11 +131,7 @@ function runCDN() {
             console.log();
             console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
 
-            if (!paths.serve) {
-                console.log(chalk.cyan('npm') + ' install -g serve');
-            }
-
-            console.log(chalk.cyan('serve') + ' -s ' + path.relative('.', paths.appBuild));
+            printServeCommand();
         } else {
             console.log(chalk.red('文件未全部上传，请单独运行') + chalk.green(' npm run cdn ') + chalk.red('命令!'));
             process.exit(1);

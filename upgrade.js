@@ -257,6 +257,13 @@ function upgradeAppProject(root) {
                                 overwrite: true
                             }
                         );
+                        spinner.succeed(chalk.green('tests/__mocks__ 目录已添加！'));
+                    }
+
+                    if (fs.existsSync(path.resolve(root, 'scripts/config/webpack.config.dev.js'))) {
+                        fs.removeSync(path.resolve(root, 'scripts/config/webpack.config.dev.js'));
+                        fs.removeSync(path.resolve(root, 'scripts/config/webpack.config.prod.js'));
+                        spinner.succeed(chalk.green('过时的 webpack.config.*.js 文件已移除！'));
                     }
 
                     console.log();
@@ -409,6 +416,10 @@ function upgradeAppProject(root) {
 
                     if (!package.scripts.test) {
                         package.scripts.test = pkgTemp.scripts.test;
+                    }
+
+                    if (!package.scripts.serve) {
+                        package.scripts.serve = pkgTemp.scripts.serve;
                     }
 
                     package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
