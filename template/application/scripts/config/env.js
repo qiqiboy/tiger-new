@@ -39,23 +39,25 @@ if (!('BASE_NAME' in process.env) && 'basename' in pkg) {
 const REACT_APP = /^(REACT_APP_|TIGER_)/i;
 const whitelists = ['BASE_NAME'];
 
-function getClientEnvironment(publicUrl) {
+function getClientEnvironment(envRaw) {
     const raw = Object.keys(process.env)
         .filter(key => REACT_APP.test(key) || whitelists.includes(key))
         .reduce(
             (env, key) => {
                 env[key] = process.env[key];
+
                 return env;
             },
             {
                 NODE_ENV: process.env.NODE_ENV || 'development',
-                PUBLIC_URL: publicUrl
+                ...envRaw
             }
         );
     // Stringify all values so we can feed into Webpack DefinePlugin
     const stringified = {
         'process.env': Object.keys(raw).reduce((env, key) => {
             env[key] = JSON.stringify(raw[key]);
+
             return env;
         }, {})
     };

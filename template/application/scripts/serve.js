@@ -24,10 +24,6 @@ const history = require('connect-history-api-fallback');
 const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
 
-const useNodeBuild = false; // paths.appNodeBuild;
-
-const app = useNodeBuild && require(path.join(paths.appNodeBuild, 'index.js')).default;
-
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
 const spinner = ora('正在启动服务器...').start();
@@ -47,51 +43,56 @@ checkBrowsers(paths.root, isInteractive)
         const urls = prepareUrls(protocol, HOST, port, paths.publicUrlOrPath.slice(0, -1));
 
         const server = express();
+        const createStatic = basename =>
+            server.use(
+                basename,
+                express.static(paths.appBuild, {
+                    index: paths.useNodeEnv ? false : 'index.html',
+                    setHeaders(res) {
+                        res.set('Access-Control-Allow-Origin', '*');
+                        res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, HEAD, DELETE, FETCH');
+                    }
+                })
+            );
 
-        if (useNodeBuild) {
+        if (paths.useNodeEnv) {
+            createStatic('/');
+
+            if (!paths.publicUrlOrPath.startsWith('http') && paths.publicUrlOrPath !== '/') {
+                createStatic(paths.publicUrlOrPath);
+            }
+
             server.use(async (request, response, next) => {
                 try {
-                    await app(request, response, next);
+                    let entryName = (request.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
+                    let htmlEntryFile = path.join(paths.appNodeBuild, entryName + '.html');
+
+                    if (!paths.pageEntries.includes(entryName)) {
+                        htmlEntryFile = path.join(paths.appNodeBuild, path.basename(paths.appHtml));
+                    }
+
+                    const { default: app } = require(path.join(
+                        paths.appNodeBuild,
+                        ((paths.nodeEntries[entryName] && entryName) ||
+                            (paths.nodeEntries.index && 'index') ||
+                            Object.keys(paths.nodeEntries)[0]) + '.js'
+                    ));
+
+                    await app(htmlEntryFile, request, response);
                 } catch (error) {
+                    spinner.fail(chalk.red('服务器有异常！\n'));
                     next(error);
                 }
             });
         } else {
-            server.use(
-                history({
-                    rewrites:
-                        paths.publicUrlOrPath !== '/' && paths.publicUrlOrPath.startsWith('/')
-                            ? [
-                                  {
-                                      from: new RegExp('^' + paths.publicUrlOrPath + '(.+)'),
-                                      to: function(context) {
-                                          const file = context.parsedUrl.pathname.replace(
-                                              new RegExp('^' + paths.publicUrlOrPath.slice(0, -1)),
-                                              ''
-                                          );
+            server.use(history());
 
-                                          if (fs.existsSync(path.join(paths.appBuild, file))) {
-                                              return file;
-                                          }
+            createStatic('/');
 
-                                          return '/';
-                                      }
-                                  }
-                              ]
-                            : undefined
-                })
-            );
+            if (!paths.publicUrlOrPath.startsWith('http') && paths.publicUrlOrPath !== '/') {
+                createStatic(paths.publicUrlOrPath);
+            }
         }
-
-        server.use(
-            express.static(paths.appBuild, {
-                index: useNodeBuild ? false : 'index.html',
-                setHeaders(res) {
-                    res.set('Access-Control-Allow-Origin', '*');
-                    res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, HEAD, DELETE, FETCH');
-                }
-            })
-        );
 
         server.listen(port, HOST, err => {
             if (err) {

@@ -28,13 +28,17 @@ function resolveApp(...relativePaths) {
     return path.resolve(appDirectory, ...relativePaths);
 }
 
-let useNodeEnv = false;
-const jsEntries = {};
+const webJSEntries = {};
+const nodeJSEntries = {};
 
 glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function(file) {
     const basename = path.basename(file).replace(/(\.web|\.node)?\.[jt]sx?$/, '');
 
-    jsEntries[basename] = file;
+    if (/\.node\.[jt]sx?$/.test(file)) {
+        nodeJSEntries[basename] = file;
+    } else {
+        webJSEntries[basename] = file;
+    }
 });
 
 const htmlEntries = glob.sync(resolveApp('public/!(_)*.html')).map(function(file) {
@@ -59,16 +63,18 @@ const moduleAlias = Object.assign(
     })
 );
 
+const useNodeEnv = process.env.SSR !== 'false' && Object.keys(nodeJSEntries).length > 0;
 const appBuildName = process.env.BUILD_DIR || (isDev ? 'buildDev' : 'build');
 
 module.exports = {
     dotenv: resolveApp('.env'),
     root: resolveApp(''),
-    appBuild: resolveApp(appBuildName, useNodeEnv ? 'web' : ''),
+    appBuild: resolveApp(appBuildName),
     appNodeBuild: resolveApp(appBuildName, 'node'),
     appPublic: resolveApp('public'),
-    appHtml: resolveApp('public/' + htmlEntries[0] + '.html'),
-    appIndexJs: Object.values(jsEntries)[0],
+    appHtml: resolveApp('public/' + (htmlEntries.includes('index') ? 'index' : htmlEntries[0]) + '.html'),
+    appIndexJs: webJSEntries.index || Object.values(webJSEntries)[0],
+    appNodeIndexJs: nodeJSEntries.index || Object.values(nodeJSEntries)[0],
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('app'),
     appTsConfig: resolveApp('tsconfig.json'),
@@ -84,7 +90,8 @@ module.exports = {
     webModuleFileExtensions,
     nodeModuleFileExtensions,
     moduleAlias,
-    entries: jsEntries,
+    entries: webJSEntries,
+    nodeEntries: nodeJSEntries,
     pageEntries: htmlEntries,
     // 一些命令检测
     serve: hasInstall('serve'),

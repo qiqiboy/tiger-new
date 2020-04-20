@@ -14,6 +14,8 @@ const paths = require('./paths');
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
+const Module = require('module');
+const tmp = require('tmp');
 const pkg = require(paths.appPackageJson);
 
 const isInteractive = process.stdout.isTTY;
@@ -86,29 +88,32 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
         spinner.text = chalk.cyan('重新编译...');
     });
 
+    const firstCompiler = compiler.compilers[0];
     let isFirstCompile = true;
     let tsMessagesPromise;
     let tsMessagesResolver;
 
-    compiler.hooks.beforeCompile.tap('beforeCompile', () => {
+    firstCompiler.hooks.beforeCompile.tap('beforeCompile', () => {
         tsMessagesPromise = new Promise(resolve => {
             tsMessagesResolver = msgs => resolve(msgs);
         });
     });
 
-    forkTsCheckerWebpackPlugin.getCompilerHooks(compiler).receive.tap('afterTypeScriptCheck', (diagnostics, lints) => {
-        const allMsgs = [...diagnostics, ...lints];
-        const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
+    forkTsCheckerWebpackPlugin
+        .getCompilerHooks(firstCompiler)
+        .receive.tap('afterTypeScriptCheck', (diagnostics, lints) => {
+            const allMsgs = [...diagnostics, ...lints];
+            const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
 
-        tsMessagesResolver({
-            errors: allMsgs.filter(msg => msg.severity === 'error').map(format),
-            warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
+            tsMessagesResolver({
+                errors: allMsgs.filter(msg => msg.severity === 'error').map(format),
+                warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
+            });
         });
-    });
 
     // "done" event fires when Webpack has finished recompiling the bundle.
     // Whether or not you have warnings or errors, you will get this event.
-    compiler.hooks.done.tap('done', async stats => {
+    compiler.hooks.done.tap('done', async ({ stats: [stats] }) => {
         if (isInteractive) {
             clearConsole();
         }
@@ -269,7 +274,25 @@ function getHttpsConfig() {
     return isHttps;
 }
 
-function createDevServerConfig(proxy, allowedHost) {
+const sourceMaps = {};
+
+function registerSourceMap(filename, map) {
+    sourceMaps[filename] = map;
+}
+
+require('source-map-support').install({
+    retrieveSourceMap: filename => {
+        let map = sourceMaps[filename + '.map'];
+
+        return (
+            map && {
+                map: JSON.parse(map)
+            }
+        );
+    }
+});
+
+function createDevServerConfig(proxy, allowedHost, spinner) {
     return {
         headers: {
             'Access-Control-Allow-Origin': '*',
@@ -293,14 +316,25 @@ function createDevServerConfig(proxy, allowedHost) {
         https: getHttpsConfig(),
         host: process.env.HOST || '0.0.0.0',
         overlay: false,
-        historyApiFallback: pkg.noRewrite
-            ? false
-            : {
-                  disableDotRule: true,
-                  index: paths.publicUrlOrPath
-              },
+        historyApiFallback:
+            pkg.noRewrite || paths.useNodeEnv
+                ? false
+                : {
+                      disableDotRule: true,
+                      index: paths.publicUrlOrPath
+                  },
         public: allowedHost,
         proxy,
+        ...(paths.useNodeEnv
+            ? {
+                  index: '',
+                  serveIndex: false,
+                  serverSideRender: true,
+                  staticOptions: {
+                      index: false
+                  }
+              }
+            : {}),
         before(app, server) {
             app.use(evalSourceMapMiddleware(server));
             app.use(errorOverlayMiddleware());
@@ -312,6 +346,10 @@ function createDevServerConfig(proxy, allowedHost) {
         after(app) {
             app.use(redirectServedPath(paths.publicUrlOrPath));
             app.use(noopServiceWorkerMiddleware(paths.publicUrlOrPath));
+
+            if (paths.useNodeEnv) {
+                app.use(devRendererMiddleware(paths.appNodeBuild, registerSourceMap, spinner));
+            }
         }
     };
 }
@@ -446,12 +484,199 @@ function printBuildError(err) {
 }
 
 function printServeCommand() {
-    const usedEnvs = ['NODE_ENV', 'BUILD_DIR', 'BASE_NAME', 'PUBLIC_URL'].filter(name => Boolean(process.env[name]));
+    const usedEnvs = ['SSR', 'NODE_ENV', 'BUILD_DIR', 'BASE_NAME', 'PUBLIC_URL'].filter(name =>
+        Boolean(process.env[name])
+    );
 
     console.log(
         (usedEnvs.length ? usedEnvs.map(name => name + '=' + process.env[name]).join(' ') + ' ' : '') +
             chalk.cyan('npm run serve')
     );
+}
+
+function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
+    Object.keys(console).forEach(name => {
+        const native = console[name];
+
+        console[name] = (...args) => {
+            spinner.clear();
+            native(...args);
+            spinner.render().start();
+        };
+    });
+
+    function renderError(res, template, error) {
+        res.status(500);
+        res.send(template);
+
+        clearConsole();
+        console.log();
+        spinner.fail(chalk.red('服务端渲染出现了异常:'));
+        console.log();
+        console.error(error);
+    }
+
+    return (req, res, next) => {
+        let cache = {};
+        let { webpackStats, fs: memoryFs } = res.locals;
+        let entryName = (req.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
+        let htmlEntryFile = path.join(nodeBuildPath, entryName + '.html');
+
+        if (!paths.pageEntries.includes(entryName)) {
+            htmlEntryFile = path.join(nodeBuildPath, path.basename(paths.appHtml));
+        }
+
+        let indexHtmlTemplate = memoryFs.readFileSync(htmlEntryFile, 'utf8');
+        let { name: indexPathname, fd } = tmp.fileSync();
+
+        fs.writeSync(fd, indexHtmlTemplate, 0, 'utf8');
+
+        let cleanup = () => {
+            clearMemotyReuqireCache(cache);
+            fs.close(fd);
+        };
+
+        let handleError = (error = 'Unknown Error') => {
+            try {
+                // Handle any errors by injecting the stack trace into the rendered
+                // HTML.
+                if (error && typeof error !== 'string') {
+                    let indexHtml = indexHtmlTemplate
+                        .replace(/%\w+%/g, '')
+                        .replace(
+                            '<body>',
+                            '<body><pre style="position: relative; z-index: 999999; border: 2px red solid; margin: 1rem; padding: 1rem;">' +
+                                error.stack +
+                                '</pre>'
+                        );
+
+                    renderError(res, indexHtml, error);
+                } else {
+                    next(error);
+                }
+            } finally {
+                cleanup();
+            }
+        };
+
+        try {
+            let stats = webpackStats.toJson({
+                all: false,
+                assets: true,
+                entrypoints: true
+            });
+            const node = stats.children[1];
+            const nodeEntrypoints = (
+                node.entrypoints[entryName] ||
+                node.entrypoints.index ||
+                node.entrypoints[Object.keys(paths.nodeEntries)[0]]
+            ).assets
+                .filter(asset => /\.js$/.test(asset))
+                .map(asset => path.join(nodeBuildPath, asset));
+
+            // Find any source map files, and pass them to the calling app so that
+            // it can transform any error stack traces appropriately.
+            for (let { name } of node.assets) {
+                let pathname = path.join(nodeBuildPath, name);
+
+                if (/\.map$/.test(pathname) && memoryFs.existsSync(pathname)) {
+                    registerSourceMap(pathname, memoryFs.readFileSync(pathname, 'utf8'));
+                }
+            }
+
+            let { default: app } = requireFromFS(nodeEntrypoints[0], memoryFs, cache);
+
+            let maybePromise = app(indexPathname, req, res);
+
+            if (maybePromise && maybePromise.then) {
+                maybePromise.then(cleanup, handleError);
+            } else {
+                cleanup();
+            }
+        } catch (error) {
+            handleError(error);
+        }
+    };
+}
+
+// Stubs the `require()` function within any evaluated code, so that entire
+// bundles can be loaded from a memory FS like the one passed in by Webpack.
+//
+// Based on require-from-string
+// MIT License, Copyright (c) Vsevolod Strukchinsky
+// https://github.com/floatdrop/require-from-string/blob/d1575a49065eb7a49b86b4de963f04f1a14dfd60/index.js
+function requireFromFS(absoluteFilename, fs, cache = {}) {
+    if (typeof absoluteFilename !== 'string') {
+        throw new Error('[requireFromFS] filename must be a string, not ' + typeof absoluteFilename);
+    }
+
+    let cached = cache[absoluteFilename];
+
+    if (cached) {
+        return cached.exports;
+    }
+
+    let moduleDirname = path.dirname(absoluteFilename);
+    let moduleExtension = path.extname(absoluteFilename);
+    let code = fs.readFileSync(absoluteFilename, 'utf8');
+
+    if (typeof code !== 'string') {
+        throw new Error('[requireFromFS] code must be a string, not ' + typeof code);
+    }
+
+    if (moduleExtension === '.json') {
+        code = 'module.exports = ' + code;
+    }
+
+    let paths = Module._nodeModulePaths(moduleDirname);
+    let parent = module.parent;
+    let m = new Module(absoluteFilename, parent);
+
+    m.filename = absoluteFilename;
+
+    m.require = filename => {
+        if (filename[0] === '.') {
+            let resolvedFilename = m.require.resolve(filename);
+
+            return requireFromFS(resolvedFilename, fs, cache);
+        }
+
+        return require(filename);
+    };
+
+    m.require.resolve = filename => {
+        if (filename[0] === '.') {
+            let resolvedFilename = path.resolve(moduleDirname, filename);
+
+            if (fs.existsSync(resolvedFilename)) {
+                return resolvedFilename;
+            }
+
+            throw new Error(`Cannot find module '${filename}'`);
+        } else {
+            return require.resolve(filename);
+        }
+    };
+
+    m.paths = paths;
+    m._compile(code, absoluteFilename);
+    cache[absoluteFilename] = m;
+    require.cache[absoluteFilename] = m;
+
+    if (parent && parent.children) {
+        parent.children.splice(parent.children.indexOf(m), 1);
+    }
+
+    return m.exports;
+}
+
+function clearMemotyReuqireCache(cache) {
+    let keys = Object.keys(cache);
+
+    for (let key of keys) {
+        delete cache[key];
+        delete require.cache[key];
+    }
 }
 
 module.exports = {

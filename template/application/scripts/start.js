@@ -59,6 +59,7 @@ checkMissDependencies(spinner).then(() => {
             }
 
             const config = configFactory('development');
+            const nodeConfig = configFactory('development', 'node');
             const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
             const appName = pkg.name;
             const tscCompileOnError = process.env.TSC_COMPILE_ON_ERROR === 'true';
@@ -69,7 +70,7 @@ checkMissDependencies(spinner).then(() => {
             };
             const compiler = createCompiler({
                 appName,
-                config,
+                config: paths.useNodeEnv ? [config, nodeConfig] : [config],
                 devSocket,
                 urls,
                 tscCompileOnError,
@@ -78,7 +79,7 @@ checkMissDependencies(spinner).then(() => {
             });
             const proxySetting = require(paths.appPackageJson).proxy;
             const proxyConfig = prepareProxy(proxySetting, paths.appPublic, paths.publicUrlOrPath);
-            const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig);
+            const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig, spinner);
             const devServer = new WebpackDevServer(compiler, serverConfig);
 
             devServer.listen(port, HOST, err => {

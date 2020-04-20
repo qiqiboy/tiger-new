@@ -14,6 +14,7 @@ const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
 const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
+const nodeExternals = require('webpack-node-externals');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const paths = require('./paths');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
@@ -44,10 +45,12 @@ const lessRegex = /\.less$/;
 const lessModuleRegex = /\.module\.less$/;
 
 // This is the production and development configuration.
-module.exports = function(webpackEnv) {
+module.exports = function(webpackEnv, executionEnv = 'web') {
     const isEnvDevelopment = webpackEnv === 'development';
     const isEnvProduction = webpackEnv === 'production';
     const isEnvProductionProfile = isEnvProduction && process.argv.includes('--profile');
+    const isEnvNode = paths.useNodeEnv && executionEnv === 'node';
+    const isEnvWeb = !isEnvNode;
 
     const shouldUseSourceMap = isEnvProduction
         ? process.env.GENERATE_SOURCEMAP === 'true'
@@ -55,11 +58,16 @@ module.exports = function(webpackEnv) {
     const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
     const shouldUseSW = !!pkg.pwa;
 
-    const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
+    const env = getClientEnvironment({
+        PUBLIC_URL: paths.publicUrlOrPath.slice(0, -1),
+        RUNTIME: executionEnv
+    });
 
     const getStyleLoaders = (cssOptions, preProcessor) => {
         const loaders = [
-            isEnvProduction || isBuilding
+            isEnvNode
+                ? require.resolve('null-loader')
+                : isBuilding
                 ? {
                       loader: MiniCssExtractPlugin.loader,
                       options: {
@@ -115,72 +123,85 @@ module.exports = function(webpackEnv) {
     const matchScriptStylePattern = /<\!--\s*script:\s*([\w]+)(?:\.[jt]sx?)?\s*-->/g;
     const htmlInjects = [];
 
-    paths.pageEntries.forEach(function(name) {
-        const chunks = ['_vendor_'];
-        const file = path.resolve(paths.appPublic, name + '.html');
+    if (isEnvWeb) {
+        paths.pageEntries.forEach(function(name) {
+            const chunks = ['_vendor_'];
+            const file = path.resolve(paths.appPublic, name + '.html');
 
-        if (paths.entries[name]) {
-            chunks.push(name);
-        }
+            if (paths.entries[name]) {
+                chunks.push(name);
+            }
 
-        const contents = fs.readFileSync(file);
-        let matches;
+            const contents = fs.readFileSync(file);
+            let matches;
 
-        while ((matches = matchScriptStylePattern.exec(contents))) {
-            chunks.push(matches[1]);
-        }
+            while ((matches = matchScriptStylePattern.exec(contents))) {
+                chunks.push(matches[1]);
+            }
 
-        htmlInjects.push(
-            new HtmlWebpackPlugin(
-                Object.assign(
-                    {
-                        chunks: chunks,
-                        filename: name + '.html',
-                        template: file,
-                        inject: true,
-                        chunksSortMode: 'manual'
-                    },
-                    isEnvProduction
-                        ? {
-                              minify: {
-                                  removeComments: true,
-                                  collapseWhitespace: true,
-                                  removeRedundantAttributes: true,
-                                  useShortDoctype: true,
-                                  removeEmptyAttributes: true,
-                                  removeStyleLinkTypeAttributes: true,
-                                  keepClosingSlash: true,
-                                  minifyJS: true,
-                                  minifyCSS: true,
-                                  minifyURLs: true
+            const createHtmlWebpaclPlugin = function(filename) {
+                return new HtmlWebpackPlugin(
+                    Object.assign(
+                        {
+                            chunks: chunks,
+                            filename,
+                            template: file,
+                            inject: true,
+                            chunksSortMode: 'manual'
+                        },
+                        isEnvProduction
+                            ? {
+                                  minify: {
+                                      removeComments: true,
+                                      collapseWhitespace: true,
+                                      removeRedundantAttributes: true,
+                                      useShortDoctype: true,
+                                      removeEmptyAttributes: true,
+                                      removeStyleLinkTypeAttributes: true,
+                                      keepClosingSlash: true,
+                                      minifyJS: true,
+                                      minifyCSS: true,
+                                      minifyURLs: true
+                                  }
                               }
-                          }
-                        : undefined
-                )
-            )
-        );
-    });
+                            : undefined
+                    )
+                );
+            };
+
+            htmlInjects.push(createHtmlWebpaclPlugin(name + '.html'));
+            htmlInjects.push(createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html')));
+        });
+    }
 
     return {
         mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
         bail: isEnvProduction,
         devtool: shouldUseSourceMap ? (isEnvProduction ? 'hidden-source-map' : 'cheap-module-source-map') : false,
-        entry: Object.assign(
-            {
-                _vendor_: [
-                    require.resolve('./polyfills'),
-                    !isBuilding && isEnvDevelopment && require.resolve('react-dev-utils/webpackHotDevClient'),
-                    !isBuilding && isEnvDevelopment && 'react-hot-loader/patch'
-                ]
-                    .concat(pkg.vendor || [])
-                    .filter(Boolean)
-            },
-            paths.entries
-        ),
+        entry: isEnvNode
+            ? paths.nodeEntries
+            : Object.assign(
+                  {
+                      _vendor_: [
+                          isEnvWeb && require.resolve('./polyfills'),
+                          isEnvWeb && !isBuilding && require.resolve('react-dev-utils/webpackHotDevClient'),
+                          isEnvWeb && !isBuilding && 'react-hot-loader/patch'
+                      ]
+                          .concat(pkg.vendor || [])
+                          .filter(Boolean)
+                  },
+                  paths.entries
+              ),
+        target: isEnvWeb ? 'web' : 'node',
         output: {
-            path: isEnvProduction || isBuilding ? paths.appBuild : undefined,
+            libraryTarget: isEnvNode ? 'commonjs2' : undefined,
+            path: isEnvWeb ? paths.appBuild : paths.appNodeBuild,
             pathinfo: isEnvDevelopment,
-            filename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
+            filename: isEnvNode
+                ? '[name].js'
+                : isEnvProduction
+                ? 'static/js/[name].[contenthash:8].js'
+                : 'static/js/[name].[hash:8].js',
             // TODO: remove this when upgrading to webpack 5
             futureEmitAssets: true,
             chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
@@ -191,6 +212,13 @@ module.exports = function(webpackEnv) {
             jsonpFunction: `webpackJsonp${pkg.name}`,
             globalObject: 'this'
         },
+        externals: isEnvWeb
+            ? undefined
+            : [
+                  nodeExternals({
+                      whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
+                  })
+              ],
         optimization: {
             minimize: isEnvProduction,
             minimizer: [
@@ -251,11 +279,13 @@ module.exports = function(webpackEnv) {
                     }
                 }
             },
-            runtimeChunk: 'single'
+            runtimeChunk: isEnvWeb ? 'single' : false
         },
         resolve: {
             modules: ['node_modules', paths.appNodeModules, paths.root].concat(paths.nodePaths),
-            extensions: paths.webModuleFileExtensions.map(ext => `.${ext}`),
+            extensions: (isEnvWeb ? paths.webModuleFileExtensions : paths.nodeModuleFileExtensions).map(
+                ext => `.${ext}`
+            ),
             alias: {
                 'react-native': 'react-native-web',
                 ...(isEnvProductionProfile && {
@@ -323,7 +353,7 @@ module.exports = function(webpackEnv) {
                                             }
                                         }
                                     ],
-                                    isEnvDevelopment && !isBuilding && 'react-hot-loader/babel' // ensure react-hot-loader is disabled
+                                    !isBuilding && 'react-hot-loader/babel' // ensure react-hot-loader is disabled
                                 ].filter(Boolean),
                                 cacheDirectory: true,
                                 cacheCompression: false,
@@ -431,9 +461,9 @@ module.exports = function(webpackEnv) {
             new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
             new ModuleNotFoundPlugin(paths.root),
             new webpack.EnvironmentPlugin(env.raw),
-            isEnvDevelopment && !isBuilding && new webpack.HotModuleReplacementPlugin(),
-            isEnvDevelopment && new CaseSensitivePathsPlugin(),
-            isEnvDevelopment && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+            !isBuilding && new webpack.HotModuleReplacementPlugin(),
+            !isBuilding && new CaseSensitivePathsPlugin(),
+            !isBuilding && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
             isEnvProduction &&
                 new ImageminPlugin({
                     cacheFolder: path.resolve(paths.appNodeModules, '.cache/imagemin'),
@@ -441,7 +471,7 @@ module.exports = function(webpackEnv) {
                         // quality: '95-100'
                     }
                 }),
-            (isBuilding || isEnvProduction) &&
+            isBuilding &&
                 new MiniCssExtractPlugin({
                     filename: isEnvProduction
                         ? 'static/css/[name].[contenthash:8].css'
@@ -453,6 +483,7 @@ module.exports = function(webpackEnv) {
                 contextRegExp: /moment$/
             }),
             isEnvProduction &&
+                isEnvWeb &&
                 shouldUseSW &&
                 new SWPrecacheWebpackPlugin({
                     cacheId: pkg.name,

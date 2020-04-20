@@ -45,6 +45,7 @@ const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
 const config = configFactory(useDevConfig ? 'development' : 'production');
+const nodeConfig = configFactory(useDevConfig ? 'development' : 'production', 'node');
 
 checkBrowsers(paths.root, isInteractive).then(() => {
     return checkMissDependencies(spinner)
@@ -95,7 +96,7 @@ checkBrowsers(paths.root, isInteractive).then(() => {
             console.log();
 
             printFileSizesAfterBuild(
-                stats,
+                stats.stats[0],
                 previousFileSizes,
                 paths.appBuild,
                 WARN_AFTER_BUNDLE_GZIP_SIZE,
@@ -146,7 +147,7 @@ function build(previousFileSizes) {
     clearConsole();
     logProgress();
 
-    let compiler = webpack(config);
+    let compiler = webpack(paths.useNodeEnv ? [config, nodeConfig] : [config]);
 
     return new Promise((resolve, reject) => {
         compiler.run((err, stats) => {
