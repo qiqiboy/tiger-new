@@ -101,9 +101,20 @@ declare global {
     interface Window {
         __: I18nParser;
     }
+
+    // eslint-disable-next-line
+    namespace NodeJS {
+        interface Global {
+            __: I18nParser;
+        }
+    }
 }
 
-window.__ = __;
+if (typeof window !== 'undefined') {
+    window.__ = __;
+} else {
+    global.__ = __;
+}
 
 const i18n = {
     language,

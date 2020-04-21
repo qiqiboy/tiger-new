@@ -61,6 +61,7 @@
     "mini-css-extract-plugin": "0",
     "sass": "1",
     "node-xlsx": "0.15",
+    "null-loader": "4",
     "optimize-css-assets-webpack-plugin": "5",
     "ora": "4",
     "postcss-flexbugs-fixes": "4",
@@ -81,7 +82,8 @@
     "terser-webpack-plugin": "2",
     "typescript": "3.8",
     "webpack": "4",
-    "webpack-dev-server": "3"
+    "webpack-dev-server": "3",
+    "webpack-node-externals": "1"
   },
   "dependencies": {
     "@loadable/component": "5",

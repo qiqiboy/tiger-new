@@ -77,7 +77,7 @@ checkMissDependencies(spinner).then(() => {
                 webpack,
                 spinner
             });
-            const proxySetting = require(paths.appPackageJson).proxy;
+            const proxySetting = process.env.PROXY || pkg.proxy;
             const proxyConfig = prepareProxy(proxySetting, paths.appPublic, paths.publicUrlOrPath);
             const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig, spinner);
             const devServer = new WebpackDevServer(compiler, serverConfig);

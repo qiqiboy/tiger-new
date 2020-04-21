@@ -152,6 +152,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         isEnvProduction
                             ? {
                                   minify: {
+                                      ignoreCustomComments: [/^\s+(your\shtml|root)\s+$/],
                                       removeComments: true,
                                       collapseWhitespace: true,
                                       removeRedundantAttributes: true,
@@ -265,19 +266,21 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             splitChunks: {
                 chunks: 'async',
                 name: false,
-                cacheGroups: {
-                    vendors: {
-                        chunks: 'all',
-                        test: '_vendor_',
-                        name: 'vendor'
-                    },
-                    i18n: {
-                        chunks: 'all',
-                        test: /utils\/i18n|locals\/\w+\.json/,
-                        enforce: true,
-                        name: 'i18n'
-                    }
-                }
+                cacheGroups: isEnvWeb
+                    ? {
+                          vendors: {
+                              chunks: 'all',
+                              test: '_vendor_',
+                              name: 'vendor'
+                          },
+                          i18n: {
+                              chunks: 'all',
+                              test: /utils\/i18n|locals\/\w+\.json/,
+                              enforce: true,
+                              name: 'i18n'
+                          }
+                      }
+                    : {}
             },
             runtimeChunk: isEnvWeb ? 'single' : false
         },

@@ -48,7 +48,7 @@ export default {
         return URL.format(base);
     },
     current(url?: string): UrlWithParsedQuery {
-        return URL.parse(url || window.location.href, true);
+        return URL.parse(url || (typeof window !== 'undefined' ? window.location.href : ''), true);
     },
     // 以下方法参考：http://nodejs.cn/api/url.html#url_legacy_url_api
     parse: URL.parse,

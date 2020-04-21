@@ -40,7 +40,7 @@ function choosePort(host, defaultPort, spinner) {
                         chalk.yellow(defaultPort) +
                         '）被占用，可能的程序是： \n  ' +
                         existingProcess +
-                        '\n' +
+                        '\n\n' +
                         '  要换一个端口运行本程序吗？',
                     default: true
                 };
@@ -48,6 +48,8 @@ function choosePort(host, defaultPort, spinner) {
                 inquirer.prompt(question).then(answer => {
                     if (answer.shouldChangePort) {
                         resolve(port);
+                        console.log();
+
                         spinner.start();
                     } else {
                         resolve(null);
@@ -385,18 +387,12 @@ function onProxyError(proxy) {
     };
 }
 
-function mayProxy(pathname) {
-    const maybePublicPath = path.resolve(paths.appPublic, pathname.slice(1));
-
-    return !fs.existsSync(maybePublicPath);
-}
-
-function prepareProxy(proxy) {
+function prepareProxy(proxy, appPublicFolder, servedPathname) {
     if (!proxy) {
         return undefined;
     }
 
-    if (typeof proxy === 'object') {
+    if (typeof proxy !== 'string') {
         return Object.keys(proxy).map(function(path) {
             const opt =
                 typeof proxy[path] === 'object'
@@ -406,18 +402,38 @@ function prepareProxy(proxy) {
                       };
             const target = opt.target;
 
-            return Object.assign({}, opt, {
-                context: function(pathname) {
-                    return mayProxy(pathname) && pathname.match(path);
+            return Object.assign(
+                {
+                    logLevel: 'silent'
                 },
-                onProxyReq: proxyReq => {
-                    if (proxyReq.getHeader('origin')) {
-                        proxyReq.setHeader('origin', target);
-                    }
-                },
-                onError: onProxyError(target)
-            });
+                opt,
+                {
+                    context: function(pathname, req) {
+                        return (
+                            req.method !== 'GET' ||
+                            (mayProxy(pathname) && req.headers.accept && req.headers.accept.indexOf('text/html') === -1)
+                        );
+                    },
+                    onProxyReq: proxyReq => {
+                        if (proxyReq.getHeader('origin')) {
+                            proxyReq.setHeader('origin', target);
+                        }
+                    },
+                    onError: onProxyError(target),
+                    secure: false,
+                    changeOrigin: true,
+                    ws: true,
+                    xfwd: true
+                }
+            );
         });
+    }
+
+    function mayProxy(pathname) {
+        const maybePublicPath = path.resolve(appPublicFolder, pathname.replace(new RegExp('^' + servedPathname), ''));
+        const isPublicFileRequest = fs.existsSync(maybePublicPath);
+
+        return !isPublicFileRequest;
     }
 
     if (!/^http(s)?:\/\//.test(proxy)) {
@@ -566,12 +582,13 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
                 entrypoints: true
             });
             const node = stats.children[1];
-            const nodeEntrypoints = (
-                node.entrypoints[entryName] ||
-                node.entrypoints.index ||
-                node.entrypoints[Object.keys(paths.nodeEntries)[0]]
-            ).assets
-                .filter(asset => /\.js$/.test(asset))
+            const jsEntryName = node.entrypoints[entryName]
+                ? entryName
+                : node.entrypoints.index
+                ? 'index'
+                : Object.keys(paths.nodeEntries)[0];
+            const nodeEntrypoints = node.entrypoints[jsEntryName].assets
+                .filter(asset => new RegExp(`${jsEntryName}\\.js$`).test(asset))
                 .map(asset => path.join(nodeBuildPath, asset));
 
             // Find any source map files, and pass them to the calling app so that

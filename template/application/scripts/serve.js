@@ -12,7 +12,6 @@ process.on('unhandledRejection', err => {
 
 const chalk = require('chalk');
 const path = require('path');
-const fs = require('fs');
 const express = require('express');
 const ora = require('ora');
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
@@ -51,17 +50,22 @@ checkBrowsers(paths.root, isInteractive)
                     setHeaders(res) {
                         res.set('Access-Control-Allow-Origin', '*');
                         res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, HEAD, DELETE, FETCH');
-                    }
+                    },
+                    fallthrough: true
                 })
             );
 
+        if (!paths.useNodeEnv) {
+            server.use(history());
+        }
+
+        createStatic('/');
+
+        if (paths.publicUrlOrPath.startsWith('/') && paths.publicUrlOrPath !== '/') {
+            createStatic(paths.publicUrlOrPath);
+        }
+
         if (paths.useNodeEnv) {
-            createStatic('/');
-
-            if (!paths.publicUrlOrPath.startsWith('http') && paths.publicUrlOrPath !== '/') {
-                createStatic(paths.publicUrlOrPath);
-            }
-
             server.use(async (request, response, next) => {
                 try {
                     let entryName = (request.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
@@ -84,14 +88,6 @@ checkBrowsers(paths.root, isInteractive)
                     next(error);
                 }
             });
-        } else {
-            server.use(history());
-
-            createStatic('/');
-
-            if (!paths.publicUrlOrPath.startsWith('http') && paths.publicUrlOrPath !== '/') {
-                createStatic(paths.publicUrlOrPath);
-            }
         }
 
         server.listen(port, HOST, err => {
