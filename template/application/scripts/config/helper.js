@@ -561,7 +561,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
                         .replace(/%\w+%/g, '')
                         .replace(
                             '<body>',
-                            '<body><pre style="position: relative; z-index: 999999; border: 2px red solid; margin: 1rem; padding: 1rem;">' +
+                            '<body><pre style="position: relative; z-index: 999999; background: #fff; border: 2px red solid, 1rem solid #fff; margin: 0; padding: 1rem;">' +
                                 error.stack +
                                 '</pre>'
                         );

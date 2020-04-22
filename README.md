@@ -86,6 +86,10 @@
 -   `TSC_COMPILE_ON_ERROR` 开发时允许 ts 编译器错误
 -   `TIGER_*` 任意的以`TIGER_`开头的变量。**该变量也会传递给 webpack 构建，所以你可以在项目代码中访问该变量：`process.env.TIGER_*`**
 
+以上环境变量，你可以在运行相关命令时指定，也可以通过项目根目录下的`.env` `.env.production` `.env.developement` `.env.local` `.env.production.local` `.env.developement.local` 等文件配置。
+
+但是，请注意，默认以`.local`结尾的环境变量文件，是不包含在项目 git 仓库中的。
+
 **支持的运行命令**
 
 -   `npm start` 启动本地开发服务

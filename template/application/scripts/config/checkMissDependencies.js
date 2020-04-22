@@ -47,6 +47,7 @@ async function checkMissDeps(spinner) {
             });
 
             spinner.succeed(chalk.green('项目依赖已更新'));
+            console.log();
             spinner.start();
         } else {
             spinner.warn(chalk.yellow('你需要按照下面命令操作后才能继续：'));

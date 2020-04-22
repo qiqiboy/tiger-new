@@ -211,13 +211,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 ? info => path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/')
                 : info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
             jsonpFunction: `webpackJsonp${pkg.name}`,
-            globalObject: 'this'
+            globalObject: isEnvWeb ? 'this' : 'global'
         },
         externals: isEnvWeb
             ? undefined
             : [
                   nodeExternals({
-                      whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
+                      whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i, /^(?!components\/)/]
                   })
               ],
         optimization: {
