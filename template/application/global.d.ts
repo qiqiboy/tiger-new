@@ -13,6 +13,13 @@ declare module '*.scss';
 declare module '*.less';
 
 /**
+ * _DEV_: process.env.NODE_ENV === 'development'
+ * _SSR_: is enable ssr
+ */
+declare const _DEV_: boolean;
+declare const _SSR_: boolean;
+
+/**
  * .svg with SVGR feature
  */
 declare module '*.svg' {
@@ -27,8 +34,8 @@ declare module '*.svg' {
  */
 declare namespace NodeJS {
     interface ProcessEnv {
-        readonly RUNTIME: 'web' | 'node',
         readonly NODE_ENV: 'development' | 'production' | 'test';
+        readonly RUNTIME: 'web' | 'node',
         readonly BASE_NAME: string;
         readonly PUBLIC_URL: string;
     }

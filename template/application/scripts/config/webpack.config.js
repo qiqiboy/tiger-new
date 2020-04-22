@@ -176,7 +176,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     }
 
     return {
-        mode: isEnvProduction ? 'production' : isEnvDevelopment && 'development',
+        mode: isEnvProduction ? 'production' : 'development',
         bail: isEnvProduction,
         devtool: shouldUseSourceMap ? (isEnvProduction ? 'hidden-source-map' : 'cheap-module-source-map') : false,
         entry: isEnvNode
@@ -184,9 +184,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             : Object.assign(
                   {
                       _vendor_: [
-                          isEnvWeb && require.resolve('./polyfills'),
-                          isEnvWeb && !isBuilding && require.resolve('react-dev-utils/webpackHotDevClient'),
-                          isEnvWeb && !isBuilding && 'react-hot-loader/patch'
+                          require.resolve('./polyfills'),
+                          !isBuilding && require.resolve('react-dev-utils/webpackHotDevClient'),
+                          !isBuilding && 'react-hot-loader/patch'
                       ]
                           .concat(pkg.vendor || [])
                           .filter(Boolean)
@@ -217,7 +217,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             ? undefined
             : [
                   nodeExternals({
-                      whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i, /^(?!components\/)/]
+                      whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
                   })
               ],
         optimization: {
@@ -464,7 +464,10 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
             new ModuleNotFoundPlugin(paths.root),
             new webpack.EnvironmentPlugin(env.raw),
-            !isBuilding && new webpack.HotModuleReplacementPlugin(),
+            new webpack.DefinePlugin({
+                _SSR_: paths.useNodeEnv,
+                _DEV_: isEnvDevelopment
+            }),
             !isBuilding && new CaseSensitivePathsPlugin(),
             !isBuilding && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
             isEnvProduction &&
