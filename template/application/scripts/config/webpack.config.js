@@ -538,7 +538,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     checkJs: false
                 },
                 silent: true,
-                formatter: isEnvProduction ? typescriptFormatter : undefined
+                formatter: isBuilding ? typescriptFormatter : undefined
             }),
             new webpack.BannerPlugin({
                 banner: '@author ' + pkg.author,
