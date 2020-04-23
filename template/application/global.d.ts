@@ -13,13 +13,6 @@ declare module '*.scss';
 declare module '*.less';
 
 /**
- * _DEV_: process.env.NODE_ENV === 'development'
- * _SSR_: is enable ssr
- */
-declare const __DEV__: boolean;
-declare const __SSR__: boolean;
-
-/**
  * .svg with SVGR feature
  */
 declare module '*.svg' {
@@ -30,14 +23,25 @@ declare module '*.svg' {
 }
 
 /**
+ * __DEV__: process.env.NODE_ENV === 'development'
+ * __SSR__: whether or not enable ssr
+ */
+declare const __DEV__: boolean;
+declare const __SSR__: boolean;
+
+/**
  * process.env.XX
  */
 declare namespace NodeJS {
     interface ProcessEnv {
         readonly NODE_ENV: 'development' | 'production' | 'test';
-        readonly RUNTIME: 'web' | 'node',
         readonly BASE_NAME: string;
         readonly PUBLIC_URL: string;
+
+        readonly RUNTIME: 'web' | 'node';
+        readonly RUNTIME_MODE: 'csr' | 'ssr';
+        readonly ENABLE_SSR: boolean;
+        readonly ENABLE_PWA: boolean;
     }
 }
 

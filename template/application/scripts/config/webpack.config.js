@@ -21,6 +21,7 @@ const htmlAttrsOptions = require('./htmlAttrsOptions');
 const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
+const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const pkg = require(paths.appPackageJson);
 
@@ -56,11 +57,14 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         ? process.env.GENERATE_SOURCEMAP === 'true'
         : process.env.GENERATE_SOURCEMAP !== 'false';
     const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
-    const shouldUseSW = !!pkg.pwa;
+    const shouldUseSW = process.env.GENERATE_SW === 'true' || !!pkg.pwa;
 
     const env = getClientEnvironment({
         PUBLIC_URL: paths.publicUrlOrPath.slice(0, -1),
-        RUNTIME: executionEnv
+        RUNTIME: executionEnv,
+        RUNTIME_MODE: isEnvNode ? 'ssr' : 'csr',
+        ENABLE_SSR: paths.useNodeEnv,
+        ENABLE_PWA: shouldUseSW
     });
 
     const getStyleLoaders = (cssOptions, preProcessor) => {
@@ -68,15 +72,15 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             isEnvNode
                 ? require.resolve('null-loader')
                 : isBuilding
-                ? {
-                      loader: MiniCssExtractPlugin.loader,
-                      options: {
-                          publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
-                          sourceMap: shouldUseSourceMap,
-                          esModule: true
+                    ? {
+                          loader: MiniCssExtractPlugin.loader,
+                          options: {
+                              publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
+                              sourceMap: shouldUseSourceMap,
+                              esModule: true
+                          }
                       }
-                  }
-                : require.resolve('style-loader'),
+                    : require.resolve('style-loader'),
             {
                 loader: require.resolve('css-loader'),
                 options: Object.assign({ sourceMap: shouldUseSourceMap }, cssOptions)
@@ -171,7 +175,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             };
 
             htmlInjects.push(createHtmlWebpaclPlugin(name + '.html'));
-            htmlInjects.push(createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html')));
+
+            paths.useNodeEnv &&
+                htmlInjects.push(createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html')));
         });
     }
 
@@ -201,8 +207,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             filename: isEnvNode
                 ? '[name].js'
                 : isEnvProduction
-                ? 'static/js/[name].[contenthash:8].js'
-                : 'static/js/[name].[hash:8].js',
+                    ? 'static/js/[name].[contenthash:8].js'
+                    : 'static/js/[name].[hash:8].js',
             // TODO: remove this when upgrading to webpack 5
             futureEmitAssets: true,
             chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
@@ -246,6 +252,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             ascii_only: true
                         }
                     },
+                    parallel: true,
+                    cache: true,
                     sourceMap: shouldUseSourceMap
                 }),
                 new OptimizeCSSAssetsPlugin({
@@ -512,11 +520,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     minify: true,
 
                     mergeStaticsConfig: true,
-                    staticFileGlobs: 'build/*.html',
-                    stripPrefix: 'build/',
+                    staticFileGlobs: path.basename(paths.appBuild) + '/*.html',
+                    stripPrefix: path.basename(paths.appBuild) + '/',
 
                     // For unknown URLs, fallback to the index page
-                    navigateFallback: paths.publicUrlOrPath + path.basename(paths.appHtml),
+                    navigateFallback:
+                        getPublicUrlOrPath(false, process.env.BASE_NAME || pkg.homepage || process.env.PUBLIC_URL) +
+                        path.basename(paths.appHtml),
                     // Ignores URLs starting from /__ (useful for Firebase):
                     // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
                     navigateFallbackWhitelist: [/^(?!\/__).*/],

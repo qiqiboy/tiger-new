@@ -99,6 +99,7 @@ checkMissDependencies(spinner).then(() => {
 
             ['SIGINT', 'SIGTERM'].forEach(function(sig) {
                 process.on(sig, function() {
+                    spinner.stop();
                     devServer.close();
                     process.exit();
                 });
@@ -114,10 +115,13 @@ checkMissDependencies(spinner).then(() => {
             }
         })
         .catch(err => {
-            if (err && err.message) {
-                console.log(err.message);
+            if (err) {
+                console.log(err.message || err);
+                console.log();
             }
 
-            process.exit(1);
+            spinner.stop();
+
+            process.kill(process.pid, 'SIGINT');
         });
 });

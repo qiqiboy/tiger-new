@@ -9,6 +9,8 @@ process.on('unhandledRejection', err => {
     }
 });
 
+require('./config/env');
+
 const chalk = require('chalk');
 const path = require('path');
 const express = require('express');
@@ -18,6 +20,7 @@ const clearConsole = require('react-dev-utils/clearConsole');
 const openBrowser = require('react-dev-utils/openBrowser');
 const { choosePort } = require('./config/helper');
 const { prepareUrls } = require('react-dev-utils/WebpackDevServerUtils');
+const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const history = require('connect-history-api-fallback');
 const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
@@ -27,6 +30,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 const spinner = ora('正在启动服务器...').start();
 
 const isInteractive = process.stdout.isTTY;
+const publicUrlOrPath = getPublicUrlOrPath(true, process.env.BASE_NAME || pkg.homepage || process.env.PUBLIC_URL);
 
 checkBrowsers(paths.root, isInteractive)
     .then(() => {
@@ -38,7 +42,7 @@ checkBrowsers(paths.root, isInteractive)
         }
 
         const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
-        const urls = prepareUrls(protocol, HOST, port, paths.publicUrlOrPath.slice(0, -1));
+        const urls = prepareUrls(protocol, HOST, port, publicUrlOrPath.slice(0, -1));
 
         const server = express();
         const createStatic = basename =>
@@ -60,7 +64,7 @@ checkBrowsers(paths.root, isInteractive)
 
         createStatic('/');
 
-        if (paths.publicUrlOrPath.startsWith('/') && paths.publicUrlOrPath !== '/') {
+        if (publicUrlOrPath.startsWith('/') && publicUrlOrPath !== '/') {
             createStatic(paths.publicUrlOrPath);
         }
 
