@@ -69,46 +69,49 @@ function dataSerializer(data: object | string) {
     return result.join('&');
 }
 
-axios.interceptors.request.use((config: AxiosRequestConfig) => {
-    if (!config.timeout) {
-        config.timeout = 60 * 1000;
-    }
+// @ts-ignore avoid duplicate interceptors
+if (axios.interceptors.response.handlers.length === 0) {
+    axios.interceptors.request.use((config: AxiosRequestConfig) => {
+        if (!config.timeout) {
+            config.timeout = 60 * 1000;
+        }
 
-    config.params = Object.assign(
-        {
-            _s: Date.now()
-        },
-        config.params
-    );
+        config.params = Object.assign(
+            {
+                _s: Date.now()
+            },
+            config.params
+        );
 
-    // 增加对表单数组提交的支持
-    if (config.useForm && (config.method === 'post' || config.method === 'put')) {
-        config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        config.transformRequest = dataSerializer;
-    }
+        // 增加对表单数组提交的支持
+        if (config.useForm && (config.method === 'post' || config.method === 'put')) {
+            config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            config.transformRequest = dataSerializer;
+        }
 
-    // 请求添加token头
-    /* if (!config.noToken) {
+        // 请求添加token头
+        /* if (!config.noToken) {
      *     config.headers.Authorization = 'Bearer YOUR_TOKEN';
      * }
      */
 
-    return config;
-});
+        return config;
+    });
 
-axios.interceptors.response.use((response: AxiosResponse) => {
-    let data = response.data;
+    axios.interceptors.response.use((response: AxiosResponse) => {
+        let data = response.data;
 
-    if (data && typeof data === 'object') {
-        if (data.is_succ === false) {
-            return createError({ response } as AxiosError);
+        if (data && typeof data === 'object') {
+            if (data.is_succ === false) {
+                return createError({ response } as AxiosError);
+            }
+
+            return data;
         }
 
-        return data;
-    }
-
-    return response;
-}, createError);
+        return response;
+    }, createError);
+}
 
 /**
  * @description 返回一个以包装后的error对象为拒绝原因的promise
@@ -120,7 +123,7 @@ function createError(responseError: AxiosError): Promise<any> {
     let error_msg!: ErrorMsg;
     let response: AxiosResponse = {} as AxiosResponse;
 
-    const pickError = function (data: IData) {
+    const pickError = function(data: IData) {
         if (data && typeof data === 'object') {
             const msg =
                 data.error_msg ||

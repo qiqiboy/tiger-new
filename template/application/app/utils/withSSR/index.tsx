@@ -56,12 +56,12 @@ function withSSR<SelfProps, More = {}>(
 
             this.state = {
                 initialProps,
-                loading: !initialProps
+                loading: routerChanged
             } as SSRState;
         }
 
         componentDidMount() {
-            if (!this.state.initialProps) {
+            if (routerChanged) {
                 this.getInitialProps();
             }
         }
