@@ -365,7 +365,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                             }
                                         }
                                     ],
-                                    !isBuilding && 'react-hot-loader/babel' // ensure react-hot-loader is disabled
+                                    !isBuilding && isEnvWeb && 'react-hot-loader/babel'
                                 ].filter(Boolean),
                                 cacheDirectory: true,
                                 cacheCompression: false,
