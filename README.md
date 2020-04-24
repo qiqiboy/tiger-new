@@ -295,6 +295,9 @@ const renderer = async (templateFile, request, response) => {
             </Switch>
         </StaticRouter>
     );
+    // %ROOT% %DATA% 为模板文件中的数据占位符
+    // <div id="root">%ROOT%</root>
+    // <script>%DATA%</script>
     let html = template
         .replace('%ROOT%', body)
         .replace('%DATA%', `var __DATA__=${initialProps ? JSON.stringify(initialProps) : 'null'}`);
@@ -347,6 +350,8 @@ export default withSSR(Home, async () => {
     };
 });
 ```
+
+以上三步配置完，即可实现`SSR`与`CSR`的同构渲染。
 
 ### 注意事项
 
