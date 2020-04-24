@@ -208,6 +208,15 @@ function upgradeAppProject(root) {
                     );
                 }
 
+                if (!fs.existsSync(path.resolve(root, 'tests/__mocks__/axios'))) {
+                    questions.push({
+                        name: 'addJestMocks',
+                        type: 'confirm',
+                        message: '是否增加jest mocks目录？',
+                        default: false
+                    });
+                }
+
                 inquirer.prompt(questions).then(answers => {
                     console.log();
 
@@ -249,7 +258,7 @@ function upgradeAppProject(root) {
                         });
                     }
 
-                    if (!fs.existsSync(path.resolve(root, 'tests/__mocks__/axios'))) {
+                    if (answers.addJestMocks) {
                         fs.copySync(
                             path.resolve(ownPath, 'template/application/tests/__mocks__/axios'),
                             path.resolve(root, 'tests/__mocks__/axios'),
