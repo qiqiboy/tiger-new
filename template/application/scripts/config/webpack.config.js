@@ -72,15 +72,15 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             isEnvNode
                 ? require.resolve('null-loader')
                 : isBuilding
-                    ? {
-                          loader: MiniCssExtractPlugin.loader,
-                          options: {
-                              publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
-                              sourceMap: shouldUseSourceMap,
-                              esModule: true
-                          }
+                ? {
+                      loader: MiniCssExtractPlugin.loader,
+                      options: {
+                          publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
+                          sourceMap: shouldUseSourceMap,
+                          esModule: true
                       }
-                    : require.resolve('style-loader'),
+                  }
+                : require.resolve('style-loader'),
             {
                 loader: require.resolve('css-loader'),
                 options: Object.assign({ sourceMap: shouldUseSourceMap }, cssOptions)
@@ -128,9 +128,10 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     const htmlInjects = [];
 
     if (isEnvWeb) {
-        paths.pageEntries.forEach(function(name) {
+        Object.keys(paths.pageEntries).forEach(function(name) {
             const chunks = ['_vendor_'];
-            const file = path.resolve(paths.appPublic, name + '.html');
+            const file = paths.pageEntries[name];
+            const nodeFile = paths.nodePageEntries[name];
 
             if (paths.entries[name]) {
                 chunks.push(name);
@@ -143,13 +144,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 chunks.push(matches[1]);
             }
 
-            const createHtmlWebpaclPlugin = function(filename) {
+            const createHtmlWebpaclPlugin = function(filename, template) {
                 return new HtmlWebpackPlugin(
                     Object.assign(
                         {
                             chunks: chunks,
                             filename,
-                            template: file,
+                            template,
                             inject: true,
                             chunksSortMode: 'manual'
                         },
@@ -174,10 +175,10 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 );
             };
 
-            htmlInjects.push(createHtmlWebpaclPlugin(name + '.html'));
+            htmlInjects.push(createHtmlWebpaclPlugin(name + '.html', file || nodeFile));
 
             paths.useNodeEnv &&
-                htmlInjects.push(createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html')));
+                htmlInjects.push(createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html'), nodeFile || file));
         });
     }
 
@@ -207,8 +208,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             filename: isEnvNode
                 ? '[name].js'
                 : isEnvProduction
-                    ? 'static/js/[name].[contenthash:8].js'
-                    : 'static/js/[name].[hash:8].js',
+                ? 'static/js/[name].[contenthash:8].js'
+                : 'static/js/[name].[hash:8].js',
             // TODO: remove this when upgrading to webpack 5
             futureEmitAssets: true,
             chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
@@ -466,7 +467,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         },
         plugins: [
             ...htmlInjects,
-            isEnvProduction &&
+            isBuilding &&
                 shouldInlineRuntimeChunk &&
                 new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime\.\w+[.]js/]),
             new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),

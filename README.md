@@ -18,6 +18,7 @@
 * [**SSR**](#ssr)
     - [开发](#开发)
     - [发布](#发布)
+    - [路由与异步数据处理](#路由与异步数据处理)
     - [注意事项](#注意事项)
 
 <!-- vim-markdown-toc -->
@@ -140,18 +141,25 @@
 `SSR`是一个可选的功能，并且它与本身的纯静态构建完全兼容，甚至可以共存。要开启项目的`SSR`功能，你只需要添加一个同名入口文件，以`.node.[ext]`作为后缀即可:
 
 ```diff
-    ├── components
-    ├── hooks
-    ├── modules
-    ├── types
-    ├── utils
-    ├── index.tsx
-+   ├── index.node.tsx
-    ├── about.tsx
-+   └── about.node.tsx
+  ├── app
+  │   ├── components
+  │   ├── hooks
+  │   ├── modules
+  │   ├── types
+  │   ├── utils
+  │   ├── index.tsx
++ │   ├── index.node.tsx
+  │   ├── about.tsx
++ │   └── about.node.tsx
+  ├── public
+  │   ├── index.html
++ │   ├── index.node.html
+  │   └── service-worker.js
 ```
 
 > 上述示例以多入口项目做示例，一般来说单入口项目只需要添加一个`index.node.[ext]`即可。对于该示例来说，`/about/*` 的请求都会走`about.node.tsx`，其它请求走默认的`index.node.tsx`。
+>
+> `.node.html`模板是可选的，如果缺省，则以默认的`index.html`作为 SSR 入口模板。
 
 `index.node.[ext]`是一个导出接收 `templateFile` `request` `response` 三个参数的函数，用来做服务端渲染启动。
 
@@ -188,7 +196,7 @@ export default renderer;
 你应当从`BUILD_DIR/node`下获取`SSR`的入口 js 文件和模板文件:
 
 ```javascript
-const express = requireI('express');
+const express = require('express');
 const renderer = require('YOUR_PROJECT/build/node/index.js').default;
 const templateFile = 'YOUR_PROJECT/build/node/index.html';
 
@@ -203,10 +211,146 @@ app.use(async (req, res, next) => {
 });
 ```
 
-**构建时会同时生成static入口和node入口，你可以随时根据切换切换到SSR或者使用纯静态部署**
+**构建时会同时生成 static 入口和 node 入口，你可以随时根据切换切换到 SSR 或者使用纯静态部署**
+
+### 路由与异步数据处理
+
+`tiger-new`的`SSR`功能仅提供了对相关入口文件的构建编译支持，并不包含更进一步的路由、异步数据处理等逻辑。但是这部分又是实际中比较常见的需求，这里提供个简单的实现思路：
+
+**1. 提取路由配置**
+
+我们要将路由配置抽取出来，方便在服务端以及客户端共用。
+
+```typescript
+// stores/routes.ts
+interface RouteItem {
+    path?: string;
+    exact?: boolean;
+    component: React.ComponentType;
+}
+
+const routes: RouteItem[] = [
+    {
+        path: '/',
+        exact: true,
+        component: Home
+    },
+    {
+        path: '/about',
+        component: AboutUs
+    }
+];
+
+export default routes;
+```
+
+**2. CSR 与 SSR 入口处理**
+
+SSR 入口：
+
+```typescript
+// app/index.node.tsx
+import fs from 'fs';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import { StaticRouter, Route, matchPath } from 'react-router-dom';
+import routes from 'stores/routes';
+
+const renderer = async (templateFile, request, response) => {
+    let initialProps;
+
+    /**
+     * 遍历路由配置，找到与当前请求匹配的路由
+     * 然后调用组件的 getInitialProps 方法，获取组件的初始数据（下面会讲到如何定义 getInitialProps）
+     */
+    for (let i = 0; i < routes.length; i++) {
+        const { component, path, exact, ...others } = routes[i];
+        const match = matchPath(request.path, {
+            path,
+            exact
+        });
+
+        if (match) {
+            // @ts-ignore
+            if (component.getInitialProps) {
+                // @ts-ignore
+                initialProps = await component.getInitialProps({
+                    match,
+                    request,
+                    response
+                });
+            }
+
+            break;
+        }
+    }
+
+    let template = fs.readFileSync(templateFile, 'utf8');
+    let body = renderToString(
+        <StaticRouter location={request.url}>
+            <Switch>
+                {routes.map(({ component, ...item }, index) => (
+                    <Route {...item} component={component} key={index} />
+                ))}
+            </Switch>
+        </StaticRouter>
+    );
+    let html = template
+        .replace('%ROOT%', body)
+        .replace('%DATA%', `var __DATA__=${initialProps ? JSON.stringify(initialProps) : 'null'}`);
+
+    response.send(html);
+};
+```
+
+CSR 入口
+
+```typescript
+// app/index.tsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
+import routes from 'stores/routes';
+
+ReactDOM[__SSR__ ? 'hydrate' : 'render'](
+    <BrowserRouter>
+        <Switch>
+            {routes.map(({ component, ...item }, index) => (
+                <Route {...item} component={component} key={index} />
+            ))}
+        </Switch>
+    </BrowserRouter>,
+    document.getElementById('wrap')
+);
+```
+
+**3. 使用 [`withSSR`](https://github.com/qiqiboy/tiger-new/blob/master/template/application/app/utils/withSSR/index.tsx) 高阶组件处理路由页面组件**
+
+```typescript
+// app/modules/Home
+import React from 'react';
+import withSSR, { SSRProps } from 'utils/withSSR';
+
+const Home: React.FC<
+    SSRProps<{
+        homeData: any;
+    }>
+> = props => {
+    return <div className="home">{props.homeData}</div>;
+};
+
+export default withSSR(Home, async () => {
+    const homeData = await fetch('/api/home');
+
+    return {
+        homeData
+    };
+});
+```
 
 ### 注意事项
 
 -   `SSR`功能并不包含对任何`web` `node`运行时环境的兼容处理，你应当注意自己的代码的环境兼容性
--   `SSR`功能并不包含任何路由的处理，如果有需要，你需要自行解决（配合 react-router 比较容易解决，需要有一定的 express 知识）
+-   `SSR`功能并不包含任何路由的处理，如果有需要，你需要自行解决（使用 react-router 比较容易解决）
+-   `SSR`功能并不包含任何页面初始化异步数据的处理，如果有需要，你需要自行解决
 -   `SSR`功能并不包含任何其它对于`SEO`场景的处理，如果有需要，你需要自行解决

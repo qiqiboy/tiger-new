@@ -74,7 +74,7 @@ checkBrowsers(paths.root, isInteractive)
                     let entryName = (request.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
                     let htmlEntryFile = path.join(paths.appNodeBuild, entryName + '.html');
 
-                    if (!paths.pageEntries.includes(entryName)) {
+                    if (!paths.pageEntries[entryName] && !paths.nodePageEntries[entryName]) {
                         htmlEntryFile = path.join(paths.appNodeBuild, path.basename(paths.appHtml));
                     }
 

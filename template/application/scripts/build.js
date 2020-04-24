@@ -200,12 +200,15 @@ function copyPublicFolder() {
         dereference: true,
         filter: file => {
             const relative = path.relative(paths.appPublic, file);
+            const mayHtmlEntryName = relative.replace(/(\.web|\.node)?\.html$/i, '');
             const basename = path.basename(file);
             const isDirectory = fs.statSync(file).isDirectory();
 
             return isDirectory
                 ? basename !== 'layout' // layout目录不复制
-                : !paths.pageEntries.find(name => name + '.html' === relative);
+                : !basename.startsWith('_') &&
+                      !paths.pageEntries[mayHtmlEntryName] &&
+                      !paths.nodePageEntries[mayHtmlEntryName];
         }
     });
 }

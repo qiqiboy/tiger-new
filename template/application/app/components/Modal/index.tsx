@@ -62,7 +62,7 @@ export const open = ((_Modal as INewModal).open = config => {
     let withResolve;
     let withReject;
 
-    const settings = { ...defaultSettings, ...config };
+    const settings: ModalProps = { ...defaultSettings, ...config };
 
     const div = document.createElement('div');
 

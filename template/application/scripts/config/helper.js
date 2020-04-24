@@ -538,7 +538,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
         let entryName = (req.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
         let htmlEntryFile = path.join(nodeBuildPath, entryName + '.html');
 
-        if (!paths.pageEntries.includes(entryName)) {
+        if (!paths.pageEntries[entryName] && !paths.nodePageEntries[entryName]) {
             htmlEntryFile = path.join(nodeBuildPath, path.basename(paths.appHtml));
         }
 
@@ -561,7 +561,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
                         .replace(/%\w+%/g, '')
                         .replace(
                             '<body>',
-                            '<body><pre style="position: relative; z-index: 999999; background: #fff; border: 2px red solid, 1rem solid #fff; margin: 0; padding: 1rem;">' +
+                            '<body><pre style="position: relative; z-index: 999999; background: #fff; border: 5px solid red; outline: 5px solid #fff; margin: 5px; padding: 1rem;">' +
                                 error.stack +
                                 '</pre>'
                         );

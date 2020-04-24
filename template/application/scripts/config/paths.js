@@ -10,10 +10,7 @@ const lodash = require('lodash');
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
-const nodePaths = (process.env.NODE_PATH || '')
-    .split(path.delimiter)
-    .filter(Boolean)
-    .map(resolveApp);
+const nodePaths = (process.env.NODE_PATH || '').split(path.delimiter).filter(Boolean).map(resolveApp);
 const pkg = require(resolveApp('package.json'));
 const publicUrlOrPath = getPublicUrlOrPath(
     process.env.NODE_ENV === 'development' && process.env.WEBPACK_BUILDING !== 'true',
@@ -44,8 +41,17 @@ glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function(file) {
     }
 });
 
-const htmlEntries = glob.sync(resolveApp('public/!(_)*.html')).map(function(file) {
-    return path.basename(file, '.html');
+const webHtmlEntries = {};
+const nodeHtmlEntries = {};
+
+glob.sync(resolveApp('public/!(_)*.html')).forEach(function(file) {
+    const basename = path.basename(file).replace(/(\.web|\.node)?\.html$/, '');
+
+    if (/\.node\.html$/.test(file)) {
+        nodeHtmlEntries[basename] = file;
+    } else {
+        webHtmlEntries[basename] = file;
+    }
 });
 
 const moduleAlias = Object.assign(
@@ -75,7 +81,12 @@ module.exports = {
     appBuild: resolveApp(appBuildName),
     appNodeBuild: resolveApp(appBuildName, 'node'),
     appPublic: resolveApp('public'),
-    appHtml: resolveApp('public/' + (htmlEntries.includes('index') ? 'index' : htmlEntries[0]) + '.html'),
+    appHtml: webHtmlEntries.index || Object.values(webHtmlEntries)[0],
+    appNodeHtml:
+        nodeHtmlEntries.index ||
+        webHtmlEntries.index ||
+        Object.values(nodeHtmlEntries)[0] ||
+        Object.values(webHtmlEntries)[0],
     appIndexJs: webJSEntries.index || Object.values(webJSEntries)[0],
     appNodeIndexJs: nodeJSEntries.index || Object.values(nodeJSEntries)[0],
     appPackageJson: resolveApp('package.json'),
@@ -93,9 +104,12 @@ module.exports = {
     webModuleFileExtensions,
     nodeModuleFileExtensions,
     moduleAlias,
+    // js entry
     entries: webJSEntries,
     nodeEntries: nodeJSEntries,
-    pageEntries: htmlEntries,
+    // html entry
+    pageEntries: webHtmlEntries,
+    nodePageEntries: nodeHtmlEntries,
     // 一些命令检测
     serve: hasInstall('serve'),
     npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
