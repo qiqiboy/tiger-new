@@ -16,7 +16,7 @@ export { RouteItem, prefetchRoutesInitialProps };
 export type SSRProps<More> = {
     __error__: Error | undefined;
     __loading__: boolean;
-    __getData__(props: any): Promise<void>;
+    __getData__(extraProps?: {}): Promise<void>;
 } & More;
 
 interface SSRInitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
@@ -73,14 +73,14 @@ function withSSR<SelfProps, More = {}>(
             }
         }
 
-        getInitialProps = async () => {
+        getInitialProps = async extraProps => {
             try {
                 this.setState({
                     loading: true
                 });
 
                 // @ts-ignore
-                const initialProps = await getInitialProps(this.props);
+                const initialProps = await getInitialProps({ ...this.props, ...extraProps });
 
                 this.setState({
                     initialProps

@@ -359,7 +359,7 @@ export default withSSR(Home, async () => {
 
 `utils/withSSR` 是 tiger-new 的项目模板中自带的一个用于 `SSR` 数据与路由处理的解决方法。（老项目中如果不存在这个文件，需要自行下载添加：[`utils/withSSR`](https://github.com/qiqiboy/tiger-new/blob/master/template/application/app/utils/withSSR)
 
-它包含一个高阶组件`withSSR`和一个 SSR 端用于预取数据的方法`prefetchRoutesInitialProps`：
+它包含一个高阶组件`withSSR`和一个 SSR 端用于预取数据的方法`prefetchRoutesInitialProps`。
 
 **withSSR(WrappedCompoennt, getInitialProps)**
 
@@ -369,7 +369,7 @@ export default withSSR(Home, async () => {
 type SSRProps<More> = {
     __error__: Error | undefined;
     __loading__: boolean;
-    __getData__(props: any): Promise<void>;
+    __getData__(extraProps？: {}): Promise<void>;
 } & More;
 
 interface SSRInitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
