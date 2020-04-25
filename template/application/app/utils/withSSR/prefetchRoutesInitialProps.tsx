@@ -1,7 +1,7 @@
 import { RouteItem } from './RouteItem.d';
 import { matchRoutes } from 'react-router-config';
 
-async function getInitialProps(routes: RouteItem[], url: string, request: any, response: any) {
+async function prefetchRoutesInitialProps(routes: RouteItem[], url: string, request: any, response: any) {
     /**
      * 1. 如果组件有loadComponent方法，则调用该方法的返回值替换原来的component配置（支持code splitting异步组件）
      * 2. 如果组件有getIntiialProps方法，则调用该方法获取组件的初始数据
@@ -45,4 +45,4 @@ async function getInitialProps(routes: RouteItem[], url: string, request: any, r
     return initialProps;
 }
 
-export default getInitialProps;
+export default prefetchRoutesInitialProps;

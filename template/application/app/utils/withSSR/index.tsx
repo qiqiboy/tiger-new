@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import { Request, Response } from 'express';
 import { RouteItem } from './RouteItem.d';
-import getInitialProps from './getInitialProps';
+import prefetchRoutesInitialProps from './prefetchRoutesInitialProps';
 
 declare global {
     interface Window {
@@ -11,7 +11,7 @@ declare global {
     }
 }
 
-export { RouteItem, getInitialProps };
+export { RouteItem, prefetchRoutesInitialProps };
 
 export type SSRProps<More> = {
     __error__: Error | undefined;
