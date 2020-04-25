@@ -1,25 +1,18 @@
-import { Component } from 'react';
+import React from 'react';
+import { Helmet } from 'react-helmet';
 
 interface TitleProps {
     title: string;
 }
 
-class Title extends Component<TitleProps> {
-    preTitle: string;
+const SITE_TITLE = 'React App';
 
-    componentDidMount() {
-        this.preTitle = document.title;
-
-        document.title = this.props.title + ' - React App';
-    }
-
-    componentWillUnmount() {
-        // document.title = this.preTitle;
-    }
-
-    render() {
-        return null;
-    }
-}
+const Title: React.FC<TitleProps> = ({ title }) => (
+    <Helmet>
+        <title>
+            {title} - {SITE_TITLE}
+        </title>
+    </Helmet>
+);
 
 export default Title;
