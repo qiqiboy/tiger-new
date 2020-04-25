@@ -45,6 +45,9 @@ function withLoadable<LoadableProps = any>(loader, name = 'default'): React.Comp
         }
     }
 
+    // @ts-ignore for ssr preload
+    ReactLoadable.loadComponent = () => loader().then(moduleExports => moduleExports[name]);
+
     return ReactLoadable;
 }
 

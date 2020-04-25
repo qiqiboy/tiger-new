@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+import hoistNonReactStatics from 'hoist-non-react-statics';
 import { Request, Response } from 'express';
+import { RouteItem } from './RouteItem.d';
+import getInitialProps from './getInitialProps';
 
 declare global {
     interface Window {
@@ -8,13 +11,17 @@ declare global {
     }
 }
 
+export { RouteItem, getInitialProps };
+
 export type SSRProps<More> = {
     __error__: Error | undefined;
     __loading__: boolean;
     __getData__(props: any): Promise<void>;
 } & More;
 
-export interface SSRinitialParams extends Partial<RouteComponentProps<any>> {
+interface SSRinitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
+    match: RouteComponentProps<any>['match'];
+    parentInitialProps: any;
     request?: Request;
     response?: Response;
 }
@@ -130,6 +137,8 @@ function withSSR<SelfProps, More = {}>(
             return WithSSR.SSRInitialData;
         };
     }
+
+    hoistNonReactStatics(WithSSR, WrappedComponent);
 
     return WithSSR;
 }

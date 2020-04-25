@@ -215,19 +215,31 @@ app.use(async (req, res, next) => {
 
 ### 路由与异步数据处理
 
-`tiger-new`的`SSR`功能仅提供了对相关入口文件的构建编译支持，并不包含更进一步的路由、异步数据处理等逻辑。但是这部分又是实际中比较常见的需求，这里提供个简单的实现思路：
+`tiger-new`的`SSR`功能仅提供了对相关入口文件的构建编译支持，并不包含更进一步的路由、异步数据处理等逻辑。但是这部分又是实际中比较常见的需求，这里提供一个基于 [`react-router-config`](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) 和 [`withSSR`](https://github.com/qiqiboy/tiger-new/blob/master/template/application/app/utils/withSSR/index.tsx) 实现的静态路由异步数据与`code splitting`异步组件的实现：
+
+> **withSSR** 是 tiger-new 内置模板里提供的一个高阶组件，它提供了默认的 `withSSR`（给组件扩展 getInitialProps 异步数据处理） 以及 `prefetchRoutesInitialProps`（SSR 端获取匹配路由的异步数据和预加载异步组件）。
 
 **1. 提取路由配置**
 
-我们要将路由配置抽取出来，方便在服务端以及客户端共用。
+我们要将路由配置抽取出来，方便在服务端以及客户端共用。建议将路由配置统一放置到`stores/routes`：
 
 ```typescript
 // stores/routes.ts
-interface RouteItem {
-    path?: string;
-    exact?: boolean;
-    component: React.ComponentType;
-}
+import { RouteItem } from 'utils/withSSR'; // 定义的路由配置项类型
+import withLoadable from 'utils/withLoadable';
+import Home from 'modules/Home';
+
+/**
+ * 按需加载组件
+ *
+ * withLoadable是tiger-new内置的异步组件方法，但是这是可选的；
+ * 事实上只要异步组件具有一个静态方法 `loadComponent` 即可，这个用于在SSR端预加载组件。
+ *
+ * 注：'modules/About' 其实是个聚合导出，为了方便统一对这几个组件做按需加载: export { About, AboutUs, AboutCompany }
+ */
+const About = withLoadable(() => 'modules/About', 'About');
+const AboutUs = withLoadable(() => 'modules/About', 'AboutUs');
+const AboutCompany = withLoadable(() => 'modules/About', 'AboutCompany');
 
 const routes: RouteItem[] = [
     {
@@ -237,7 +249,17 @@ const routes: RouteItem[] = [
     },
     {
         path: '/about',
-        component: AboutUs
+        component: About,
+        routes: [
+            {
+                path: '/about/us',
+                component: AboutUs
+            },
+            {
+                path: '/about/company',
+                component: AboutCompany
+            }
+        ]
     }
 ];
 
@@ -253,57 +275,39 @@ SSR 入口：
 import fs from 'fs';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { StaticRouter, Route, matchPath } from 'react-router-dom';
+import { StaticRouter } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
+import App from 'modules/App';
 import routes from 'stores/routes';
+import { prefetchRoutesInitialProps } from 'utils/withSSR';
 
 const renderer = async (templateFile, request, response) => {
-    let initialProps;
-
     /**
-     * 遍历路由配置，找到与当前请求匹配的路由
-     * 然后调用组件的 getInitialProps 方法，获取组件的初始数据（下面会讲到如何定义 getInitialProps）
+     * 获取页面初始数据以及预加载异步组件
      */
-    for (let i = 0; i < routes.length; i++) {
-        const { component, path, exact, ...others } = routes[i];
-        const match = matchPath(request.path, {
-            path,
-            exact
-        });
-
-        if (match) {
-            // @ts-ignore
-            if (component.getInitialProps) {
-                // @ts-ignore
-                initialProps = await component.getInitialProps({
-                    match,
-                    request,
-                    response
-                });
-            }
-
-            break;
-        }
-    }
+    const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response);
 
     let template = fs.readFileSync(templateFile, 'utf8');
+    /**
+     * SSR端需要使用StaticRouter
+     * 并且需要使用 react-router-config 的 renderRoutes 方法渲染路由
+     */
     let body = renderToString(
         <StaticRouter location={request.url}>
-            <Switch>
-                {routes.map(({ component, ...item }, index) => (
-                    <Route {...item} component={component} key={index} />
-                ))}
-            </Switch>
+            <div className="app">{renderRoutes(routes)}</div>
         </StaticRouter>
     );
-    // %ROOT% %DATA% 为模板文件中的数据占位符
-    // <div id="root">%ROOT%</root>
-    // <script>%DATA%</script>
+    /**
+     * 将页面的初始数据通过 __DATA__ 渲染到页面上，让 CSR 端的组件读取，以实现同构渲染
+     */
     let html = template
         .replace('%ROOT%', body)
         .replace('%DATA%', `var __DATA__=${initialProps ? JSON.stringify(initialProps) : 'null'}`);
 
     response.send(html);
 };
+
+export default renderer;
 ```
 
 CSR 入口
@@ -315,13 +319,12 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 import routes from 'stores/routes';
 
+/**
+ * CSR端也需要使用 react-router-config 的 renderRoutes 方法渲染路由
+ */
 ReactDOM[__SSR__ ? 'hydrate' : 'render'](
     <BrowserRouter>
-        <Switch>
-            {routes.map(({ component, ...item }, index) => (
-                <Route {...item} component={component} key={index} />
-            ))}
-        </Switch>
+        <div className="app">{renderRoutes(routes)}</div>
     </BrowserRouter>,
     document.getElementById('wrap')
 );
@@ -334,11 +337,9 @@ ReactDOM[__SSR__ ? 'hydrate' : 'render'](
 import React from 'react';
 import withSSR, { SSRProps } from 'utils/withSSR';
 
-const Home: React.FC<
-    SSRProps<{
-        homeData: any;
-    }>
-> = props => {
+const Home: React.FC<SSRProps<{
+    homeData: any;
+}>> = props => {
     return <div className="home">{props.homeData}</div>;
 };
 
@@ -359,3 +360,4 @@ export default withSSR(Home, async () => {
 -   `SSR`功能并不包含任何路由的处理，如果有需要，你需要自行解决（使用 react-router 比较容易解决）
 -   `SSR`功能并不包含任何页面初始化异步数据的处理，如果有需要，你需要自行解决
 -   `SSR`功能并不包含任何其它对于`SEO`场景的处理，如果有需要，你需要自行解决
+- `SEO`相关需求场景，建议使用 [`react-helmet`](https://github.com/nfl/react-helmet)，它也支持`SSR`

@@ -99,7 +99,8 @@
     "react-bootstrap-formutil": "latest",
     "react-dom": "16",
     "react-formutil": "latest",
-    "react-router-dom": "latest",
+    "react-router-config": "5",
+    "react-router-dom": "5",
     "react-transition-group": "4",
     "water-wave": "latest"
   }
