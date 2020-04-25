@@ -19,7 +19,7 @@ export type SSRProps<More> = {
     __getData__(props: any): Promise<void>;
 } & More;
 
-interface SSRinitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
+interface SSRInitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
     match: RouteComponentProps<any>['match'];
     parentInitialProps: any;
     request?: Request;
@@ -41,7 +41,7 @@ if (!routerChanged && typeof window !== 'undefined') {
 
 function withSSR<SelfProps, More = {}>(
     WrappedComponent: React.ComponentType<SelfProps & SSRProps<More>>,
-    getInitialProps: (props: SSRinitialParams) => Promise<More>
+    getInitialProps: (props: SSRInitialParams) => Promise<More>
 ) {
     interface SSRState {
         initialProps: More;

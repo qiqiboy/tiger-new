@@ -19,6 +19,7 @@
     - [开发](#开发)
     - [发布](#发布)
     - [路由与异步数据处理](#路由与异步数据处理)
+    - [`withSSR`](#withssr)
     - [注意事项](#注意事项)
 
 <!-- vim-markdown-toc -->
@@ -215,7 +216,7 @@ app.use(async (req, res, next) => {
 
 ### 路由与异步数据处理
 
-`tiger-new`的`SSR`功能仅提供了对相关入口文件的构建编译支持，并不包含更进一步的路由、异步数据处理等逻辑。但是这部分又是实际中比较常见的需求，这里提供一个基于 [`react-router-config`](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) 和 [`withSSR`](https://github.com/qiqiboy/tiger-new/blob/master/template/application/app/utils/withSSR/index.tsx) 实现的静态路由异步数据与`code splitting`异步组件的实现：
+`tiger-new`的`SSR`功能仅提供了对相关入口文件的构建编译支持，并不包含更进一步的路由、异步数据处理等逻辑。但是这部分又是实际中比较常见的需求，这里提供一个基于 [`react-router-config`](https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config) 和 [`withSSR`](#withssr) 实现的静态路由异步数据与`code splitting`异步组件的实现：
 
 > **withSSR** 是 tiger-new 内置模板里提供的一个高阶组件，它提供了默认的 `withSSR`（给组件扩展 getInitialProps 异步数据处理） 以及 `prefetchRoutesInitialProps`（SSR 端获取匹配路由的异步数据和预加载异步组件）。
 
@@ -330,7 +331,7 @@ ReactDOM[__SSR__ ? 'hydrate' : 'render'](
 );
 ```
 
-**3. 使用 [`withSSR`](https://github.com/qiqiboy/tiger-new/blob/master/template/application/app/utils/withSSR/index.tsx) 高阶组件处理路由页面组件**
+**3. 使用 [`withSSR`](#withssr) 高阶组件处理路由页面组件**
 
 ```typescript
 // app/modules/Home
@@ -354,10 +355,121 @@ export default withSSR(Home, async () => {
 
 以上三步配置完，即可实现`SSR`与`CSR`的同构渲染。
 
+### `withSSR`
+
+`utils/withSSR` 是 tiger-new 的项目模板中自带的一个用于 `SSR` 数据与路由处理的解决方法。（老项目中如果不存在这个文件，需要自行下载添加：[`utils/withSSR`](https://github.com/qiqiboy/tiger-new/blob/master/template/application/app/utils/withSSR)
+
+它包含一个高阶组件`withSSR`和一个 SSR 端用于预取数据的方法`prefetchRoutesInitialProps`：
+
+**withSSR(WrappedCompoennt, getInitialProps)**
+
+这是一个高阶组件，其 TS 签名如下:
+
+```typescript
+type SSRProps<More> = {
+    __error__: Error | undefined;
+    __loading__: boolean;
+    __getData__(props: any): Promise<void>;
+} & More;
+
+interface SSRInitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
+    match: RouteComponentProps<any>['match'];
+    parentInitialProps: any;
+    request?: Request;
+    response?: Response;
+}
+
+function withSSR<SelfProps, More = {}>(
+    WrappedComponent: React.ComponentType<SelfProps & SSRProps<More>>,
+    getInitialProps: (props: SSRInitialParams) => Promise<More>
+): React.ComponentType<Omit<SelfProps, keyof SSRProps<More>>>;
+```
+
+`withSSR`会向组件传递`getInitialProps`返回的对象，以及 `__loading__` `__error__` `__getData__` 等三个属性，你可以用这几个属性来处理异步状态。
+
+第二个参数 `getInitialProps` 接受一个对象参数，该方法在 SSR 和 CSR 端都会被调用，所以参数略有不同：
+
+-   node 环境，包含 `request` 和 `response` 对象，不包含 `location` `history`
+-   browser 环境，包含 `location` `history`对象，不包含 `request` 和 `response`
+-   `match` 和 `parentInitialProps` 无论哪个环境都存在
+
+`getInitialProps`应该返回一个包含要传递给组件的值的`object`对象（注意，如果是异步调用，需要返回 Promise 对象容器）：
+
+```typescript
+withSSR(MyComponent, () =>
+    fetch('/data.json').then(resp => ({
+        data: resp.toJSON()
+    }))
+);
+
+/**
+ * async/await语法，同上
+ */
+withSSR(MyComponent, async () => {
+    const resp = await fetch('/data.json');
+    return { data: resp.toJSON() };
+});
+
+/**
+ * 动态 path 路由，数据需要根据路由参数获取
+ */
+withSSR(UserDetail, async ({ match }) => {
+    const resp = await fetch(`/api/user/${match.params.userid}`);
+
+    return { userData: resp.toJSON() };
+});
+
+/**
+ * 嵌套子路由路由，子路由的数据请求依赖于父级路由的数据
+ * 这里假设父级路由获取userList数据，该UserDetail组件获取并渲染userList的第一项对应的数据
+ * 通过 parentInitialProps 可以拿到父级路由的初始props对象
+ */
+withSSR(UserDetail, async ({ parentInitialProps }) => {
+    const resp = await fetch(`/api/user/${parentInitialProps.userList[0].id}`);
+
+    return { userData: resp.toJSON() };
+});
+```
+
+> **TypeScript 注意事项：** 如果使用 ts 开发，请使用 `withSSR` 包装的组件需要通过 `SSRProps<{}>` 来声明组件的 props 类型，这样就可以在组件内部安全的通过 props 访问 `passToComponentPropName` `__error__` `__loading__` `__getData__` 等属性了
+
+```typescript
+const MyComp: React.FC<SSRProps<{
+    passToComponentPropName: string;
+}> &
+    RouteComponentProps> = props => {
+    if (props.__loading__) {
+        return 'loading...';
+    }
+
+    if (props.__error__) {
+        return props.__error__.message;
+    }
+
+    return <div>{props.passToComponentPropName}</div>;
+};
+
+export default withSSR(MyComp, async () => ({
+    passToComponentPropName: 'I am good!'
+}));
+```
+
+**prefetchRoutesInitialProps**
+
+`prefetchRoutesInitialProps` 用于在 SSR 端预加载通过 `withSSR` 绑定了 `getInitialProps` 方法的组件。它支持嵌套路由。
+
+当匹配到嵌套路由时，它会预先调用父级路由的 `getInitialProps`，然后将结果(`parentInitialProps`)和子路由的匹配信息(`match`等对象)一起传递给子路由的`getInitialProps`。这是一个递归过程，支持多级路由。
+
+```typescript
+function prefetchRoutesInitialProps(routes: RouteItem[], url: string, request: any, response: any): Promise<{}>;
+```
+
+具体使用示例请参考上方 [路由与异步数据处理](#路由与异步数据处理)
+
 ### 注意事项
 
 -   `SSR`功能并不包含对任何`web` `node`运行时环境的兼容处理，你应当注意自己的代码的环境兼容性
 -   `SSR`功能并不包含任何路由的处理，如果有需要，你需要自行解决（使用 react-router 比较容易解决）
 -   `SSR`功能并不包含任何页面初始化异步数据的处理，如果有需要，你需要自行解决
 -   `SSR`功能并不包含任何其它对于`SEO`场景的处理，如果有需要，你需要自行解决
-- `SEO`相关需求场景，建议使用 [`react-helmet`](https://github.com/nfl/react-helmet)，它也支持`SSR`
+-   `SEO`相关需求场景，建议使用 [`react-helmet`](https://github.com/nfl/react-helmet)，它也支持`SSR`
