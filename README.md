@@ -348,7 +348,9 @@ const renderer = async (templateFile, request, response) => {
 export default renderer;
 ```
 
-**3. 使用 [`withSSR`](#withssr) 高阶组件处理路由页面组件**
+**3. 使用 [`withSSR`](#withssr) 高阶组件给路由页面组件绑定数据获取方法**
+
+我们的页面组件应该尽可能依赖于从其`props`中获取相关页面所需数据，减少其内部自身的数据获取逻辑。
 
 ```typescript
 // app/modules/Home
