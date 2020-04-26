@@ -133,6 +133,11 @@ function withSSR<SelfProps, More = {}>(
                 // @ts-ignore
                 return await getInitialProps(...args);
             } catch (error) {
+                // Supress circular reference error in JSON.stringify
+                if (error.response) {
+                    error.response = {};
+                }
+
                 return {
                     __error__: error
                 };
