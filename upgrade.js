@@ -217,6 +217,26 @@ function upgradeAppProject(root) {
                     });
                 }
 
+                if (!fs.existsSync(path.resolve(root, 'app/utils/withSSR'))) {
+                    questions.push(
+                        {
+                            name: 'addSSR',
+                            type: 'confirm',
+                            message: '是否增加SSR相关功能文件？',
+                            default: false
+                        },
+                        {
+                            name: 'updateGlobalDTS',
+                            type: 'confirm',
+                            message: '是否更新 global.d.ts 文件？',
+                            default: true,
+                            when: function(answers) {
+                                return answers.addSSR;
+                            }
+                        }
+                    );
+                }
+
                 inquirer.prompt(questions).then(answers => {
                     console.log();
 
@@ -240,7 +260,7 @@ function upgradeAppProject(root) {
                         spinner.succeed(chalk.red('tsconfig.local.json已移除！'));
                     }
 
-                    if (!fs.existsSync(globalDeclare)) {
+                    if (!fs.existsSync(globalDeclare) || answers.updateGlobalDTS) {
                         fs.copySync(path.resolve(ownPath, 'template/application/global.d.ts'), globalDeclare, {
                             overwrite: true
                         });
@@ -274,8 +294,6 @@ function upgradeAppProject(root) {
                         fs.removeSync(path.resolve(root, 'scripts/config/webpack.config.prod.js'));
                         spinner.succeed(chalk.green('过时的 webpack.config.*.js 文件已移除！'));
                     }
-
-                    console.log();
 
                     if (!package.husky) {
                         package.husky = {
@@ -364,6 +382,25 @@ function upgradeAppProject(root) {
                         spinner.succeed(chalk.red('已成功升级i18n支持！'));
                     }
 
+                    if (answers.addSSR) {
+                        fs.copySync(
+                            path.resolve(ownPath, 'template/application/app/utils/withSSR'),
+                            path.resolve(root, 'app/utils/withSSR'),
+                            {
+                                overwrite: true
+                            }
+                        );
+                        spinner.succeed(chalk.green('utils/withSSR 目录已添加！'));
+
+                        fs.copySync(
+                            path.resolve(ownPath, 'template/application/app/utils/URL'),
+                            path.resolve(root, 'app/utils/URL'),
+                            {
+                                overwrite: true
+                            }
+                        );
+                    }
+
                     if (!package.config) {
                         package.config = {};
 
@@ -371,6 +408,8 @@ function upgradeAppProject(root) {
                             package.config.commitizen = pkgTemp.config.commitizen;
                         }
                     }
+
+                    console.log();
 
                     if (!package.prettier.arrowParens) {
                         package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
