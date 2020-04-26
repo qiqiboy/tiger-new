@@ -30,7 +30,7 @@ async function prefetchRoutesInitialProps(routes: RouteItem[], url: string, requ
                         match,
                         request,
                         response
-                    }).then(props => (route.routes ? getInitialRouteData(route.routes, props) : props))
+                    }).then((props = {}) => (route.routes ? getInitialRouteData(route.routes, props) : props))
                 );
             }
         }

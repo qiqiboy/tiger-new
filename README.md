@@ -276,6 +276,7 @@ CSR 入口：
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
 import routes from 'stores/routes';
 
 /**
