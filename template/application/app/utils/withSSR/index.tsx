@@ -11,6 +11,12 @@ declare global {
     }
 }
 
+declare module 'react-router' {
+    interface StaticContext {
+        initialProps?: any;
+    }
+}
+
 export { RouteItem, prefetchRoutesInitialProps };
 
 export type SSRProps<More> = {
@@ -44,28 +50,28 @@ function withSSR<SelfProps, More = {}>(
     getInitialProps: (props: SSRInitialParams) => Promise<More>
 ) {
     interface SSRState {
-        initialProps: More;
+        initialProps?: More;
         loading: boolean;
         error: any;
     }
 
-    class WithSSR extends Component<Omit<SelfProps, keyof SSRProps<More>>, SSRState> {
+    class WithSSR extends Component<Omit<SelfProps, keyof SSRProps<More>> & RouteComponentProps, SSRState> {
         static displayName = `WithSSR.${WrappedComponent.displayName || WrappedComponent.name}`;
 
         constructor(props) {
             super(props);
-
-            let initialProps = WithSSR.SSRInitialData;
 
             if (!routerChanged) {
                 routerChanged = props.history?.action === 'PUSH';
             }
 
             this.state = {
-                initialProps,
+                initialProps: this.SSRInitialData,
                 loading: routerChanged
             } as SSRState;
         }
+
+        SSRInitialData = this.props.staticContext?.initialProps;
 
         componentDidMount() {
             if (routerChanged) {
@@ -73,10 +79,11 @@ function withSSR<SelfProps, More = {}>(
             }
         }
 
-        getInitialProps = async extraProps => {
+        getInitialProps = async (extraProps?: {}) => {
             try {
                 this.setState({
-                    loading: true
+                    loading: true,
+                    error: null
                 });
 
                 // @ts-ignore
@@ -101,9 +108,9 @@ function withSSR<SelfProps, More = {}>(
         };
 
         render() {
-            if (WithSSR.SSRInitialData) {
+            if (this.SSRInitialData) {
                 // @ts-ignore
-                return <WrappedComponent {...this.props} {...WithSSR.SSRInitialData} __loading__={false} />;
+                return <WrappedComponent {...this.props} {...this.SSRInitialData} __loading__={false} />;
             }
 
             const { loading, error, initialProps } = this.state;
@@ -121,20 +128,15 @@ function withSSR<SelfProps, More = {}>(
             );
         }
 
-        static SSRInitialData: any;
         static getInitialProps = async (...args) => {
             try {
                 // @ts-ignore
-                const initialProps = await getInitialProps(...args);
-
-                WithSSR.SSRInitialData = initialProps;
+                return await getInitialProps(...args);
             } catch (error) {
-                WithSSR.SSRInitialData = {
+                return {
                     __error__: error
                 };
             }
-
-            return WithSSR.SSRInitialData;
         };
     }
 

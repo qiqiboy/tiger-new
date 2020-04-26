@@ -269,49 +269,7 @@ export default routes;
 
 **2. CSR 与 SSR 入口处理**
 
-SSR 入口：
-
-```typescript
-// app/index.node.tsx
-import fs from 'fs';
-import React from 'react';
-import { renderToString } from 'react-dom/server';
-import { StaticRouter } from 'react-router-dom';
-import { renderRoutes } from 'react-router-config';
-import App from 'modules/App';
-import routes from 'stores/routes';
-import { prefetchRoutesInitialProps } from 'utils/withSSR';
-
-const renderer = async (templateFile, request, response) => {
-    /**
-     * 获取页面初始数据以及预加载异步组件
-     */
-    const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response);
-
-    let template = fs.readFileSync(templateFile, 'utf8');
-    /**
-     * SSR端需要使用StaticRouter
-     * 并且需要使用 react-router-config 的 renderRoutes 方法渲染路由
-     */
-    let body = renderToString(
-        <StaticRouter location={request.url}>
-            <div className="app">{renderRoutes(routes)}</div>
-        </StaticRouter>
-    );
-    /**
-     * 将页面的初始数据通过 __DATA__ 渲染到页面上，让 CSR 端的组件读取，以实现同构渲染
-     */
-    let html = template
-        .replace('%ROOT%', body)
-        .replace('%DATA%', `var __DATA__=${initialProps ? JSON.stringify(initialProps) : 'null'}`);
-
-    response.send(html);
-};
-
-export default renderer;
-```
-
-CSR 入口
+CSR 入口：
 
 ```typescript
 // app/index.tsx
@@ -331,6 +289,64 @@ ReactDOM[__SSR__ ? 'hydrate' : 'render'](
 );
 ```
 
+SSR 入口：
+
+```typescript
+// app/index.node.tsx
+import fs from 'fs';
+import React from 'react';
+import { renderToString } from 'react-dom/server';
+import { StaticRouter, Route, StaticRouterContext } from 'react-router';
+import { renderRoutes } from 'react-router-config';
+import App from 'modules/App';
+import routes from 'stores/routes';
+import { prefetchRoutesInitialProps } from 'utils/withSSR';
+
+const renderer = async (templateFile, request, response) => {
+    /**
+     * 获取页面初始数据以及预加载异步组件
+     */
+    const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response);
+    /**
+     * ctx为一个包含 initialProps 的对象，需要传递给StaticRouter的context属性
+     * 这一点很重要，确保我们的页面组件可以拿到初始化的数据
+     */
+    const ctx: StaticRouterContext = {
+        initialProps
+    };
+
+    let template = fs.readFileSync(templateFile, 'utf8');
+    /**
+     * SSR端需要使用StaticRouter
+     * 并且需要使用 react-router-config 的 renderRoutes 方法渲染路由
+     *
+     * !!!!! 注意StaticRouter的context属性一定不能忘了哦
+     */
+    let body = renderToString(
+        <StaticRouter location={request.url} context={ctx}>
+            <div className="app">{renderRoutes(routes)}</div>
+        </StaticRouter>
+    );
+    /**
+     * 将页面的初始数据通过 __DATA__ 渲染到页面上，让 CSR 端的组件读取，以实现同构渲染
+     */
+    let html = template
+        .replace('%ROOT%', body)
+        .replace('%DATA%', `var __DATA__=${initialProps ? JSON.stringify(initialProps) : 'null'}`);
+
+    /**
+     * 处理页面重定向
+     */
+    if (ctx.url) {
+        response.redirect(ctx.url);
+    } else {
+        response.send(html);
+    }
+};
+
+export default renderer;
+```
+
 **3. 使用 [`withSSR`](#withssr) 高阶组件处理路由页面组件**
 
 ```typescript
@@ -338,9 +354,11 @@ ReactDOM[__SSR__ ? 'hydrate' : 'render'](
 import React from 'react';
 import withSSR, { SSRProps } from 'utils/withSSR';
 
-const Home: React.FC<SSRProps<{
-    homeData: any;
-}>> = props => {
+const Home: React.FC<
+    SSRProps<{
+        homeData: any;
+    }>
+> = props => {
     return <div className="home">{props.homeData}</div>;
 };
 
@@ -434,10 +452,12 @@ withSSR(UserDetail, async ({ parentInitialProps }) => {
 > **TypeScript 注意事项：** 如果使用 ts 开发，请使用 `withSSR` 包装的组件需要通过 `SSRProps<{}>` 来声明组件的 props 类型，这样就可以在组件内部安全的通过 props 访问 `passToComponentPropName` `__error__` `__loading__` `__getData__` 等属性了
 
 ```typescript
-const MyComp: React.FC<SSRProps<{
-    passToComponentPropName: string;
-}> &
-    RouteComponentProps> = props => {
+const MyComp: React.FC<
+    SSRProps<{
+        passToComponentPropName: string;
+    }> &
+        RouteComponentProps
+> = props => {
     if (props.__loading__) {
         return 'loading...';
     }
