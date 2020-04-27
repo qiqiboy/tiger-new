@@ -213,7 +213,9 @@ function resolveApp(...dirs) {
 }
 
 // 将 BUILD_DIR 作为静态资源目录
-app.use(express.static(resolveApp()));
+app.use(express.static(resolveApp(), {
+    index: false
+}));
 
 app.use(async (req, res, next) => {
     try {
