@@ -178,7 +178,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             htmlInjects.push(createHtmlWebpaclPlugin(name + '.html', file || nodeFile));
 
             paths.useNodeEnv &&
-                htmlInjects.push(createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html'), nodeFile || file));
+                htmlInjects.push(
+                    createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html'), nodeFile || file)
+                );
         });
     }
 
@@ -536,21 +538,22 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     // 因为这种文件是绝对路径，以 / 开头的
                     staticFileGlobsIgnorePatterns: [/\.map$/, /manifest\.json$/, /^\/.*\.html$/]
                 }),
-            new ForkTsCheckerWebpackPlugin({
-                typescript: resolve.sync('typescript', {
-                    basedir: paths.appNodeModules
+            (!isBuilding || isEnvWeb) &&
+                new ForkTsCheckerWebpackPlugin({
+                    typescript: resolve.sync('typescript', {
+                        basedir: paths.appNodeModules
+                    }),
+                    async: isEnvDevelopment,
+                    useTypescriptIncrementalApi: true,
+                    checkSyntacticErrors: true,
+                    tsconfig: paths.webpackTsConfig,
+                    compilerOptions: {
+                        jsx: 'preserve',
+                        checkJs: false
+                    },
+                    silent: true,
+                    formatter: isBuilding ? typescriptFormatter : undefined
                 }),
-                async: isEnvDevelopment,
-                useTypescriptIncrementalApi: true,
-                checkSyntacticErrors: true,
-                tsconfig: paths.webpackTsConfig,
-                compilerOptions: {
-                    jsx: 'preserve',
-                    checkJs: false
-                },
-                silent: true,
-                formatter: isBuilding ? typescriptFormatter : undefined
-            }),
             new webpack.BannerPlugin({
                 banner: '@author ' + pkg.author,
                 entryOnly: true

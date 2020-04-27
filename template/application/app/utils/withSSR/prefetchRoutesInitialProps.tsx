@@ -18,7 +18,9 @@ async function prefetchRoutesInitialProps(routes: RouteItem[], url: string, requ
             const loadComponent = route.component?.loadComponent;
 
             if (loadComponent) {
-                route.component = await loadComponent();
+                const moduleExports = await loadComponent();
+
+                route.component = moduleExports?.default || moduleExports;
             }
 
             const getInitialProps = route.component?.getInitialProps;

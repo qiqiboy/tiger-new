@@ -90,32 +90,37 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
         spinner.text = chalk.cyan('重新编译...');
     });
 
-    const firstCompiler = compiler.compilers[0];
     let isFirstCompile = true;
     let tsMessagesPromise;
     let tsMessagesResolver;
+    let tsCompilerIndex;
 
-    firstCompiler.hooks.beforeCompile.tap('beforeCompile', () => {
-        tsMessagesPromise = new Promise(resolve => {
-            tsMessagesResolver = msgs => resolve(msgs);
-        });
-    });
-
-    forkTsCheckerWebpackPlugin
-        .getCompilerHooks(firstCompiler)
-        .receive.tap('afterTypeScriptCheck', (diagnostics, lints) => {
-            const allMsgs = [...diagnostics, ...lints];
-            const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
-
-            tsMessagesResolver({
-                errors: allMsgs.filter(msg => msg.severity === 'error').map(format),
-                warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
+    compiler.compilers.forEach((compiler, index) => {
+        compiler.hooks.beforeCompile.tap('beforeCompile', () => {
+            tsMessagesPromise = new Promise(resolve => {
+                tsMessagesResolver = msgs => resolve(msgs);
             });
+
+            tsCompilerIndex = index;
         });
+
+        forkTsCheckerWebpackPlugin
+            .getCompilerHooks(compiler)
+            .receive.tap('afterTypeScriptCheck', (diagnostics, lints) => {
+                const allMsgs = [...diagnostics, ...lints];
+                const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
+
+                tsCompilerIndex === index &&
+                    tsMessagesResolver({
+                        errors: allMsgs.filter(msg => msg.severity === 'error').map(format),
+                        warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
+                    });
+            });
+    });
 
     // "done" event fires when Webpack has finished recompiling the bundle.
     // Whether or not you have warnings or errors, you will get this event.
-    compiler.hooks.done.tap('done', async ({ stats: [stats] }) => {
+    compiler.hooks.done.tap('done', async ({ stats: [stats, ...otherStats] }) => {
         if (isInteractive) {
             clearConsole();
         }
@@ -128,6 +133,22 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
             warnings: true,
             errors: true
         });
+
+        for (let stats of otherStats) {
+            const otherData = stats.toJson({
+                all: false,
+                warnings: true,
+                errors: true
+            });
+
+            if (statsData.errors.length === 0) {
+                statsData.errors.push(...otherData.errors);
+            }
+
+            if (statsData.warnings.length === 0) {
+                statsData.warnings.push(...otherData.warnings);
+            }
+        }
 
         if (statsData.errors.length === 0) {
             const delayedMsg = setTimeout(() => {
@@ -146,13 +167,15 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
 
             statsData.warnings.push(...messages.warnings);
 
+            const tsStats = otherStats[tsCompilerIndex - 1] || stats;
+
             if (tscCompileOnError) {
-                stats.compilation.warnings.push(...messages.errors);
+                tsStats.compilation.warnings.push(...messages.errors);
             } else {
-                stats.compilation.errors.push(...messages.errors);
+                tsStats.compilation.errors.push(...messages.errors);
             }
 
-            stats.compilation.warnings.push(...messages.warnings);
+            tsStats.compilation.warnings.push(...messages.warnings);
 
             if (messages.errors.length > 0) {
                 if (tscCompileOnError) {
@@ -532,7 +555,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
         console.error(error);
     }
 
-    return (req, res, next) => {
+    return async (req, res, next) => {
         let cache = {};
         let { webpackStats, fs: memoryFs } = res.locals;
         let entryName = (req.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
@@ -605,16 +628,12 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
             const renderer = typeof entryExport === 'function' ? entryExport : entryExport.default;
 
             if (typeof renderer !== 'function') {
-                throw new Error(`${nodeEntrypoints[0]} 必须导出一个renderer函数！`)
+                throw new Error(`${nodeEntrypoints[0]} 必须导出一个renderer函数！`);
             }
 
-            const maybePromise = renderer(indexPathname, req, res);
+            await renderer(indexPathname, req, res);
 
-            if (maybePromise && maybePromise.then) {
-                maybePromise.then(cleanup, handleError);
-            } else {
-                cleanup();
-            }
+            cleanup();
         } catch (error) {
             handleError(error);
         }
