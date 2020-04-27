@@ -194,14 +194,26 @@ export default renderer;
 
 要发布测试或者生产环境，依然是运行`npm run build:dev` 或者 `npm run pack`。但是与纯静态项目不一样的是，`SSR`的入口文件会放到 `BUILD_DIR/node` 路径下。
 
-你应当从`BUILD_DIR/node`下获取`SSR`的入口 js 文件和模板文件:
+你可以在项目下新建一个`server.js`文件，作为启动入口：
 
 ```javascript
+// server.js
+const path = require('path');
 const express = require('express');
-const renderer = require('YOUR_PROJECT/build/node/index.js').default;
-const templateFile = 'YOUR_PROJECT/build/node/index.html';
+const renderer = require(resolveApp('node/index')).default;
+const templateFile = resolveApp('node/index.html');
 
 const app = express();
+const port = process.env.PORT || 4000; // 默认端口
+
+function resolveApp(...dirs) {
+    const buildDir = process.env.NODE_ENV === 'development' ? 'buildDev' : 'build';
+
+    return path.join(process.cwd(), buildDir, ...dirs);
+}
+
+// 将 BUILD_DIR 作为静态资源目录
+app.use(express.static(resolveApp()));
 
 app.use(async (req, res, next) => {
     try {
@@ -210,9 +222,74 @@ app.use(async (req, res, next) => {
         next(err);
     }
 });
+
+app.listen(port);
+
+process.on('SIGINT', function() {
+    process.exit(0);
+});
 ```
 
-**构建时会同时生成 static 入口和 node 入口，你可以随时根据切换切换到 SSR 或者使用纯静态部署**
+再创建`pm2`的配置文件`pm2.config.js`：
+
+```javascript
+// pm2.config.js
+module.exports = {
+    apps: [
+        {
+            name: 'my-ssr-app-prod',
+            script: 'server.js',
+            watch: false,
+            env: {
+                NODE_ENV: 'production',
+                PORT: 4100
+            },
+            instances: -1,
+            exec_mode: 'cluster',
+            ignore_watch: ['[/\\]./', 'node_modules']
+        },
+        {
+            name: 'my-ssr-app-dev',
+            script: 'server.js',
+            watch: false,
+            env: {
+                NODE_ENV: 'development',
+                PORT: 4100
+            },
+            instances: 1,
+            ignore_watch: ['[/\\]./', 'node_modules']
+        }
+    ]
+};
+```
+
+最终文件结构大概类似：
+
+```diff
+    ├── app
+    ├── build
+    ├── buildDev
+    ├── package.json
+    ├── public
+    ├── scripts
++   ├── server.js
++   ├── pm2.config.js
+    └── tsconfig.json
+```
+
+然后你就可以在服务器上通过`pm2`启动、管理你的应用服务：
+
+```bash
+# 一键启动、重载应用
+
+# development环境
+pm2 reload pm2.config.js --only my-ssr-app-dev
+
+# production环境
+pm2 reload pm2.config.js --only my-ssr-app-prod
+```
+
+**注意：构建时会同时生成 static 入口和 node 入口，你可以随时根据切换切换到 SSR 或者使用纯静态部署**
 
 ### 路由与异步数据处理
 
@@ -302,6 +379,17 @@ import { renderRoutes } from 'react-router-config';
 import App from 'modules/App';
 import routes from 'stores/routes';
 import { prefetchRoutesInitialProps } from 'utils/withSSR';
+
+/**
+ * 拦截未捕获的的promise rejection异常，避免报错
+ */
+if (!global.__handledRejection__) {
+    global.__handledRejection__ = true;
+
+    process.on('unhandledRejection', () => {
+        // @TODO 待查明具体的rejection来源，你可以在这里加入对异常的处理逻辑
+    });
+}
 
 const renderer = async (templateFile, request, response) => {
     /**

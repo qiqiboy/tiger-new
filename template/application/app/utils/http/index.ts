@@ -73,7 +73,7 @@ function dataSerializer(data: object | string) {
 if (axios.interceptors.response.handlers.length === 0) {
     axios.interceptors.request.use((config: AxiosRequestConfig) => {
         if (!config.timeout) {
-            config.timeout = 60 * 1000;
+            config.timeout = typeof window === 'undefined' ? 10 * 1000 : 60 * 1000;
         }
 
         config.params = Object.assign(

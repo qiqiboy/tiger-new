@@ -43,6 +43,10 @@ declare namespace NodeJS {
         readonly ENABLE_SSR: boolean;
         readonly ENABLE_PWA: boolean;
     }
+
+    interface Global {
+        __handledRejection__: boolean;
+    }
 }
 
 /**

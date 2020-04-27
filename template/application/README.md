@@ -26,6 +26,8 @@
 
 <!-- vim-markdown-toc -->
 
+> ### 如果要了解 **SSR** 功能，请[参考这里](https://github.com/qiqiboy/tiger-new/blob/master/README.md#ssr)的文档说明。
+
 ### 目录结构
 
 项目初始化完毕后，你将会看到下面的目录结构
