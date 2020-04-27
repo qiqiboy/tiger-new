@@ -11,6 +11,10 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
+if (process.env.NODE_ENV === 'development') {
+    require('source-map-support').install();
+}
+
 const chalk = require('chalk');
 const path = require('path');
 const express = require('express');
@@ -71,21 +75,27 @@ checkBrowsers(paths.root, isInteractive)
         if (paths.useNodeEnv) {
             server.use(async (request, response, next) => {
                 try {
-                    let entryName = (request.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
+                    const entryName = (request.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
+                    const jsEntryFile = path.join(
+                        paths.appNodeBuild,
+                        ((paths.nodeEntries[entryName] && entryName) ||
+                            (paths.nodeEntries.index && 'index') ||
+                            Object.keys(paths.nodeEntries)[0]) + '.js'
+                    );
                     let htmlEntryFile = path.join(paths.appNodeBuild, entryName + '.html');
 
                     if (!paths.pageEntries[entryName] && !paths.nodePageEntries[entryName]) {
                         htmlEntryFile = path.join(paths.appNodeBuild, path.basename(paths.appHtml));
                     }
 
-                    const { default: app } = require(path.join(
-                        paths.appNodeBuild,
-                        ((paths.nodeEntries[entryName] && entryName) ||
-                            (paths.nodeEntries.index && 'index') ||
-                            Object.keys(paths.nodeEntries)[0]) + '.js'
-                    ));
+                    const entryExport = require(jsEntryFile);
+                    const renderer = typeof entryExport === 'function' ? entryExport : entryExport.default;
 
-                    await app(htmlEntryFile, request, response);
+                    if (typeof renderer !== 'function') {
+                        throw new Error(`${jsEntryFile} 必须导出一个renderer函数！`);
+                    }
+
+                    await renderer(htmlEntryFile, request, response);
                 } catch (error) {
                     spinner.fail(chalk.red('服务器有异常！\n'));
                     next(error);

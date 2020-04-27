@@ -601,9 +601,14 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
                 }
             }
 
-            let { default: app } = requireFromFS(nodeEntrypoints[0], memoryFs, cache);
+            const entryExport = requireFromFS(nodeEntrypoints[0], memoryFs, cache);
+            const renderer = typeof entryExport === 'function' ? entryExport : entryExport.default;
 
-            let maybePromise = app(indexPathname, req, res);
+            if (typeof renderer !== 'function') {
+                throw new Error(`${nodeEntrypoints[0]} 必须导出一个renderer函数！`)
+            }
+
+            const maybePromise = renderer(indexPathname, req, res);
 
             if (maybePromise && maybePromise.then) {
                 maybePromise.then(cleanup, handleError);
