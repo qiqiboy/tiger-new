@@ -165,7 +165,9 @@
 `index.node.[ext]`是一个导出接收 `templateFile` `request` `response` 三个参数的函数，用来做服务端渲染启动。
 
 -   `templateFile` 模板文件路径
--   `request` `response` 即为 `HTTP request`和`HTTP response` 对象。如果你使用其它框架，可以自行定义（如果生产环境选择使用其它 HTTP 服务框架，或者传递不一样的参数，请注意区分生产和开发环境，因为开发环境使用 webpack 时，总是固定传递默认的三个参数值）
+-   `request` `response` 即为 `HTTP request`和`HTTP response` 对象
+
+> 注意：以上几个参数为本地开发环境默认传递的参数，但是服务器部署并一定要求使用 Express 或者必须按照该参数传递。事实上你完全可以自定义你的`index.node.[ext]`入口方法的函数定义，只要做好本地环境和服务器部署环境区分即可。
 
 基本的 `index.node.tsx` 里的内容大致如下：
 
@@ -213,13 +215,15 @@ function resolveApp(...dirs) {
 }
 
 // 将 BUILD_DIR 作为静态资源目录
-app.use(express.static(resolveApp(), {
-    index: false
-}));
+app.use(
+    express.static(resolveApp(), {
+        index: false
+    })
+);
 
 app.use(async (req, res, next) => {
     try {
-        renderer(templateFile, req, res);
+        await renderer(templateFile, req, res);
     } catch (err) {
         next(err);
     }
@@ -237,6 +241,7 @@ process.on('SIGINT', function() {
 ```javascript
 // pm2.config.js
 module.exports = {
+    // 区分生产和测试环境，分开配置
     apps: [
         {
             name: 'my-ssr-app-prod',
@@ -246,8 +251,9 @@ module.exports = {
                 NODE_ENV: 'production',
                 PORT: 4100
             },
-            instances: -1,
+            instances: -1, // 生产环境使用最大cpu线程数减1，你可以自行修改其他数只或者'max'
             exec_mode: 'cluster',
+            source_map_support: true,
             ignore_watch: ['[/\\]./', 'node_modules']
         },
         {
@@ -258,7 +264,8 @@ module.exports = {
                 NODE_ENV: 'development',
                 PORT: 4100
             },
-            instances: 1,
+            instances: 1, // 测试环境只起一个线程，你也可以自行修改
+            source_map_support: true,
             ignore_watch: ['[/\\]./', 'node_modules']
         }
     ]
@@ -282,7 +289,7 @@ module.exports = {
 然后你就可以在服务器上通过`pm2`启动、管理你的应用服务：
 
 ```bash
-# 一键启动、重载应用
+# 一键启动、重载应用，因为我们在一个配置文件里配置了多个app，所以需要通过 `--only` 指定要启动的应用
 
 # development环境
 pm2 reload pm2.config.js --only my-ssr-app-dev

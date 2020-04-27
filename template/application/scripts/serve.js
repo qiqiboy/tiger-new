@@ -11,10 +11,6 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
-if (process.env.NODE_ENV === 'development') {
-    require('source-map-support').install();
-}
-
 const chalk = require('chalk');
 const path = require('path');
 const express = require('express');
