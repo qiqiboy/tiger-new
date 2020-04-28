@@ -15,9 +15,10 @@ const pkg = require(resolveApp('package.json'));
 const publicUrlOrPath = getPublicUrlOrPath(
     process.env.NODE_ENV === 'development' && process.env.WEBPACK_BUILDING !== 'true',
     pkg.homepage || (pkg.noRewrite ? '.' : undefined),
-    process.env.NODE_ENV === 'production' && process.env.SKIP_CDN !== 'true' && pkg.cdn
-        ? pkg.cdn.host + pkg.cdn.path
-        : process.env.PUBLIC_URL || process.env.BASE_NAME
+    process.env.PUBLIC_URL ||
+        (process.env.NODE_ENV === 'production' && process.env.SKIP_CDN !== 'true' && pkg.cdn
+            ? pkg.cdn.host + pkg.cdn.path
+            : process.env.BASE_NAME)
 );
 const moduleFileExtensions = ['mjs', 'js', 'ts', 'tsx', 'jsx'];
 
