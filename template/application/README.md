@@ -256,7 +256,7 @@ $ PROXY='https://api.twitter.com/' npm start
 -   `HOST` 指定本地服务的 host；请注意，单独设置该变量，将导致本地的`localhost`失效，只能使用指定的`HOST`访问服务
 -   `HTTPS` 配置使用 https；需要有本地的 SSL 证书
 -   `PROXY` 配置本地代理服务器
--   `DANGEROUSLY_DISABLE_HOST_CHECK` 关闭 host 检测；`DANGEROUSLY_DISABLE_HOST_CHECK=false`将允许任意的 host 访问
+-   `DANGEROUSLY_DISABLE_HOST_CHECK` 关闭 host 检测；`DANGEROUSLY_DISABLE_HOST_CHECK=true`将允许任意的 host 访问
 -   `IGNORE_CSS_ORDER_WARNINGS` 禁止`mini-css-extract-plugin`插件输出`conflicting order`警告信息
 -   `PUBLIC_URL` 类似 webpack 配置中的`config.publicPath`，可以用来控制生成的代码的入口位置
 -   `BASE_NAME` 指定项目的`basename`，例如`BASE_NAME=/account`

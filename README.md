@@ -76,7 +76,7 @@
 -   `HOST` 指定本地服务的 host；请注意，单独设置该变量，将导致本地的`localhost`失效，只能使用指定的`HOST`访问服务
 -   `HTTPS` 配置使用 https；需要有本地的 SSL 证书
 -   `PROXY` 配置本地代理服务器
--   `DANGEROUSLY_DISABLE_HOST_CHECK` 关闭 host 检测；`DANGEROUSLY_DISABLE_HOST_CHECK=false`将允许任意的 host 访问
+-   `DANGEROUSLY_DISABLE_HOST_CHECK` 关闭 host 检测；`DANGEROUSLY_DISABLE_HOST_CHECK=true` 将允许任意的 host 访问
 -   `IGNORE_CSS_ORDER_WARNINGS` 禁止`mini-css-extract-plugin`插件输出`conflicting order`警告信息
 -   `PUBLIC_URL` 类似 webpack 配置中的`config.publicPath`，可以用来控制生成的代码的入口位置
 -   `BASE_NAME` 指定项目的`basename`，例如`BASE_NAME=/account`
@@ -589,7 +589,7 @@ function prefetchRoutesInitialProps(routes: RouteItem[], url: string, request: a
 ### 注意事项
 
 -   `SSR`功能并不包含对任何`web` `node`运行时环境的兼容处理，你应当注意自己的代码的环境兼容性
--   `SSR`功能并不包含任何路由的处理，如果有需要，你需要自行解决（使用 react-router 比较容易解决）
--   `SSR`功能并不包含任何页面初始化异步数据的处理，如果有需要，你需要自行解决
--   `SSR`功能并不包含任何其它对于`SEO`场景的处理，如果有需要，你需要自行解决
--   `SEO`相关需求场景，建议使用 [`react-helmet`](https://github.com/nfl/react-helmet)，它也支持`SSR`
+-   `SSR`功能并不包含任何路由的处理，如果有需要，你需要自行解决（使用 react-router 比较容易解决，参考[路由与异步数据处理](#路由与异步数据处理))
+-   `SSR`功能并不包含任何页面初始化异步数据的处理，如果有需要，你需要自行解决(参考[路由与异步数据处理](#路由与异步数据处理))
+-   `SSR`功能并不包含任何其它对于`SEO`场景的处理，如果有需要，你需要自行解决（建议使用 [`react-helmet`](https://github.com/nfl/react-helmet)，它支持`SSR`）
+-   `mobx-react`在`SSR`场景下会导致内存泄漏，请参考[Server Side Rendering with `useStaticRendering`](https://github.com/mobxjs/mobx-react#server-side-rendering-with-usestaticrendering)
