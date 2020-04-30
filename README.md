@@ -511,7 +511,12 @@ function withSSR<SelfProps, More = {}>(
 -   browser 环境，包含 `location` `history`对象，不包含 `request` 和 `response`
 -   `match` 和 `parentInitialProps` 无论哪个环境都存在
 
-`getInitialProps`应该返回一个包含要传递给组件的值的`object`对象（注意，如果是异步调用，需要返回 Promise 对象容器）：
+`getInitialProps`应该返回一个包含要传递给组件`object`，它会和组件上层传递的 props 对象合并后传递给当前组件，当前组件就可以通过 props 获取相关数据（注意，如果是从异步调用数据，`getInitialProps` 则需要返回 Promise 对象容器）:
+
+-   如果`getInitialProps`返回空值，例如`null` `undefined`，则表示不在 server 端输出渲染，在页面加载后会在浏览器端重新获取数据
+-   你不需要特别处理`getInitialProps`的异常，如果`getInitialProps`内部调用有异常发生，出错信息会放到 `{ __error__: Error }`传递给组件
+-   同样的组件也会接收`{ __loading__: true }`，如果`getInitialProps`是异步返回数据的话
+-   `getInitialProps` 也会通过 `{  __getData__ }` 传递给组件，方便在组件内部发起重新调用
 
 ```typescript
 withSSR(MyComponent, () =>

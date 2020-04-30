@@ -27,27 +27,29 @@ export type SSRProps<More> = {
 
 interface SSRInitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
     match: RouteComponentProps<any>['match'];
-    parentInitialProps: any;
+    parentInitialProps?: any;
     request?: Request;
     response?: Response;
 }
 
-let routerChanged = typeof window === 'undefined' || !window.__DATA__ || !!window.__DATA__.__error__;
+const isEnvBrowser = typeof window !== 'undefined';
+
+let shouldFetchData = isEnvBrowser && !window.__DATA__;
 const onHistoryChange = () => {
-    routerChanged = true;
+    shouldFetchData = true;
 
     window.removeEventListener('popstate', onHistoryChange);
     window.removeEventListener('hashchange', onHistoryChange);
 };
 
-if (!routerChanged && typeof window !== 'undefined') {
+if (isEnvBrowser && !shouldFetchData) {
     window.addEventListener('popstate', onHistoryChange);
     window.addEventListener('hashchange', onHistoryChange);
 }
 
 function withSSR<SelfProps, More = {}>(
     WrappedComponent: React.ComponentType<SelfProps & SSRProps<More>>,
-    getInitialProps: (props: SSRInitialParams) => Promise<More>
+    getInitialProps: (props: SSRInitialParams) => Promise<More | undefined> | More | undefined
 ) {
     interface SSRState {
         initialProps?: More;
@@ -61,20 +63,25 @@ function withSSR<SelfProps, More = {}>(
         constructor(props) {
             super(props);
 
-            if (!routerChanged) {
-                routerChanged = props.history?.action === 'PUSH';
+            if (!shouldFetchData) {
+                shouldFetchData = props.history?.action === 'PUSH';
             }
 
             this.state = {
-                initialProps: this.SSRInitialData,
-                loading: routerChanged
+                initialProps: isEnvBrowser ? (shouldFetchData ? {} : window.__DATA__) : this.SSRInitialData,
+                loading: shouldFetchData,
+                error:
+                    isEnvBrowser &&
+                    !shouldFetchData &&
+                    window.__DATA__?.__error__ &&
+                    new Error(window.__DATA__?.__error__)
             } as SSRState;
         }
 
         SSRInitialData = this.props.staticContext?.initialProps;
 
         componentDidMount() {
-            if (routerChanged) {
+            if (shouldFetchData) {
                 this.getInitialProps();
             }
         }
@@ -119,7 +126,6 @@ function withSSR<SelfProps, More = {}>(
                 // @ts-ignore
                 <WrappedComponent
                     {...this.props}
-                    {...(routerChanged ? {} : window.__DATA__)}
                     {...initialProps}
                     __loading__={loading}
                     __error__={error}

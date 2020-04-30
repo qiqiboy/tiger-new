@@ -8,7 +8,7 @@ async function prefetchRoutesInitialProps(routes: RouteItem[], url: string, requ
      *      同一级的路由并行处理异步，子路由需要等待上一级异步处理完毕，并接受上级路由的返回值当作参数继续处理异步
      *      最后所有匹配的路由的异步数据返回值merge后统一返回（所以特别注意如果有路由嵌套，异步数据的返回值对象的key不能重复）
      */
-    const getInitialRouteData = async (routes: RouteItem[], extraProps: {}) => {
+    const getInitialRouteData = async (routes: RouteItem[], extraProps?: {}) => {
         const branch = matchRoutes(routes, url);
         const loaders: Array<Promise<any>> = [];
 
@@ -32,17 +32,27 @@ async function prefetchRoutesInitialProps(routes: RouteItem[], url: string, requ
                         match,
                         request,
                         response
-                    }).then((props = {}) => (route.routes ? getInitialRouteData(route.routes, props) : props))
+                    }).then(props => (route.routes ? getInitialRouteData(route.routes, props) : props))
                 );
             }
         }
 
         const results = await Promise.all(loaders);
 
-        return results.reduce((initialProps, result) => ({ ...initialProps, ...result }), extraProps);
+        return results.reduce((initialProps, result) => {
+            if (result) {
+                if (result.__error__ instanceof Error) {
+                    result.__error__ = result.__error__.message;
+                }
+
+                return { ...initialProps, ...result };
+            }
+
+            return initialProps;
+        }, extraProps);
     };
 
-    const initialProps = await getInitialRouteData(routes, {});
+    const initialProps = await getInitialRouteData(routes);
 
     return initialProps;
 }
