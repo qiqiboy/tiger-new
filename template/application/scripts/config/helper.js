@@ -155,7 +155,8 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
                 spinner.text = chalk.cyan('文件已编译，正在TSC检查...') + useTimer();
             }, 100);
 
-            const messages = await tsMessagesPromise;
+            const messages =
+                process.env.DISABLE_TSC_CHECK === 'true' ? { errors: [], warnings: [] } : await tsMessagesPromise;
 
             clearTimeout(delayedMsg);
 

@@ -539,6 +539,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     staticFileGlobsIgnorePatterns: [/\.map$/, /manifest\.json$/, /^\/.*\.html$/]
                 }),
             (!isBuilding || isEnvWeb) &&
+                process.env.DISABLE_TSC_CHECK !== 'true' &&
                 new ForkTsCheckerWebpackPlugin({
                     typescript: resolve.sync('typescript', {
                         basedir: paths.appNodeModules
