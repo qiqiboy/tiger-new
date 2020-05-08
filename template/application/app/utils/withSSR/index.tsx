@@ -30,6 +30,9 @@ interface SSRInitialParams extends Partial<Omit<RouteComponentProps, 'match'>> {
     parentInitialProps?: any;
     request?: Request;
     response?: Response;
+
+    [P: string]: any;
+    [P: number]: any;
 }
 
 const isEnvBrowser = typeof window !== 'undefined';
