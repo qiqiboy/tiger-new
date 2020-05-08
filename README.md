@@ -638,8 +638,8 @@ import cookick from 'cookick'; // cookick是utils/i18n模块使用的cookie解�
 import { createI18n, context as i18nContext } from 'utils/i18n';
 
 const renderer = async (templateFile, request, response) => {
-    // 如果是.map或者.json，忽略
-    if (request.path.endsWith('.map') || request.path.endsWith('.json')) {
+    // 如果不是html页面请求，忽略；或这里执行其它逻辑处理
+    if (!request.accepts().includes('text/html')) {
         return response.status(404).end();
     }
 
