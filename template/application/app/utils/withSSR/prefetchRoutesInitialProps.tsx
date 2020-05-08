@@ -1,5 +1,6 @@
 import { RouteItem } from './RouteItem.d';
 import { matchRoutes } from 'react-router-config';
+import URL from 'url';
 
 async function prefetchRoutesInitialProps(
     routes: RouteItem[],
@@ -15,7 +16,7 @@ async function prefetchRoutesInitialProps(
      *      最后所有匹配的路由的异步数据返回值merge后统一返回（所以特别注意如果有路由嵌套，异步数据的返回值对象的key不能重复）
      */
     const getInitialRouteData = async (routes: RouteItem[], extraProps?: {}) => {
-        const branch = matchRoutes(routes, url);
+        const branch = matchRoutes(routes, URL.parse(url).pathname);
         const loaders: Array<Promise<any>> = [];
 
         for (let i = 0; i < branch.length; i++) {
