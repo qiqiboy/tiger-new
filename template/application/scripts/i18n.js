@@ -61,11 +61,15 @@ function scanner() {
     glob.sync(paths.appSrc + '/**/*.{js,jsx,ts,tsx}').forEach(file => {
         const content = fs.readFileSync(file);
 
-        i18nParser.parseFuncFromString(content, { list: ['__', 'i18n.__', 'window.__'] }, key => {
-            if (key) {
-                i18nParser.set(key, key);
+        i18nParser.parseFuncFromString(
+            content,
+            { list: ['__', 'i18n.__', 'window.__', 'props.i18n.__', 'this.props.i18n.__'] },
+            key => {
+                if (key) {
+                    i18nParser.set(key, key);
+                }
             }
-        });
+        );
     });
 
     const i18nJson = i18nParser.get();

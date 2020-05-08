@@ -19,66 +19,46 @@
  * <div>{printf(__1('我今年%s岁'), age)}</div>
  *
  * ********************************************************************************************************
+ * SSR开启时，在Server端，需要注意应当使用withI18n高阶组件来调用i18n对象，不可以直接引用utils/i18n 中的__()方法
  *
  * 更详细用法，参考项目README.md
  */
-
+import { createContext } from 'react';
 import URL from 'utils/URL';
 import pkg from 'package.json';
+import cookick from 'cookick';
 
 // 可用的语言
 // @ts-ignore
 const allowedLangs = pkg.locals || ['zh_CN', 'en_US'];
 const LOCAL_LANG_FLAG = 'lang';
-// url中的参数对象
-const queryObj = URL.current().query;
-const localLang = localStorage.getItem(LOCAL_LANG_FLAG);
+const isBrowser = typeof window !== 'undefined';
 
-// 从浏览器地址中解析 ?lang=xxx 或者从本地lcoalStorage中获取存在标识符
-const mayLang =
-    (Array.isArray(queryObj.lang) ? queryObj.lang[0] : queryObj.lang) || localStorage.getItem(LOCAL_LANG_FLAG);
+/**
+ * globalTranslation为以语言标识符作为key，对应的语言包json为内容的对象
+ */
+const globalTranslation = allowedLangs.reduce((translation, lang) => {
+    try {
+        // @ts-ignore
+        if (pkg.locals) {
+            translation[lang] = require(`locals/${lang}.json`);
+        }
+    } catch (err) {}
 
-// 确保得到的语言标识符是允许的、合法的，否则则尝试根据浏览器语言设置默认语言
-export let language: string =
-    process.env.NODE_ENV === 'test'
-        ? 'zh_CN'
-        : allowedLangs.includes(mayLang as string)
-        ? (mayLang as string)
-        : getBrowserLang();
-
-// 如果本地的语言标识符与当前不一致，则更新本地存储
-if (localLang !== language) {
-    localStorage.setItem(LOCAL_LANG_FLAG, language);
-}
+    return translation;
+}, {});
 
 // 从浏览器语言字符串中解析对应的默认语言
-function getBrowserLang(): string {
-    const { language: browserlang } = window.navigator;
-
+function getBrowserLang(browserlang: string): string {
     if (/en/i.test(browserlang) && allowedLangs.includes('en_US')) {
         return 'en_US';
     } else if (/tw|hk/i.test(browserlang) && allowedLangs.includes('zh_TW')) {
         return 'zh_TW';
+    } else if (/cn/i.test(browserlang) && allowedLangs.includes('zh_CN')) {
+        return 'zh_CN';
     }
 
     return allowedLangs[0];
-}
-
-/** **********************语言翻译相关方法*************************/
-
-let globalTranslation = {};
-
-// @ts-ignore
-if (pkg.locals) {
-    globalTranslation = require(`locals/${language}.json`);
-}
-
-/**
- * @description
- * 语言包匹配
- */
-export function __(text: string): string {
-    return globalTranslation[text] || text;
 }
 
 /**
@@ -95,6 +75,32 @@ export function printf(text: string, ...args: Array<string | number>): string {
     });
 }
 
+/**
+ * 使用cookie存储lang标识，主要用于开启SSR时
+ */
+const getLangByCookie = key => cookick.getCookie(key);
+const setLangByCookie = (key, lang) => cookick.setCookie(key, lang);
+
+/**
+ * 使用localStorage存储lang标识，主要用于未开启SSR时
+ */
+const getLangByStorage = key => localStorage.getItem(key);
+const setlangByStorage = (key, lang) => localStorage.setItem(key, lang);
+
+/**
+ * 创建默认的i18n对象
+ * 注意，在server端，所有用户共享默认的同一种语言。server端应当通过withI18n高阶组件调用i18n对象，
+ * 并且所有的语言文案都应当在组件生命周期内创建，即不可直接声明组件外的变量作为多语言文案
+ */
+let defaultI18n = isBrowser
+    ? createI18n(window.location.href, window.navigator.language)
+    : createI18n('/', allowedLangs[0]);
+
+export default defaultI18n;
+export const __ = defaultI18n.__;
+export const language = defaultI18n.language;
+export const context = createContext(defaultI18n);
+
 type I18nParser = typeof __;
 declare global {
     const __: I18nParser;
@@ -110,16 +116,52 @@ declare global {
     }
 }
 
-if (typeof window !== 'undefined') {
+if (isBrowser) {
     window.__ = __;
-} else {
-    global.__ = __;
 }
+/**
+ * 如果开启了SSR，那么就不应该调用全局__()
+ * 这里故意不创建全局的__函数，那么在node端将会报错，以提醒开发者通过withI18n高阶组件形式调用
+ * else {
+ *      global.__ = __;
+ * }
+ */
 
-const i18n = {
-    language,
-    __,
-    printf
-};
+export function createI18n(
+    url: string,
+    browserLanguage: string,
+    getLocalLang: (langKey: string) => string | undefined | null = __SSR__ ? getLangByCookie : getLangByStorage,
+    setLocalLang: (langkey: string, lang: string) => void = __SSR__ ? setLangByCookie : setlangByStorage
+) {
+    const queryObj = URL.parse(url, true).query;
+    const localLang = getLocalLang?.(LOCAL_LANG_FLAG);
+    // 从地址中解析 ?lang=xxx 或者从本地存储中获取存在标识符
+    const mayLang = (Array.isArray(queryObj.lang) ? queryObj.lang[0] : queryObj.lang) || localLang;
 
-export default i18n;
+    const language: string = allowedLangs.includes(mayLang as string)
+        ? (mayLang as string)
+        : getBrowserLang(browserLanguage);
+
+    // 如果本地的语言标识符与当前不一致，则更新本地存储
+    if (localLang !== language) {
+        setLocalLang?.(LOCAL_LANG_FLAG, language);
+    }
+
+    const translation = globalTranslation[language] || {};
+
+    /**
+     * @description
+     * 语言包匹配
+     */
+    function __(text: string): string {
+        return translation[text] || text;
+    }
+
+    const i18n = {
+        __,
+        printf,
+        language
+    };
+
+    return i18n;
+}

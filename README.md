@@ -20,6 +20,7 @@
     - [发布](#发布)
     - [路由与异步数据处理](#路由与异步数据处理)
     - [`withSSR`](#withssr)
+    - [国际化 i18n](#国际化-i18n)
     - [注意事项](#注意事项)
 
 <!-- vim-markdown-toc -->
@@ -86,7 +87,7 @@
 -   `RUNTIME` 运行时标记，`web` 或者 `node`
 -   `COMPILE_ON_WARNING` 构建时允许警告
 -   `TSC_COMPILE_ON_ERROR` 开发时允许 ts 编译器错误
--   `DISABLE_TSC_CHECK` 禁用typescript编译检查
+-   `DISABLE_TSC_CHECK` 禁用 typescript 编译检查
 -   `TIGER_*` 任意的以`TIGER_`开头的变量。**该变量也会传递给 webpack 构建，所以你可以在项目代码中访问该变量：`process.env.TIGER_*`**
 
 以上环境变量，你可以在运行相关命令时指定，也可以通过项目根目录下的`.env` `.env.production` `.env.developement` `.env.local` `.env.production.local` `.env.developement.local` 等文件配置。
@@ -405,7 +406,9 @@ const renderer = async (templateFile, request, response) => {
     /**
      * 获取页面初始数据以及预加载异步组件
      */
-    const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response);
+    const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response, {
+        // 如果有其它数据希望传递给getInitialProps方法，可以在这里指定。没有可以缺省该参数
+    });
     /**
      * ctx为一个包含 initialProps 的对象，需要传递给StaticRouter的context属性
      * 这一点很重要，确保我们的页面组件可以拿到初始化的数据
@@ -517,7 +520,7 @@ function withSSR<SelfProps, More = {}>(
 -   如果`getInitialProps`返回空值，例如`null` `undefined`，则表示不在 server 端输出渲染，在页面加载后会在浏览器端重新获取数据
 -   你不需要特别处理`getInitialProps`的异常，如果`getInitialProps`内部调用有异常发生，出错信息会放到 `{ __error__: Error }`传递给组件
 -   同样的组件也会接收`{ __loading__: true }`，如果`getInitialProps`是异步返回数据的话
--   `getInitialProps` 也会通过 `{  __getData__ }` 传递给组件，方便在组件内部发起重新调用
+-   `getInitialProps` 也会通过 `{ __getData__ }` 传递给组件，方便在组件内部发起重新调用
 
 ```typescript
 withSSR(MyComponent, () =>
@@ -587,10 +590,98 @@ export default withSSR(MyComp, async () => ({
 当匹配到嵌套路由时，它会预先调用父级路由的 `getInitialProps`，然后将结果(`parentInitialProps`)和子路由的匹配信息(`match`等对象)一起传递给子路由的`getInitialProps`。这是一个递归过程，支持多级路由。
 
 ```typescript
-function prefetchRoutesInitialProps(routes: RouteItem[], url: string, request: any, response: any): Promise<{}>;
+function prefetchRoutesInitialProps(
+    routes: RouteItem[],
+    url: string,
+    request: any,
+    response: any,
+    extendProps?: object
+): Promise<{}>;
 ```
 
 具体使用示例请参考上方 [路由与异步数据处理](#路由与异步数据处理)
+
+### 国际化 i18n
+
+`tiger-new`的模板中带了一个`utils/i18n`模块，用于处理多语言。如果要支持 SSR，需要注意的是，界面语言不可以通过全局的`__()`方法处理了，必须放到组件的生命周期中声明，并且通过`utils/i18n/withI18n`高阶组件传递的`i18n.__()`来处理多语言文案。
+
+**错误示例：**
+
+```typescript
+// About.tsx
+const title = __('About Us'); // 错误，不可以在组件外直接通过全局 __() 调用语言包
+
+function AboutPage() {
+    return <div>{title}</div>;
+}
+```
+
+**正确示例：**
+
+```typescript
+// About.tsx
+import withI18n, { I18nProps } from 'utils/i18n/withI18n';
+
+function AboutPage(props: I18nProps) {
+    const title = props.i18n.__('About Us');
+
+    return <div>{title}</div>;
+}
+
+export default withI18n(About);
+```
+
+另外服务端入口需要提供下`withI18n`依赖的 i18n 上下文入口：
+
+```typescript
+import cookick from 'cookick'; // cookick是utils/i18n模块使用的cookie解析模块
+import { createI18n, context as i18nContext } from 'utils/i18n';
+
+const renderer = async (templateFile, request, response) => {
+    // 如果是.map或者.json，忽略
+    if (request.path.endsWith('.map') || request.path.endsWith('.json')) {
+        return response.status(404).end();
+    }
+
+    /**
+     * 设置cookick的解析来源
+     */
+    cookick.updateCookieSource(request.headers.cookie);
+
+    /**
+     * 创建一个新的适用于服务端的i18n对象
+     * 注意，这里并没有指定createI18n的第三、四个参数，是因为设置cookie由浏览器端js完成即可
+     */
+    const i18n = createI18n(request.url, request.get('accept-language'));
+
+    const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response, {
+        // 将i18n对象作为getInitialProps的额外参数传递，这样就可以在getIntialProps中也可以访问i18n对象了
+        i18n
+    });
+    const ctx: StaticRouterContext = {
+        initialProps
+    };
+
+    let body = renderToString(
+        <StaticRouter location={request.url} context={ctx}>
+            {/* 这里需要通过i18nContext.Provider将i18n向下传递，供withI18n模块访问 */}
+            <i18nContext.Provider value={i18n}>
+                <App />
+            </i18nContext.Provider>
+        </StaticRouter>
+    );
+
+    let html = template
+        .replace('%ROOT%', body)
+        .replace('%DATA%', `var __DATA__=${initialProps ? JSON.stringify(initialProps) : 'null'}`);
+
+    if (ctx.url) {
+        response.redirect(ctx.url);
+    } else {
+        response.send(html);
+    }
+};
+```
 
 ### 注意事项
 
