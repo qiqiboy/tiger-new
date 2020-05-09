@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import hoistNonReactStatics from 'hoist-non-react-statics';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { RouteItem } from './RouteItem.d';
 import prefetchRoutesInitialProps from './prefetchRoutesInitialProps';
 

@@ -387,6 +387,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter, Route, StaticRouterContext } from 'react-router';
 import { renderRoutes } from 'react-router-config';
+import type { Request, Response } from 'express'; // 引入ts类型定义，js可以省略
 import App from 'modules/App';
 import routes from 'stores/routes';
 import { prefetchRoutesInitialProps } from 'utils/withSSR';
@@ -402,7 +403,7 @@ if (!global.__handledRejection__) {
     });
 }
 
-const renderer = async (templateFile, request, response) => {
+const renderer = async (templateFile: string, request: Request, response: Response) => {
     /**
      * 获取页面初始数据以及预加载异步组件
      */
@@ -634,10 +635,11 @@ export default withI18n(About);
 另外服务端入口需要提供下`withI18n`依赖的 i18n 上下文入口：
 
 ```typescript
+import type { Request, Response } from 'express'; // 引入ts类型定义，js可以省略
 import cookick from 'cookick'; // cookick是utils/i18n模块使用的cookie解析模块
 import { createI18n, context as i18nContext } from 'utils/i18n';
 
-const renderer = async (templateFile, request, response) => {
+const renderer = async (templateFile: string, request: Request, response: Response) => {
     // 如果不是html页面请求，忽略；或这里执行其它逻辑处理
     if (!request.accepts().includes('text/html')) {
         return response.status(404).end();
@@ -646,13 +648,13 @@ const renderer = async (templateFile, request, response) => {
     /**
      * 设置cookick的解析来源
      */
-    cookick.updateCookieSource(request.headers.cookie);
+    cookick.updateCookieSource(request.headers.cookie || '');
 
     /**
      * 创建一个新的适用于服务端的i18n对象
      * 注意，这里并没有指定createI18n的第三、四个参数，是因为设置cookie由浏览器端js完成即可
      */
-    const i18n = createI18n(request.url, request.get('accept-language'));
+    const i18n = createI18n(request.url, request.get('accept-language') || '');
 
     const initialProps = await prefetchRoutesInitialProps(routes, request.url, request, response, {
         // 将i18n对象作为getInitialProps的额外参数传递，这样就可以在getIntialProps中也可以访问i18n对象了
