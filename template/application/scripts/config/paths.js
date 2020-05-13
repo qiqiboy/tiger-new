@@ -56,15 +56,12 @@ glob.sync(resolveApp('public/!(_)*.html')).forEach(function(file) {
 });
 
 const moduleAlias = Object.assign(
-    {
-        components: resolveApp('app/components'),
-        modules: resolveApp('app/modules'),
-        utils: resolveApp('app/utils'),
-        stores: resolveApp('app/stores'),
-        types: resolveApp('app/types'),
-        hooks: resolveApp('app/hooks')
-    },
-    lodash.mapValues(pkg.alias, function(relativePath) {
+    glob.sync(resolveApp('app/*') + '/').reduce((alias, file) => {
+        alias[path.basename(file)] = path.resolve(file);
+
+        return alias;
+    }, {}),
+    lodash.mapValues(pkg.alias, function (relativePath) {
         if (fs.pathExistsSync(resolveApp(relativePath))) {
             return resolveApp(relativePath);
         }
