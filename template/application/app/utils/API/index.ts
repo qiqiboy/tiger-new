@@ -20,7 +20,7 @@ interface APIInstance {
     patch<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
 }
 
-type APIPicker<T extends any> = { [P in keyof T]: API<T[P]['API']> };
+type APIPicker<T extends { [P: string]: any }> = { [P in keyof T]: API<T[P]['API']> };
 type API<T> = { [P in keyof T]: T[P] extends object ? API<T[P]> : APIInstance };
 
 const isDev = process.env.NODE_ENV === 'development' || process.env.REACT_APP_ENV === 'development';

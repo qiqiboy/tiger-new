@@ -44,6 +44,6 @@
     "rollup-plugin-filesize": "6",
     "rollup-plugin-sass": "1",
     "rollup-plugin-terser": "5",
-    "typescript": "3.8"
+    "typescript": "3.9"
   }
 }
