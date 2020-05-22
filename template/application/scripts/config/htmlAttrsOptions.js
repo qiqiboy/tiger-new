@@ -57,6 +57,10 @@ module.exports = {
                 attribute: 'href',
                 type: 'src',
                 filter: (tag, attribute, attributes) => {
+                    if (/image/i.test(getAttributeValue(attributes, 'type')) || /icon/i.test(getAttributeValue(attributes, 'rel'))) {
+                        return true;
+                    }
+
                     if (!/stylesheet/i.test(getAttributeValue(attributes, 'rel'))) {
                         return false;
                     }
@@ -114,7 +118,7 @@ module.exports = {
              * Will process: url.jpeg
              * Not process: url.jpeg?xx
              */
-            if (/\.(webp|png|jpeg|jpg|gif|svg|mp3|mp4|wmv|mp4|ogg|webm|s[ac]ss|css|less|m?[tj]sx?)$/.test(value)) {
+            if (/\.(webp|png|jpeg|jpg|gif|ico|svg|mp3|mp4|wmv|mp4|ogg|webm|s[ac]ss|css|less|m?[tj]sx?)$/.test(value)) {
                 return true;
             }
 

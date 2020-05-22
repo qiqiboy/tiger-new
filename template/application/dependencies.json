@@ -41,7 +41,7 @@
     "eslint-plugin-import": "2",
     "eslint-plugin-jsx-a11y": "6",
     "eslint-plugin-react": "7",
-    "eslint-plugin-react-hooks": "3",
+    "eslint-plugin-react-hooks": "4",
     "file-loader": "6",
     "fs-extra": "9",
     "glob": "7",
