@@ -27,6 +27,7 @@ declare module '*.svg' {
  * __SSR__: whether or not enable ssr
  */
 declare const __DEV__: boolean;
+declare const __LOCAL_DEV__: boolean;
 declare const __SSR__: 'web' | 'node' | false;
 
 /**

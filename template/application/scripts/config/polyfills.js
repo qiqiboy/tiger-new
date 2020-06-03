@@ -1,9 +1,11 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
-// classList
-require('classlist-polyfill');
+if (typeof window !== 'undefined') {
+    // classList
+    require('classlist-polyfill');
 
-// requestAnimationFrame
-require('raf-dom').polyfill();
+    // requestAnimationFrame
+    require('raf-dom').polyfill();
+}
 
 // ECMAScript
 require('core-js/features/object');

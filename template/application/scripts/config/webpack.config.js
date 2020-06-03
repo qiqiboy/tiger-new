@@ -477,7 +477,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             new webpack.EnvironmentPlugin(env.raw),
             new webpack.DefinePlugin({
                 __SSR__: JSON.stringify(paths.useNodeEnv && executionEnv),
-                __DEV__: JSON.stringify(isEnvDevelopment)
+                __DEV__: JSON.stringify(isEnvDevelopment),
+                __LOCAL_DEV__: JSON.stringify(!isBuilding)
             }),
             !isBuilding && new CaseSensitivePathsPlugin(),
             !isBuilding && new WatchMissingNodeModulesPlugin(paths.appNodeModules),

@@ -36,7 +36,7 @@ if (!('BASE_NAME' in process.env) && 'basename' in pkg) {
     process.env.BASE_NAME = pkg.basename;
 }
 
-const REACT_APP = /^(REACT_APP_|TIGER_)/i;
+const REACT_APP = /^(REACT_APP_|TIGER_|WDS_SOCKET_)/i;
 const whitelists = ['BASE_NAME'];
 
 function getClientEnvironment(envRaw) {
