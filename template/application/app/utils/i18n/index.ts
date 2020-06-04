@@ -94,7 +94,7 @@ const setlangByStorage = (key, lang) => localStorage.setItem(key, lang);
  */
 let defaultI18n = isBrowser
     ? createI18n(window.location.href, window.navigator.language)
-    : createI18n('/', allowedLangs[0]);
+    : createI18n('/', allowedLangs[0], () => '');
 
 export default defaultI18n;
 export const __ = defaultI18n.__;

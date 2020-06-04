@@ -285,6 +285,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                               name: 'vendor'
                           },
                           i18n: {
+                              priority: 100,
                               chunks: 'all',
                               test: /utils\/i18n|locals\/\w+\.json/,
                               enforce: true,
@@ -564,6 +565,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         // Some libraries import Node modules but don't use them in the browser.
         // Tell webpack to provide empty mocks for them so importing them works.
         node: {
+            __filename: isEnvWeb,
+            __dirname: isEnvWeb,
             module: 'empty',
             dgram: 'empty',
             dns: 'mock',
