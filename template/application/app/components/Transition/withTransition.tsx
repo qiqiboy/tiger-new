@@ -9,19 +9,19 @@ import {
     TransitionChildren
 } from 'react-transition-group/Transition';
 
-export interface TransitionProps extends TransitionActions {
+export interface TransitionProps<RefElement extends undefined | HTMLElement = undefined> extends TransitionActions {
     in?: boolean;
     classNames?: string | CSSTransitionClassNames;
     mountOnEnter?: boolean;
     unmountOnExit?: boolean;
     timeout?: number;
-    addEndListener?: EndHandler;
-    onEnter?: EnterHandler;
-    onEntering?: EnterHandler;
-    onEntered?: EnterHandler;
-    onExit?: ExitHandler;
-    onExiting?: ExitHandler;
-    onExited?: ExitHandler;
+    addEndListener?: EndHandler<RefElement>;
+    onEnter?: EnterHandler<RefElement>;
+    onEntering?: EnterHandler<RefElement>;
+    onEntered?: EnterHandler<RefElement>;
+    onExit?: ExitHandler<RefElement>;
+    onExiting?: ExitHandler<RefElement>;
+    onExited?: ExitHandler<RefElement>;
     children: TransitionChildren;
 }
 

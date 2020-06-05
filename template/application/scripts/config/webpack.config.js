@@ -287,7 +287,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                           i18n: {
                               priority: 100,
                               chunks: 'all',
-                              test: /utils\/i18n|locals\/\w+\.json/,
+                              test: /locals\/\w+\.json$/,
                               enforce: true,
                               name: 'i18n'
                           }
