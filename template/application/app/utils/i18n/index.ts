@@ -127,13 +127,12 @@ export function createI18n(
     setLocalLang: (langkey: string, lang: string) => void = __SSR__ ? setLangByCookie : setlangByStorage
 ) {
     const queryObj = URL.parse(url, true).query;
-    const localLang = getLocalLang?.(LOCAL_LANG_FLAG);
     // 从地址中解析 ?lang=xxx 或者从本地存储中获取存在标识符
-    const mayLang = (Array.isArray(queryObj.lang) ? queryObj.lang[0] : queryObj.lang) || localLang;
+    const queryLang = Array.isArray(queryObj.lang) ? queryObj.lang[0] : queryObj.lang;
+    const localLang = getLocalLang?.(LOCAL_LANG_FLAG);
+    const browserLang = getBrowserLang(browserLanguage);
 
-    const language: string = allowedLangs.includes(mayLang as string)
-        ? (mayLang as string)
-        : getBrowserLang(browserLanguage);
+    const language = [queryLang, localLang, browserLang].find(lang => allowedLangs.includes(lang || '')) || allowedLangs[0];
 
     // 如果本地的语言标识符与当前不一致，则更新本地存储
     if (localLang !== language) {

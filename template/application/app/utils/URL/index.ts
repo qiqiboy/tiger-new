@@ -24,6 +24,7 @@ export default {
             base = URL.parse(base, true);
 
             delete base.search;
+            delete base.host;
         }
 
         if (typeof url === 'string') {

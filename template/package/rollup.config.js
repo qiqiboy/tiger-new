@@ -126,6 +126,8 @@ function createConfig(env, module) {
                             removeImport: true
                         }
                     ],
+                    require('@babel/plugin-proposal-optional-chaining').default,
+                    require('@babel/plugin-proposal-nullish-coalescing-operator').default,
                     // Adds Numeric Separators
                     require('@babel/plugin-proposal-numeric-separator').default
                 ].filter(Boolean)
