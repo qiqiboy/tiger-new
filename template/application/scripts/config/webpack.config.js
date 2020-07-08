@@ -111,7 +111,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     { sourceMap: shouldUseSourceMap },
                     preProcessor === 'less-loader'
                         ? {
-                              javascriptEnabled: true
+                              lessOptions: {
+                                  javascriptEnabled: true
+                              }
                           }
                         : {
                               implementation: require('sass')

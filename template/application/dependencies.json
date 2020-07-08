@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "@babel/core": "7.9",
+    "@babel/core": "7",
     "@babel/plugin-proposal-decorators": "7",
     "@commitlint/cli": "9",
     "@commitlint/config-conventional": "9",
