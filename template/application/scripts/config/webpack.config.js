@@ -187,7 +187,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     return {
         mode: isEnvProduction ? 'production' : 'development',
         bail: isEnvProduction,
-        devtool: shouldUseSourceMap ? (isEnvProduction ? 'hidden-source-map' : 'cheap-module-source-map') : false,
+        devtool: shouldUseSourceMap
+            ? isBuilding
+                ? isEnvProduction
+                    ? 'hidden-source-map'
+                    : 'cheap-module-source-map'
+                : 'eval-cheap-module-source-map'
+            : false,
         entry: isEnvNode
             ? paths.nodeEntries
             : Object.assign(

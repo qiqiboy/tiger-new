@@ -62,7 +62,8 @@ module.exports = {
     globals: {
         __: true,
         __SSR__: true,
-        __DEV__: true
+        __DEV__: true,
+        __LOCAL_DEV__: true
     },
     parserOptions: {
         ecmaFeatures: {
