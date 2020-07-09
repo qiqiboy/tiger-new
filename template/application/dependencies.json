@@ -22,6 +22,7 @@
     "babel-eslint": "10",
     "babel-jest": "26",
     "babel-loader": "8",
+    "babel-plugin-auto-css-modules-flag": "latest",
     "babel-plugin-named-asset-import": "0.3",
     "babel-preset-react-app": "9",
     "case-sensitive-paths-webpack-plugin": "2",

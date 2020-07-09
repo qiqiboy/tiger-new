@@ -39,11 +39,8 @@ const babelOption = {
 
 // style files regexes
 const cssRegex = /\.css$/;
-const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
-const sassModuleRegex = /\.module\.(scss|sass)$/;
 const lessRegex = /\.less$/;
-const lessModuleRegex = /\.module\.less$/;
 
 // This is the production and development configuration.
 module.exports = function(webpackEnv, executionEnv = 'web') {
@@ -366,6 +363,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             options: {
                                 customize: require.resolve('babel-preset-react-app/webpack-overrides'),
                                 plugins: [
+                                    require.resolve('babel-plugin-auto-css-modules-flag'),
                                     [
                                         require.resolve('babel-plugin-named-asset-import'),
                                         {
@@ -391,14 +389,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         },
                         {
                             test: cssRegex,
-                            exclude: cssModuleRegex,
-                            use: getStyleLoaders({
-                                importLoaders: 1
-                            }),
-                            sideEffects: true
-                        },
-                        {
-                            test: cssModuleRegex,
+                            resourceQuery: /modules/,
                             use: getStyleLoaders({
                                 importLoaders: 1,
                                 modules: {
@@ -407,8 +398,27 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             })
                         },
                         {
+                            test: cssRegex,
+                            use: getStyleLoaders({
+                                importLoaders: 1
+                            }),
+                            sideEffects: true
+                        },
+                        {
                             test: sassRegex,
-                            exclude: sassModuleRegex,
+                            resourceQuery: /modules/,
+                            use: getStyleLoaders(
+                                {
+                                    importLoaders: 2,
+                                    modules: {
+                                        getLocalIdent: getCSSModuleLocalIdent
+                                    }
+                                },
+                                'sass-loader'
+                            )
+                        },
+                        {
+                            test: sassRegex,
                             use: getStyleLoaders(
                                 {
                                     importLoaders: 2
@@ -418,7 +428,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             sideEffects: true
                         },
                         {
-                            test: sassModuleRegex,
+                            test: lessRegex,
+                            resourceQuery: /modules/,
                             use: getStyleLoaders(
                                 {
                                     importLoaders: 2,
@@ -426,12 +437,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                         getLocalIdent: getCSSModuleLocalIdent
                                     }
                                 },
-                                'sass-loader'
+                                'less-loader'
                             )
                         },
                         {
                             test: lessRegex,
-                            exclude: lessModuleRegex,
                             use: getStyleLoaders(
                                 {
                                     importLoaders: 2
@@ -439,18 +449,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 'less-loader'
                             ),
                             sideEffects: true
-                        },
-                        {
-                            test: lessModuleRegex,
-                            use: getStyleLoaders(
-                                {
-                                    importLoaders: 2,
-                                    modules: {
-                                        getLocalIdent: getCSSModuleLocalIdent
-                                    }
-                                },
-                                'less-loader'
-                            )
                         },
                         {
                             test: /\.(txt|htm)$/,
