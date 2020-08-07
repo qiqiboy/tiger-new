@@ -65,10 +65,12 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     });
 
     const getStyleLoaders = (cssOptions, preProcessor) => {
+        if (isEnvNode) {
+            return [require.resolve('null-loader')];
+        }
+
         const loaders = [
-            isEnvNode
-                ? require.resolve('null-loader')
-                : isBuilding
+            isBuilding
                 ? {
                       loader: MiniCssExtractPlugin.loader,
                       options: {
@@ -285,6 +287,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 cacheGroups: isEnvWeb
                     ? {
                           vendors: {
+                              priority: 10,
                               chunks: 'all',
                               test: '_vendor_',
                               name: 'vendor'
