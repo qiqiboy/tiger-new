@@ -18,7 +18,9 @@ interface LoadableState {
  * const AsyncComponent = withLoadable(() => import('xxx'), 'exportName');
  */
 function withLoadable<LoadableProps = any>(loader, name = 'default'): React.ComponentClass<LoadableProps> {
-    const LoadableComponent = loadable.lib(loader);
+    const LoadableComponent = loadable.lib(loader, {
+        cacheKey: () => loader.toString()
+    });
 
     class ReactLoadable extends Component<LoadableProps, LoadableState> {
         readonly state = {} as LoadableState;
