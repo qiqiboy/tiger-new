@@ -1,5 +1,5 @@
-import React, { Children, cloneElement } from 'react';
-import { render as reactRender, unmountComponentAtNode } from 'react-dom';
+import React, { Children, cloneElement, Component } from 'react';
+import { render as reactRender, unmountComponentAtNode, createPortal, Renderer } from 'react-dom';
 import { Modal, ModalProps as BSModalProps } from 'react-bootstrap';
 import { isValidElementType } from 'react-is';
 import './style.scss';
@@ -19,8 +19,35 @@ type INewModal = typeof Modal & {
 
 type RenderCompoenent = React.ComponentType<any> | React.ReactElement<any>;
 
-type ModalProps = Omit<BSModalProps, 'animation'> & {
-    className?: string;
+type ModalProps = Partial<
+    Pick<
+        BSModalProps,
+        | 'size'
+        | 'bsPrefix'
+        | 'centered'
+        | 'backdropClassName'
+        | 'dialogClassName'
+        | 'dialogAs'
+        | 'scrollable'
+        | 'style'
+        | 'className'
+        | 'show'
+        | 'container'
+        | 'onShow'
+        | 'onHide'
+        | 'manager'
+        | 'backdrop'
+        | 'onEscapeKeyDown'
+        | 'onBackdropClick'
+        | 'onExiting'
+        | 'restoreFocusOptions'
+        | 'restoreFocus'
+        | 'enforceFocus'
+        | 'autoFocus'
+        | 'keyboard'
+        | 'containerClassName'
+    >
+> & {
     component: RenderCompoenent;
     animation?: boolean | 'slide' | 'fade';
 };
@@ -33,6 +60,8 @@ export interface ModalHandler {
 const defaultSettings = {
     animation: true
 };
+
+let renderToRoot = reactRender;
 
 /**
  * @desc 给react-bootstrap的Modal扩展一个open方法，用来方便的创建更灵活的modal。
@@ -62,7 +91,7 @@ export const open = ((_Modal as INewModal).open = config => {
     let withResolve;
     let withReject;
 
-    const settings: ModalProps = { ...defaultSettings, ...config };
+    const settings = { ...defaultSettings, ...config };
 
     const div = document.createElement('div');
 
@@ -109,8 +138,9 @@ export const open = ((_Modal as INewModal).open = config => {
             children = TheComponent;
         }
 
-        reactRender(
+        renderToRoot(
             <Modal
+                // @ts-ignore
                 onHide={onHide}
                 {...props}
                 animation={Boolean(animation)}
@@ -157,3 +187,59 @@ export const open = ((_Modal as INewModal).open = config => {
         }
     };
 });
+
+export interface ModalRootState {
+    modals: Record<string, React.ReactElement>;
+}
+
+export class ModalRoot extends Component<{}, ModalRootState> {
+    readonly state: ModalRootState = {
+        modals: {}
+    };
+
+    root: HTMLDivElement;
+
+    public componentDidMount() {
+        renderToRoot = ((element, target) => {
+            if (!target.id) {
+                target.id = 'bs-modal-' + (Date.now() + Math.random());
+            }
+
+            const { modals } = this.state;
+            const originalCallback = element.props.onExited;
+
+            modals[target.id] = cloneElement(element, {
+                key: target.id,
+                onExited: () => {
+                    originalCallback?.();
+
+                    const { modals } = this.state;
+
+                    delete modals[target.id];
+
+                    this.setState({
+                        modals
+                    });
+                }
+            });
+
+            this.setState({
+                modals
+            });
+        }) as Renderer;
+    }
+
+    public componentWillUnmount() {
+        this.root && document.body.removeChild(this.root);
+    }
+
+    render() {
+        if (!this.root) {
+            this.root = document.createElement('div');
+
+            document.body.appendChild(this.root);
+        }
+
+        return createPortal(Object.values(this.state.modals), this.root);
+    }
+}
