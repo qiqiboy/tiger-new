@@ -1,4 +1,4 @@
-import React, { Component, createElement } from 'react';
+import React, { Component } from 'react';
 import loadable from '@loadable/component';
 import Loading from 'components/Loading';
 import ErrorBox from 'components/ErrorBox';
@@ -18,8 +18,9 @@ interface LoadableState {
  * const AsyncComponent = withLoadable(() => import('xxx'), 'exportName');
  */
 function withLoadable<LoadableProps = any>(loader, name = 'default'): React.ComponentClass<LoadableProps> {
-    const LoadableComponent = loadable.lib(loader, {
-        cacheKey: () => loader.toString()
+    const LoadableComponent = loadable(loader, {
+        resolveComponent: moduleExports => moduleExports[name],
+        fallback: <Loading className="loadable--loading" />
     });
 
     class ReactLoadable extends Component<LoadableProps, LoadableState> {
@@ -40,9 +41,7 @@ function withLoadable<LoadableProps = any>(loader, name = 'default'): React.Comp
                     onClick={() => LoadableComponent.load().then(() => this.setState({ error: null }))}
                 />
             ) : (
-                <LoadableComponent fallback={<Loading className="loadable--loading" />}>
-                    {moduleExports => createElement(moduleExports[name], this.props)}
-                </LoadableComponent>
+                <LoadableComponent />
             );
         }
     }
