@@ -191,7 +191,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         devtool: shouldUseSourceMap
             ? isBuilding
                 ? isEnvProduction
-                    ? 'hidden-source-map'
+                    ? isEnvNode
+                        ? 'source-map'
+                        : 'hidden-source-map'
                     : 'cheap-module-source-map'
                 : 'eval-cheap-module-source-map'
             : false,
@@ -272,7 +274,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         map: shouldUseSourceMap
                             ? {
                                   inline: false,
-                                  annotation: true
+                                  annotation: isEnvDevelopment
                               }
                             : false
                     },
