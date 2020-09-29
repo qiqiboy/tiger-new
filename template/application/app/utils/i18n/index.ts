@@ -104,14 +104,8 @@ export const context = createContext(defaultI18n);
 type I18nParser = typeof __;
 declare global {
     const __: I18nParser;
-    interface Window {
-        __: I18nParser;
-    }
 }
 
-if (isBrowser) {
-    window.__ = __;
-}
 /**
  * 如果开启了SSR，那么就不应该调用全局__()
  * 这里故意不创建全局的__函数，那么在node端将会报错，以提醒开发者通过withI18n高阶组件形式调用

@@ -481,6 +481,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         },
         plugins: [
             ...htmlInjects,
+            isEnvWeb &&
+                fs.existsSync(path.join(paths.appSrc, 'utils/i18n')) &&
+                new webpack.ProvidePlugin({
+                    __: ['utils/i18n', '__']
+                }),
             isBuilding &&
                 shouldInlineRuntimeChunk &&
                 new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/runtime\.\w+[.]js/]),
