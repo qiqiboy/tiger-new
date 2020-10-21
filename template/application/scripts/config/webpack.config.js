@@ -383,7 +383,52 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 ].filter(Boolean),
                                 cacheDirectory: true,
                                 cacheCompression: false,
-                                compact: isEnvProduction
+                                compact: isEnvProduction,
+                                ...(isEnvWeb
+                                    ? {}
+                                    : {
+                                          babelrc: false,
+                                          configFile: false,
+                                          presets: [
+                                              [
+                                                  require('@babel/preset-env').default,
+                                                  {
+                                                      targets: {
+                                                          node: 10
+                                                      },
+                                                      useBuiltIns: 'entry',
+                                                      corejs: 3,
+                                                      exclude: ['transform-typeof-symbol']
+                                                  }
+                                              ],
+                                              [
+                                                  require('@babel/preset-react').default,
+                                                  {
+                                                      development: isEnvDevelopment,
+                                                      useBuiltIns: true
+                                                  }
+                                              ],
+                                              [require('@babel/preset-typescript').default]
+                                          ],
+                                          plugins: [
+                                              ...(pkg.babel && pkg.babel.plugins),
+                                              [
+                                                  require('@babel/plugin-proposal-class-properties').default,
+                                                  {
+                                                      loose: true
+                                                  }
+                                              ],
+                                              isEnvProduction && [
+                                                  require('babel-plugin-transform-react-remove-prop-types').default,
+                                                  {
+                                                      removeImport: true
+                                                  }
+                                              ],
+                                              require('@babel/plugin-proposal-numeric-separator').default,
+                                              require('@babel/plugin-proposal-optional-chaining').default,
+                                              require('@babel/plugin-proposal-nullish-coalescing-operator').default
+                                          ].filter(Boolean)
+                                      })
                             }
                         },
                         {
