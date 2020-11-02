@@ -82,7 +82,7 @@
     "typescript": "3.9",
     "webpack": "4",
     "webpack-dev-server": "3",
-    "webpack-node-externals": "1"
+    "webpack-node-externals": "2"
   },
   "dependencies": {
     "@loadable/component": "5",

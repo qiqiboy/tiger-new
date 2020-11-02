@@ -235,7 +235,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             ? undefined
             : [
                   nodeExternals({
-                      whitelist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
+                      allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
                   })
               ],
         optimization: {

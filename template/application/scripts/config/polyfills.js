@@ -5,6 +5,11 @@ if (typeof window !== 'undefined') {
 
     // requestAnimationFrame
     require('raf-dom').polyfill();
+
+    // fix IE10 location.origin
+    if (typeof window.location.origin === 'undefined') {
+        window.location.origin = window.location.protocol + '//' + window.location.host;
+    }
 }
 
 // ECMAScript
