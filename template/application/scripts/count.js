@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const { execSync } = require('child_process');
-const chalk = require('chalk');
 const fs = require('fs');
+const chalk = require('chalk');
 const ora = require('ora');
 const clearConsole = require('react-dev-utils/clearConsole');
 const paths = require('./config/paths');
@@ -27,8 +27,7 @@ const extraCommand = onlyJS ? ' --include-lang=JavaScript,TypeScript' : '';
 
 const output = JSON.parse(
     execSync(
-        'cloc app static --exclude-lang=SVG --force-lang=JavaScript,jsx --exclude-dir=node_modules --json' +
-            extraCommand
+        `cloc app static --exclude-lang=SVG --force-lang=JavaScript,jsx --exclude-dir=node_modules --json${extraCommand}`
     )
         .toString()
         .trim()
@@ -68,8 +67,8 @@ const tableData = Object.keys(output)
                 detail.comment,
                 detail.code,
                 lineCount,
-                ((lineCount / totalCount) * 100).toFixed(2) + '%',
-                ((detail.nFiles / totalFiles) * 100).toFixed(2) + '%'
+                `${((lineCount / totalCount) * 100).toFixed(2)}%`,
+                `${((detail.nFiles / totalFiles) * 100).toFixed(2)}%`
             ].map(content => ({ content: String(content), color: 'white' }))
         );
 
@@ -184,7 +183,7 @@ Object.keys(output)
                         color: 'white'
                     },
                     {
-                        content: (item.size / 100).toFixed(2) + ' KB',
+                        content: `${(item.size / 100).toFixed(2)} KB`,
                         color: 'white'
                     }
                 ])

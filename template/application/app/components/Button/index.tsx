@@ -42,7 +42,7 @@ class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<
         }
 
         if (ghost && variant && !/^outline-/.test(variant)) {
-            variant = 'outline-' + variant;
+            variant = `outline-${variant}`;
         }
 
         const overrideProps = {

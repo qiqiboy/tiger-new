@@ -6,6 +6,7 @@ var _ = require('lodash');
 var ora = require('ora');
 var execSync = require('child_process').execSync;
 var spawn = require('cross-spawn');
+var semver = require('semver');
 var ownPkg = require('./package.json');
 
 var spinner = ora();
@@ -235,6 +236,15 @@ function upgradeAppProject(root) {
                             }
                         }
                     );
+                }
+
+                if (semver.lt(package.dependencies.react, '17.0.0')) {
+                    questions.push({
+                        name: 'upgradeReact',
+                        type: 'confirm',
+                        message: '是否升级react@17.x ？',
+                        default: true
+                    });
                 }
 
                 inquirer.prompt(questions).then(answers => {
@@ -485,7 +495,24 @@ function upgradeAppProject(root) {
                         true,
                         function() {
                             console.log();
-                            spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
+                            spinner.succeed('项目开发依赖已更新！');
+                            console.log();
+
+                            if (answers.upgradeReact) {
+                                install(
+                                    ['react@latest', 'react-dom@latest', 'react-formutil@latest'],
+                                    false,
+                                    function() {
+                                        console.log();
+                                        spinner.succeed('升级react成功！');
+
+                                        console.log();
+                                        spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
+                                    }
+                                );
+                            } else {
+                                spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
+                            }
                         }
                     );
                 });

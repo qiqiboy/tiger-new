@@ -34,7 +34,7 @@ function reducer(state, action) {
  *
  */
 
-function useStates<InitialState extends object, I>(
+function useStates<InitialState extends object>(
     initialState: InitialState
 ): [InitialState, (newState: Partial<InitialState>) => void];
 

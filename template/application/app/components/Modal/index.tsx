@@ -202,7 +202,7 @@ export class ModalRoot extends Component<{}, ModalRootState> {
     public componentDidMount() {
         renderToRoot = ((element, target) => {
             if (!target.id) {
-                target.id = 'bs-modal-' + (Date.now() + Math.random());
+                target.id = `bs-modal-${Date.now() + Math.random()}`;
             }
 
             const { modals } = this.state;

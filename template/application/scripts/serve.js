@@ -11,17 +11,17 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
-const chalk = require('chalk');
 const path = require('path');
+const chalk = require('chalk');
 const express = require('express');
 const ora = require('ora');
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
 const clearConsole = require('react-dev-utils/clearConsole');
 const openBrowser = require('react-dev-utils/openBrowser');
-const { choosePort } = require('./config/helper');
 const { prepareUrls } = require('react-dev-utils/WebpackDevServerUtils');
 const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const history = require('connect-history-api-fallback');
+const { choosePort } = require('./config/helper');
 const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
 
@@ -74,11 +74,13 @@ checkBrowsers(paths.root, isInteractive)
                     const entryName = (request.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
                     const jsEntryFile = path.join(
                         paths.appNodeBuild,
-                        ((paths.nodeEntries[entryName] && entryName) ||
+                        `${
+                            (paths.nodeEntries[entryName] && entryName) ||
                             (paths.nodeEntries.index && 'index') ||
-                            Object.keys(paths.nodeEntries)[0]) + '.js'
+                            Object.keys(paths.nodeEntries)[0]
+                        }.js`
                     );
-                    let htmlEntryFile = path.join(paths.appNodeBuild, entryName + '.html');
+                    let htmlEntryFile = path.join(paths.appNodeBuild, `${entryName}.html`);
 
                     if (!paths.pageEntries[entryName] && !paths.nodePageEntries[entryName]) {
                         htmlEntryFile = path.join(paths.appNodeBuild, path.basename(paths.appHtml));
@@ -108,7 +110,7 @@ checkBrowsers(paths.root, isInteractive)
                 clearConsole();
             }
 
-            spinner.succeed(chalk.green('应用(' + pkg.name + ')已启动:'));
+            spinner.succeed(chalk.green(`应用(${pkg.name})已启动:`));
             console.log();
 
             if (urls.lanUrlForTerminal) {

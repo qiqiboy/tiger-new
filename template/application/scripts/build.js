@@ -13,16 +13,16 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
+const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs-extra');
-const path = require('path');
 const webpack = require('webpack');
-const configFactory = require('./config/webpack.config');
-const paths = require('./config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const clearConsole = require('react-dev-utils/clearConsole');
+const configFactory = require('./config/webpack.config');
+const paths = require('./config/paths');
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const checkMissDependencies = require('./config/checkMissDependencies');
@@ -69,12 +69,10 @@ checkBrowsers(paths.root, isInteractive).then(() => {
                 console.log();
 
                 // Teach some ESLint tricks.
-                console.log('\n搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
+                console.log(`\n搜索相关${chalk.underline(chalk.yellow('关键词'))}以了解更多关于警告产生的原因.`);
 
                 console.log(
-                    '如果要忽略警告, 可以将 ' +
-                        chalk.cyan('// eslint-disable-next-line') +
-                        ' 添加到产生警告的代码行上方\n'
+                    `如果要忽略警告, 可以将 ${chalk.cyan('// eslint-disable-next-line')} 添加到产生警告的代码行上方\n`
                 );
 
                 console.log();
@@ -111,7 +109,7 @@ checkBrowsers(paths.root, isInteractive).then(() => {
 
                 printServeCommand();
             } else {
-                spinner.succeed('项目打包完成，请确保资源已上传到：' + chalk.green(paths.publicUrlOrPath) + '.');
+                spinner.succeed(`项目打包完成，请确保资源已上传到：${chalk.green(paths.publicUrlOrPath)}.`);
             }
 
             console.log();
@@ -132,7 +130,7 @@ function build(previousFileSizes) {
     let startTime = Date.now();
     let timer;
     let logProgress = function(stop) {
-        let text = packText + '已耗时：' + ((Date.now() - startTime) / 1000).toFixed(3) + 's';
+        let text = `${packText}已耗时：${((Date.now() - startTime) / 1000).toFixed(3)}s`;
 
         if (stop) {
             clearTimeout(timer);
@@ -165,7 +163,7 @@ function build(previousFileSizes) {
 
                 // Add additional information for postcss errors
                 if (Object.prototype.hasOwnProperty.call(err, 'postcssNode')) {
-                    errMessage += '\nCompileError: Begins at CSS selector ' + err.postcssNode.selector;
+                    errMessage += `\nCompileError: Begins at CSS selector ${err.postcssNode.selector}`;
                 }
 
                 messages = formatWebpackMessages({

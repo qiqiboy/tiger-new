@@ -15,13 +15,13 @@ const ora = require('ora');
 const WebpackDevServer = require('webpack-dev-server');
 const clearConsole = require('react-dev-utils/clearConsole');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const { choosePort, createCompiler, prepareProxy, createDevServerConfig } = require('./config/helper');
 const { prepareUrls } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
+const { checkBrowsers } = require('react-dev-utils/browsersHelper');
+const { choosePort, createCompiler, prepareProxy, createDevServerConfig } = require('./config/helper');
 const paths = require('./config/paths');
 const configFactory = require('./config/webpack.config');
 const checkMissDependencies = require('./config/checkMissDependencies');
-const { checkBrowsers } = require('react-dev-utils/browsersHelper');
 const { ensureLocals } = require('./i18n');
 const pkg = require(paths.appPackageJson);
 
@@ -50,10 +50,9 @@ checkMissDependencies(spinner).then(() => {
                 console.log();
 
                 spinner.fail(
-                    '请关闭占用 ' +
-                        chalk.bold(chalk.yellow(DEFAULT_PORT)) +
-                        ' 端口的程序后再运行；或者指定一个新的端口：' +
-                        chalk.bold(chalk.yellow('PORT=4000 npm start'))
+                    `请关闭占用 ${chalk.bold(
+                        chalk.yellow(DEFAULT_PORT)
+                    )} 端口的程序后再运行；或者指定一个新的端口：${chalk.bold(chalk.yellow('PORT=4000 npm start'))}`
                 );
 
                 console.log();

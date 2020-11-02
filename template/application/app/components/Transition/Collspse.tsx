@@ -91,7 +91,7 @@ class Collapse extends Component<CollapseProps> {
                     return defaultStyle;
                 },
                 {
-                    [cssNames.sizeName]: node[cssNames.sizeFrom] + 'px'
+                    [cssNames.sizeName]: `${node[cssNames.sizeFrom]}px`
                 }
             );
         }
@@ -125,8 +125,9 @@ class Collapse extends Component<CollapseProps> {
     addTransition = node => {
         node.classList.add(TransitionClassName);
 
-        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
-            this.props.timeout + 'ms';
+        node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = `${
+            this.props.timeout
+        }ms`;
     };
 
     onEnter = node => {
@@ -170,7 +171,7 @@ class Collapse extends Component<CollapseProps> {
 
             this.snapStyle(node);
 
-            node.style[cssNames.sizeName] = node[cssNames.sizeFrom] + 'px';
+            node.style[cssNames.sizeName] = `${node[cssNames.sizeFrom]}px`;
         }
     };
 

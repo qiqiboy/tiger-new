@@ -1,4 +1,5 @@
 // 声明资源文件类型
+declare module '*.avif';
 declare module '*.png';
 declare module '*.jpg';
 declare module '*.jpeg';

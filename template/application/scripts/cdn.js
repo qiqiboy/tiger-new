@@ -6,8 +6,8 @@ const OSS = require('ali-oss');
 const chalk = require('chalk');
 const lodash = require('lodash');
 const glob = require('glob');
-const paths = require('./config/paths');
 const ora = require('ora');
+const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
 const { printServeCommand } = require('./config/helper');
 
@@ -95,7 +95,7 @@ function runCDN() {
 
             // 已经存在
             if (oldStaticConfig[relative]) {
-                spinner.succeed(chalk.green('已存在：' + relative));
+                spinner.succeed(chalk.green(`已存在：${relative}`));
                 exitsNum++;
 
                 return false;
@@ -113,21 +113,17 @@ function runCDN() {
 
         console.log(
             chalk[failNum ? 'red' : 'cyan'](
-                '+++++++++++++++++++++++++++++++\n 文件上传完毕(' +
-                    chalk.blue(pkg.cdn.path) +
-                    ') \n ' +
-                    chalk.magenta('成功: ' + uploadNum) +
-                    ' \n ' +
-                    chalk.red('失败: ' + failNum) +
-                    ' \n ' +
-                    chalk.green('重复: ' + exitsNum) +
-                    '\n+++++++++++++++++++++++++++++++'
+                `+++++++++++++++++++++++++++++++\n 文件上传完毕(${chalk.blue(pkg.cdn.path)}) \n ${chalk.magenta(
+                    `成功: ${uploadNum}`
+                )} \n ${chalk.red(`失败: ${failNum}`)} \n ${chalk.green(
+                    `重复: ${exitsNum}`
+                )}\n+++++++++++++++++++++++++++++++`
             )
         );
 
         if (!failNum) {
             fs.outputFileSync(staticConfigFile, JSON.stringify(newStaticConfig, '\n', 2));
-            console.log(chalk.blue('配置文件已经更新: ' + staticConfigFile));
+            console.log(chalk.blue(`配置文件已经更新: ${staticConfigFile}`));
             console.log();
             console.log(chalk.green('项目已经成功编译，运行以下命令可即时预览：'));
 
@@ -156,10 +152,10 @@ function createRsync(file) {
                 .execute(function(error, code, cmd) {
                     if (error) {
                         resolve(false);
-                        spinner.fail(chalk.red('上传失败(' + error + ')：' + relative));
+                        spinner.fail(chalk.red(`上传失败(${error})：${relative}`));
                     } else {
                         resolve(true);
-                        spinner.warn(chalk.yellow('已上传：' + relative));
+                        spinner.warn(chalk.yellow(`已上传：${relative}`));
                     }
                 });
         }, 200 * throttleDelay++);
@@ -176,11 +172,11 @@ function createOSS(file) {
                 .put(path.join(pkg.cdn.path, objectName), file)
                 .then(() => {
                     resolve(true);
-                    spinner.warn(chalk.yellow('已上传：' + objectName));
+                    spinner.warn(chalk.yellow(`已上传：${objectName}`));
                 })
                 .catch(error => {
                     resolve(false);
-                    spinner.fail(chalk.red('上传失败(' + error + ')：' + objectName));
+                    spinner.fail(chalk.red(`上传失败(${error})：${objectName}`));
                 });
         }, 200 * throttleDelay++);
     });

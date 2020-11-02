@@ -16,27 +16,17 @@ const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent')
 const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
-const paths = require('./paths');
-const htmlAttrsOptions = require('./htmlAttrsOptions');
-const getClientEnvironment = require('./env');
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+const getClientEnvironment = require('./env');
+const htmlAttrsOptions = require('./htmlAttrsOptions');
+const paths = require('./paths');
 const pkg = require(paths.appPackageJson);
 
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 const shouldUseRelativeAssetPath = !paths.publicUrlOrPath.startsWith('http');
-const babelOption = {
-    babelrc: false,
-    configFile: false,
-    compact: false,
-    presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
-    cacheDirectory: true,
-    cacheCompression: false,
-    sourceMaps: false
-};
-
 // style files regexes
 const cssRegex = /\.css$/;
 const sassRegex = /\.(scss|sass)$/;
@@ -63,6 +53,17 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         ENABLE_SSR: paths.useNodeEnv,
         ENABLE_PWA: shouldUseSW
     });
+
+    const babelOption = {
+        babelrc: false,
+        configFile: false,
+        compact: false,
+        presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
+        cacheDirectory: true,
+        cacheCompression: false,
+        sourceMaps: shouldUseSourceMap,
+        inputSourceMap: shouldUseSourceMap
+    };
 
     const getStyleLoaders = (cssOptions, preProcessor) => {
         if (isEnvNode) {
@@ -176,11 +177,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 );
             };
 
-            htmlInjects.push(createHtmlWebpaclPlugin(name + '.html', file || nodeFile));
+            htmlInjects.push(createHtmlWebpaclPlugin(`${name}.html`, file || nodeFile));
 
             paths.useNodeEnv &&
                 htmlInjects.push(
-                    createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, name + '.html'), nodeFile || file)
+                    createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, `${name}.html`), nodeFile || file)
                 );
         });
     }
@@ -219,8 +220,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             filename: isEnvNode
                 ? '[name].js'
                 : isEnvProduction
-                ? 'static/js/[name].[contenthash:8].js'
-                : 'static/js/[name].[hash:8].js',
+                    ? 'static/js/[name].[contenthash:8].js'
+                    : 'static/js/[name].[hash:8].js',
             // TODO: remove this when upgrading to webpack 5
             futureEmitAssets: true,
             chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
@@ -367,6 +368,14 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             loader: require.resolve('babel-loader'),
                             options: {
                                 customize: require.resolve('babel-preset-react-app/webpack-overrides'),
+                                presets: [
+                                    [
+                                        'react-app',
+                                        {
+                                            runtime: paths.hasJsxRuntime ? 'automatic' : 'classic'
+                                        }
+                                    ]
+                                ],
                                 plugins: [
                                     require.resolve('babel-plugin-auto-css-modules-flag'),
                                     [
@@ -405,7 +414,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                                   require('@babel/preset-react').default,
                                                   {
                                                       development: isEnvDevelopment,
-                                                      useBuiltIns: true
+                                                      ...(!paths.hasJsxRuntime ? { useBuiltIns: true } : {}),
+                                                      runtime: paths.hasJsxRuntime ? 'automatic' : 'classic'
                                                   }
                                               ],
                                               [require('@babel/preset-typescript').default]
@@ -509,7 +519,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             loader: require.resolve('file-loader'),
                             options: {
                                 name: 'static/media/[name].[hash:8].[ext]',
-                                esModule: false
+                                esModule: true
                             }
                         },
                         {
@@ -517,7 +527,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             loader: require.resolve('file-loader'),
                             options: {
                                 name: 'static/images/[name].[hash:8].[ext]',
-                                esModule: false
+                                esModule: true
                             }
                         }
                     ]
@@ -586,8 +596,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     minify: true,
 
                     mergeStaticsConfig: true,
-                    staticFileGlobs: path.basename(paths.appBuild) + '/*.html',
-                    stripPrefix: path.basename(paths.appBuild) + '/',
+                    staticFileGlobs: `${path.basename(paths.appBuild)}/*.html`,
+                    stripPrefix: `${path.basename(paths.appBuild)}/`,
 
                     // For unknown URLs, fallback to the index page
                     navigateFallback:
@@ -612,14 +622,14 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     checkSyntacticErrors: true,
                     tsconfig: paths.webpackTsConfig,
                     compilerOptions: {
-                        jsx: 'preserve',
+                        jsx: paths.hasJsxRuntime ? (isEnvProduction ? 'react-jsx' : 'react-jsxdev') : 'preserve',
                         checkJs: false
                     },
                     silent: true,
                     formatter: isBuilding ? typescriptFormatter : undefined
                 }),
             new webpack.BannerPlugin({
-                banner: '@author ' + pkg.author,
+                banner: `@author ${pkg.author}`,
                 entryOnly: true
             })
         ].filter(Boolean),

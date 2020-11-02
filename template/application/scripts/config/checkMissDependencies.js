@@ -24,9 +24,9 @@ async function checkMissDeps(spinner) {
             {
                 name: 'reInstall',
                 type: 'confirm',
-                message:
-                    '你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n' +
-                    chalk.dim('重新运行 npm install 安装所有依赖项.'),
+                message: `你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n${chalk.dim(
+                    '重新运行 npm install 安装所有依赖项.'
+                )}`,
                 default: true
             }
         ]);
@@ -37,7 +37,7 @@ async function checkMissDeps(spinner) {
             await new Promise((resolve, reject) => {
                 install(function(code, command, args) {
                     if (code !== 0) {
-                        spinner.fail('`' + command + ' ' + args.join(' ') + '` 运行失败');
+                        spinner.fail(`\`${command} ${args.join(' ')}\` 运行失败`);
 
                         reject();
                     } else {
@@ -53,7 +53,7 @@ async function checkMissDeps(spinner) {
             spinner.warn(chalk.yellow('你需要按照下面命令操作后才能继续：'));
             console.log();
 
-            console.log(chalk.green('   ' + paths.npmCommander + ' install'));
+            console.log(chalk.green(`   ${paths.npmCommander} install`));
 
             return Promise.reject();
         }

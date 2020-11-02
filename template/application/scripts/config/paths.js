@@ -22,8 +22,22 @@ const publicUrlOrPath = getPublicUrlOrPath(
 );
 const moduleFileExtensions = ['mjs', 'js', 'ts', 'tsx', 'jsx'];
 
-const webModuleFileExtensions = moduleFileExtensions.map(ext => 'web.' + ext).concat(moduleFileExtensions, 'json');
-const nodeModuleFileExtensions = moduleFileExtensions.map(ext => 'node.' + ext).concat(moduleFileExtensions, 'json');
+const hasJsxRuntime = (() => {
+    if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
+        return false;
+    }
+
+    try {
+        require.resolve('react/jsx-runtime');
+
+        return true;
+    } catch (e) {
+        return false;
+    }
+})();
+
+const webModuleFileExtensions = moduleFileExtensions.map(ext => `web.${ext}`).concat(moduleFileExtensions, 'json');
+const nodeModuleFileExtensions = moduleFileExtensions.map(ext => `node.${ext}`).concat(moduleFileExtensions, 'json');
 
 function resolveApp(...relativePaths) {
     return path.resolve(appDirectory, ...relativePaths);
@@ -56,12 +70,12 @@ glob.sync(resolveApp('public/!(_)*.html')).forEach(function(file) {
 });
 
 const moduleAlias = Object.assign(
-    glob.sync(resolveApp('app/*') + '/').reduce((alias, file) => {
+    glob.sync(`${resolveApp('app/*')}/`).reduce((alias, file) => {
         alias[path.basename(file)] = path.resolve(file);
 
         return alias;
     }, {}),
-    lodash.mapValues(pkg.alias, function (relativePath) {
+    lodash.mapValues(pkg.alias, function(relativePath) {
         if (fs.pathExistsSync(resolveApp(relativePath))) {
             return resolveApp(relativePath);
         }
@@ -111,12 +125,13 @@ module.exports = {
     // 一些命令检测
     serve: hasInstall('serve'),
     npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
-    useNodeEnv
+    useNodeEnv,
+    hasJsxRuntime
 };
 
 function hasInstall(command) {
     try {
-        execSync(command + ' --version', {
+        execSync(`${command} --version`, {
             stdio: 'ignore'
         });
 

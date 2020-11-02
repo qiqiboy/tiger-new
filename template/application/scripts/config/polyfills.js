@@ -8,7 +8,7 @@ if (typeof window !== 'undefined') {
 
     // fix IE10 location.origin
     if (typeof window.location.origin === 'undefined') {
-        window.location.origin = window.location.protocol + '//' + window.location.host;
+        window.location.origin = `${window.location.protocol}//${window.location.host}`;
     }
 }
 

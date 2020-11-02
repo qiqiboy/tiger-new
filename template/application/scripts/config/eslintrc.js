@@ -1,4 +1,5 @@
 const paths = require('./paths');
+const pkg = require(paths.appPackageJson);
 
 /**
  * 0: off
@@ -14,10 +15,82 @@ module.exports = {
              * }, */
             rules: {
                 // typescript
-                '@typescript-eslint/no-use-before-define': [2, { functions: false, classes: false }],
+                '@typescript-eslint/adjacent-overload-signatures': 2,
+                '@typescript-eslint/array-type': [
+                    1,
+                    {
+                        default: 'array-simple'
+                    }
+                ],
+                '@typescript-eslint/ban-tslint-comment': 1,
+                '@typescript-eslint/ban-types': [
+                    2,
+                    {
+                        extendDefaults: true,
+                        types: {
+                            '{}': false,
+                            object: false
+                        }
+                    }
+                ],
+                '@typescript-eslint/class-literal-property-style': 1,
+                // '@typescript-eslint/consistent-indexed-object-style': 2,
+                '@typescript-eslint/consistent-type-assertions': 2,
+                '@typescript-eslint/consistent-type-definitions': [2, 'interface'],
+                '@typescript-eslint/member-delimiter-style': [1],
+                // '@typescript-eslint/member-ordering': 1,
+                '@typescript-eslint/naming-convention': [
+                    'error',
+                    {
+                        selector: 'typeLike',
+                        format: ['PascalCase']
+                    }
+                ],
+                '@typescript-eslint/no-confusing-non-null-assertion': 2,
+                '@typescript-eslint/no-empty-interface': 2,
+                '@typescript-eslint/no-extra-non-null-assertion': 2,
+                '@typescript-eslint/no-extraneous-class': 2,
+                '@typescript-eslint/no-invalid-void-type': 1,
+                '@typescript-eslint/no-misused-new': 2,
+                '@typescript-eslint/no-namespace': 2,
+                '@typescript-eslint/no-non-null-asserted-optional-chain': 1,
+                '@typescript-eslint/no-parameter-properties': [
+                    2,
+                    {
+                        allows: [
+                            'readonly',
+                            'private',
+                            'protected',
+                            'public',
+                            'private readonly',
+                            'protected readonly',
+                            'public readonly'
+                        ]
+                    }
+                ],
+                '@typescript-eslint/no-redeclare': [
+                    2,
+                    {
+                        ignoreDeclarationMerge: true
+                    }
+                ],
+                '@typescript-eslint/no-require-imports': 2,
+                '@typescript-eslint/no-var-requires': 2,
+                '@typescript-eslint/no-this-alias': [
+                    'error',
+                    {
+                        allowDestructuring: true, // Allow `const { props, state } = this`; false by default
+                        allowedNames: ['self'] // Allow `const self = this`; `[]` by default
+                    }
+                ],
+                '@typescript-eslint/no-unnecessary-type-constraint': 1,
+                '@typescript-eslint/prefer-as-const': 1,
+                // '@typescript-eslint/prefer-function-type': 1,
+                '@typescript-eslint/prefer-literal-enum-member': 2,
+                '@typescript-eslint/triple-slash-reference': 2,
+                '@typescript-eslint/type-annotation-spacing': 1,
                 '@typescript-eslint/unified-signatures': 1,
-                // '@typescript-eslint/await-thenable': 2,
-                '@typescript-eslint/camelcase': 0,
+
                 'no-unused-vars': 0,
                 '@typescript-eslint/no-unused-vars': [
                     1,
@@ -29,33 +102,19 @@ module.exports = {
                         argsIgnorePattern: '^_|^err|^ev' // _xxx, err, error, ev, event
                     }
                 ],
-                '@typescript-eslint/adjacent-overload-signatures': 2,
-                '@typescript-eslint/array-type': [
-                    1,
-                    {
-                        default: 'array-simple'
-                    }
-                ],
-                '@typescript-eslint/ban-types': 2,
-                '@typescript-eslint/class-name-casing': 2,
+
+                'default-param-last': 0,
+                '@typescript-eslint/default-param-last': 2,
+
+                'no-dupe-class-members': 0,
+                '@typescript-eslint/no-dupe-class-members': 2,
+
+                // disabled rules
                 '@typescript-eslint/explicit-function-return-type': 0,
                 '@typescript-eslint/explicit-member-accessibility': 0,
-                '@typescript-eslint/interface-name-prefix': 0,
-                '@typescript-eslint/member-delimiter-style': 2,
-                '@typescript-eslint/no-empty-interface': 1,
-                '@typescript-eslint/no-extra-non-null-assertion': 2,
                 '@typescript-eslint/no-explicit-any': 0,
                 '@typescript-eslint/no-inferrable-types': 0,
-                '@typescript-eslint/no-misused-new': 2,
-                '@typescript-eslint/no-non-null-assertion': 0,
-                '@typescript-eslint/consistent-type-assertions': 2,
-                '@typescript-eslint/no-parameter-properties': 2,
-                '@typescript-eslint/triple-slash-reference': 2,
-                '@typescript-eslint/no-var-requires': 2,
-                '@typescript-eslint/consistent-type-definitions': [2, 'interface'],
-                '@typescript-eslint/no-namespace': 2,
-                '@typescript-eslint/prefer-namespace-keyword': 2,
-                '@typescript-eslint/type-annotation-spacing': 1
+                '@typescript-eslint/no-non-null-assertion': 0
             }
         }
     ],
@@ -65,12 +124,17 @@ module.exports = {
         __DEV__: true,
         __LOCAL_DEV__: true
     },
+    settings: {
+        'import/core-modules': Object.keys(pkg.dependencies),
+        'import/internal-regex': new RegExp(`^(app|libs|${Object.keys(paths.moduleAlias).join('|')})/`)
+    },
     parserOptions: {
         ecmaFeatures: {
             legacyDecorators: true
         }
     },
     rules: {
+        'react/react-in-jsx-scope': paths.hasJsxRuntime ? 0 : 2,
         'react/jsx-no-target-blank': 0,
         'react/no-unsafe': [2, { checkAliases: true }],
         'react/no-deprecated': 2,
@@ -91,6 +155,13 @@ module.exports = {
                 allowCallExpression: true, // The true value here is for backward compatibility
                 allowLiteral: true,
                 allowObject: true
+            }
+        ],
+        'import/no-duplicates': 1,
+        'import/order': [
+            1,
+            {
+                groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown']
             }
         ],
         eqeqeq: [1, 'smart'],
@@ -123,14 +194,19 @@ module.exports = {
         'no-multiple-empty-lines': [
             1,
             {
-                max: 2,
-                maxEOF: 1,
-                maxBOF: 1
+                max: 1,
+                maxEOF: 0,
+                maxBOF: 0
             }
         ],
         'default-case': [1, { commentPattern: '^no[-\\s]+default$' }],
+        'default-param-last': 2,
         curly: 2,
         'dot-notation': 1,
+        'symbol-description': 2,
+        'prefer-template': 1,
+        'no-unexpected-multiline': 1,
+        'no-dupe-class-members': 2,
         'no-else-return': 2,
         'guard-for-in': 2,
         'no-empty-pattern': 2,
@@ -149,8 +225,8 @@ module.exports = {
         'no-lone-blocks': 2,
         'no-self-compare': 2,
         'no-sequences': 2,
+        'no-floating-decimal': 1,
         yoda: 1,
-        'no-unexpected-multiline': 1,
         'no-with': 2,
         'no-useless-escape': 2,
         'no-useless-concat': 2,
@@ -165,6 +241,8 @@ module.exports = {
             }
         ],
         'no-unmodified-loop-condition': 2,
+        'no-unreachable': 1,
+        'no-unsafe-negation': 2,
         'wrap-iife': [2, 'inside'],
         'lines-between-class-members': [1, 'always', { exceptAfterSingleLine: true }],
         'padding-line-between-statements': [

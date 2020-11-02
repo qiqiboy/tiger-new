@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+const Module = require('module');
 const getProcessForPort = require('react-dev-utils/getProcessForPort');
 const clearConsole = require('react-dev-utils/clearConsole');
 const detect = require('detect-port-alt');
@@ -10,12 +13,9 @@ const forkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpack
 const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware');
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
-const paths = require('./paths');
 const chalk = require('chalk');
-const fs = require('fs');
-const path = require('path');
-const Module = require('module');
 const tmp = require('tmp');
+const paths = require('./paths');
 const pkg = require(paths.appPackageJson);
 
 const isInteractive = process.stdout.isTTY;
@@ -36,12 +36,8 @@ function choosePort(host, defaultPort, spinner) {
                     type: 'confirm',
                     name: 'shouldChangePort',
                     message:
-                        '端口（' +
-                        chalk.yellow(defaultPort) +
-                        '）被占用，可能的程序是： \n  ' +
-                        existingProcess +
-                        '\n\n' +
-                        '  要换一个端口运行本程序吗？',
+                        `端口（${chalk.yellow(defaultPort)}）被占用，可能的程序是： \n  ${existingProcess}\n\n` +
+                        `  要换一个端口运行本程序吗？`,
                     default: true
                 };
 
@@ -58,10 +54,7 @@ function choosePort(host, defaultPort, spinner) {
             }),
         err => {
             throw new Error(
-                chalk.red(`无法为 ${chalk.bold(host)} 找到可用的端口.`) +
-                    '\n' +
-                    ('错误信息: ' + err.message || err) +
-                    '\n'
+                `${chalk.red(`无法为 ${chalk.bold(host)} 找到可用的端口.`)}\n${`错误信息: ${err.message}` || err}\n`
             );
         }
     );
@@ -197,9 +190,9 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
         const isSuccessful = !messages.errors.length && !messages.warnings.length;
 
         if (isSuccessful && (isInteractive || isFirstCompile)) {
-            spinner.succeed(chalk.green('编译通过！' + useTimer(true)));
+            spinner.succeed(chalk.green(`编译通过！${useTimer(true)}`));
             console.log();
-            spinner.succeed(chalk.green('应用(' + appName + ')已启动:'));
+            spinner.succeed(chalk.green(`应用(${appName})已启动:`));
             console.log();
 
             if (urls.lanUrlForTerminal) {
@@ -218,7 +211,7 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
                 messages.errors.length = 1;
             }
 
-            spinner.fail(chalk.red('编译失败！！' + useTimer(true)));
+            spinner.fail(chalk.red(`编译失败！！${useTimer(true)}`));
             console.log();
             console.log(messages.errors.join('\n\n'));
             console.log();
@@ -226,16 +219,16 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
 
         // Show warnings if no errors were found.
         if (messages.warnings.length) {
-            spinner.warn(chalk.yellow('编译有警告产生：' + useTimer(true)));
+            spinner.warn(chalk.yellow(`编译有警告产生：${useTimer(true)}`));
             console.log();
             console.log(messages.warnings.join('\n\n'));
             console.log();
 
             // Teach some ESLint tricks.
-            console.log('\n搜索相关' + chalk.underline(chalk.yellow('关键词')) + '以了解更多关于警告产生的原因.');
+            console.log(`\n搜索相关${chalk.underline(chalk.yellow('关键词'))}以了解更多关于警告产生的原因.`);
 
             console.log(
-                '如果要忽略警告, 可以将 ' + chalk.cyan('// eslint-disable-next-line') + ' 添加到产生警告的代码行上方\n'
+                `如果要忽略警告, 可以将 ${chalk.cyan('// eslint-disable-next-line')} 添加到产生警告的代码行上方\n`
             );
         }
 
@@ -308,7 +301,7 @@ function registerSourceMap(filename, map) {
 
 require('source-map-support').install({
     retrieveSourceMap: filename => {
-        let map = sourceMaps[filename + '.map'];
+        let map = sourceMaps[`${filename}.map`];
 
         return (
             map && {
@@ -385,20 +378,15 @@ function onProxyError(proxy) {
         var host = req.headers && req.headers.host;
 
         console.log(
-            chalk.red('代理错误：') +
-                '无法将 ' +
-                chalk.cyan(req.url) +
-                ' 的请求从 ' +
-                chalk.cyan(host) +
-                ' 转发到 ' +
-                chalk.cyan(proxy) +
-                '.'
+            `${chalk.red('代理错误：')}无法将 ${chalk.cyan(req.url)} 的请求从 ${chalk.cyan(host)} 转发到 ${chalk.cyan(
+                proxy
+            )}.`
         );
 
         console.log(
-            '点击 https://nodejs.org/api/errors.html#errors_common_system_errors 查看更多信息 (' +
-                chalk.cyan(err.code) +
-                ').'
+            `点击 https://nodejs.org/api/errors.html#errors_common_system_errors 查看更多信息 (${chalk.cyan(
+                err.code
+            )}).`
         );
 
         console.log();
@@ -407,7 +395,7 @@ function onProxyError(proxy) {
             res.writeHead(500);
         }
 
-        res.end('代理错误： 无法将 ' + req.url + ' 的请求从 ' + host + ' 转发到 ' + proxy + ' (' + err.code + ').');
+        res.end(`代理错误： 无法将 ${req.url} 的请求从 ${host} 转发到 ${proxy} (${err.code}).`);
     };
 }
 
@@ -454,7 +442,7 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
     }
 
     function mayProxy(pathname) {
-        const maybePublicPath = path.resolve(appPublicFolder, pathname.replace(new RegExp('^' + servedPathname), ''));
+        const maybePublicPath = path.resolve(appPublicFolder, pathname.replace(new RegExp(`^${servedPathname}`), ''));
         const isPublicFileRequest = fs.existsSync(maybePublicPath);
 
         return !isPublicFileRequest;
@@ -462,7 +450,7 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
 
     if (!/^http(s)?:\/\//.test(proxy)) {
         console.log(chalk.red('proxy 只能是一个 http:// 或者 https:// 开头的字符串或者一个object配置'));
-        console.log(chalk.red('当前 proxy 的类型是 "' + typeof proxy + '"。'));
+        console.log(chalk.red(`当前 proxy 的类型是 "${typeof proxy}"。`));
         console.log(chalk.red('你可以从 package.json 中移除它，或者设置一个字符串地址（目标服务器）'));
         process.exit(1);
     }
@@ -510,14 +498,14 @@ function printBuildError(err) {
 
             console.log(
                 '代码压缩有异常: \n\n',
-                chalk.yellow(`\t${problemPath}:${line}${column !== '0' ? ':' + column : ''}`),
+                chalk.yellow(`\t${problemPath}:${line}${column !== '0' ? `:${column}` : ''}`),
                 '\n'
             );
         } catch (ignored) {
             console.log('代码压缩出现异常.', err);
         }
     } else {
-        console.log((message || err) + '\n');
+        console.log(`${message || err}\n`);
     }
 
     console.log();
@@ -529,7 +517,7 @@ function printServeCommand() {
     );
 
     console.log(
-        (usedEnvs.length ? usedEnvs.map(name => name + '=' + process.env[name]).join(' ') + ' ' : '') +
+        (usedEnvs.length ? `${usedEnvs.map(name => `${name}=${process.env[name]}`).join(' ')} ` : '') +
             chalk.cyan('npm run serve')
     );
 }
@@ -560,7 +548,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
         let cache = {};
         let { webpackStats, fs: memoryFs } = res.locals;
         let entryName = (req.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
-        let htmlEntryFile = path.join(nodeBuildPath, entryName + '.html');
+        let htmlEntryFile = path.join(nodeBuildPath, `${entryName}.html`);
 
         if (!paths.pageEntries[entryName] && !paths.nodePageEntries[entryName]) {
             htmlEntryFile = path.join(nodeBuildPath, path.basename(paths.appHtml));
@@ -585,9 +573,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
                         .replace(/%\w+%/g, '')
                         .replace(
                             '<body>',
-                            '<body><pre style="position: relative; z-index: 999999; background: #fff; border: 5px solid red; outline: 5px solid #fff; margin: 5px; padding: 1rem;">' +
-                                error.stack +
-                                '</pre>'
+                            `<body><pre style="position: relative; z-index: 999999; background: #fff; border: 5px solid red; outline: 5px solid #fff; margin: 5px; padding: 1rem;">${error.stack}</pre>`
                         );
 
                     renderError(res, indexHtml, error);
@@ -649,7 +635,7 @@ function devRendererMiddleware(nodeBuildPath, registerSourceMap, spinner) {
 // https://github.com/floatdrop/require-from-string/blob/d1575a49065eb7a49b86b4de963f04f1a14dfd60/index.js
 function requireFromFS(absoluteFilename, fs, cache = {}) {
     if (typeof absoluteFilename !== 'string') {
-        throw new Error('[requireFromFS] filename must be a string, not ' + typeof absoluteFilename);
+        throw new Error(`[requireFromFS] filename must be a string, not ${typeof absoluteFilename}`);
     }
 
     let cached = cache[absoluteFilename];
@@ -663,11 +649,11 @@ function requireFromFS(absoluteFilename, fs, cache = {}) {
     let code = fs.readFileSync(absoluteFilename, 'utf8');
 
     if (typeof code !== 'string') {
-        throw new Error('[requireFromFS] code must be a string, not ' + typeof code);
+        throw new Error(`[requireFromFS] code must be a string, not ${typeof code}`);
     }
 
     if (moduleExtension === '.json') {
-        code = 'module.exports = ' + code;
+        code = `module.exports = ${code}`;
     }
 
     let paths = Module._nodeModulePaths(moduleDirname);

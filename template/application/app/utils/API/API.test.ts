@@ -1,5 +1,5 @@
-import API, { axiosMethods } from '.';
 import axios from 'axios';
+import API, { axiosMethods } from '.';
 
 jest.mock('axios');
 

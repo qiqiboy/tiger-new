@@ -1,8 +1,8 @@
-const fs = require('fs-extra');
 const path = require('path');
-const paths = require('./paths');
+const fs = require('fs-extra');
 const lodash = require('lodash');
 const glob = require('glob');
+const paths = require('./paths');
 
 const excludeDirs = ['node_modules', 'build', 'buildDev', 'dist'];
 
@@ -22,6 +22,11 @@ const rootDirs = glob
     }, {});
 
 module.exports = {
+    globals: {
+        __SSR__: false,
+        __DEV__: true,
+        __LOCAL_DEV__: true
+    },
     rootDir: paths.root,
     roots: ['<rootDir>/app', fs.existsSync(path.join(paths.root, 'tests')) && '<rootDir>/tests'].filter(Boolean),
     collectCoverageFrom: ['app/**/*.{js,jsx,ts,tsx}', '!app/**/*.d.ts'],

@@ -57,7 +57,10 @@ module.exports = {
                 attribute: 'href',
                 type: 'src',
                 filter: (tag, attribute, attributes) => {
-                    if (/image/i.test(getAttributeValue(attributes, 'type')) || /icon/i.test(getAttributeValue(attributes, 'rel'))) {
+                    if (
+                        /image/i.test(getAttributeValue(attributes, 'type')) ||
+                        /icon/i.test(getAttributeValue(attributes, 'rel'))
+                    ) {
                         return true;
                     }
 

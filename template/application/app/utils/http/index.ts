@@ -62,7 +62,7 @@ function dataSerializer(data: object | string) {
 
     for (key in data as object) {
         if (data.hasOwnProperty(key)) {
-            result.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+            result.push(`${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
         }
     }
 
@@ -70,7 +70,7 @@ function dataSerializer(data: object | string) {
 }
 
 // @ts-ignore avoid duplicate interceptors
-if (axios.interceptors.response.handlers.length === 0) {
+if (axios.interceptors.response.handlers?.length === 0) {
     axios.interceptors.request.use((config: AxiosRequestConfig) => {
         if (!config.timeout) {
             config.timeout = typeof window === 'undefined' ? 10 * 1000 : 60 * 1000;
@@ -91,9 +91,9 @@ if (axios.interceptors.response.handlers.length === 0) {
 
         // 请求添加token头
         /* if (!config.noToken) {
-     *     config.headers.Authorization = 'Bearer YOUR_TOKEN';
-     * }
-     */
+         *     config.headers.Authorization = 'Bearer YOUR_TOKEN';
+         * }
+         */
 
         return config;
     });
@@ -167,7 +167,7 @@ function createError(responseError: AxiosError): Promise<any> {
             error_code = 'OFF_LINE';
         } else if (responseError.code === 'ECONNABORTED') {
             error_code = 504;
-            error_msg = '网络请求超时(' + responseError.config.timeout + 'ms)，请确认网络正常并重试';
+            error_msg = `网络请求超时(${responseError.config.timeout}ms)，请确认网络正常并重试`;
         }
     } else {
         // 请求未发出

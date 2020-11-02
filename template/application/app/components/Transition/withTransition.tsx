@@ -62,8 +62,7 @@ export default function withTransition(
 
         onEntering = node => {
             if (node) {
-                node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration =
-                    this.props.timeout + 'ms';
+                node.style.transitionDuration = node.style.WebkitTransitionDuration = node.style.MozTransitionDuration = `${this.props.timeout}ms`;
             }
         };
 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Button from 'components/Button';
 import { Alert } from 'react-bootstrap';
+import Button from 'components/Button';
 
 export interface ErrorBoxProps {
     error: Error | string;

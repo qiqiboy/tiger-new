@@ -1,6 +1,6 @@
-import { RouteItem } from './RouteItem.d';
 import { matchRoutes } from 'react-router-config';
 import URL from 'url';
+import { RouteItem } from './RouteItem.d';
 
 async function prefetchRoutesInitialProps(
     routes: RouteItem[],

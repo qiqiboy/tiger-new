@@ -24,9 +24,9 @@
  * 更详细用法，参考项目README.md
  */
 import { createContext } from 'react';
+import cookick from 'cookick';
 import URL from 'utils/URL';
 import pkg from 'package.json';
-import cookick from 'cookick';
 
 // 可用的语言
 // @ts-ignore
@@ -41,6 +41,7 @@ const globalTranslation = allowedLangs.reduce((translation, lang) => {
     try {
         // @ts-ignore
         if (pkg.locals) {
+            // eslint-disable-next-line
             translation[lang] = require(`locals/${lang}.json`);
         }
     } catch (err) {}
@@ -126,7 +127,8 @@ export function createI18n(
     const localLang = getLocalLang?.(LOCAL_LANG_FLAG);
     const browserLang = getBrowserLang(browserLanguage);
 
-    const language = [queryLang, localLang, browserLang].find(lang => allowedLangs.includes(lang || '')) || allowedLangs[0];
+    const language =
+        [queryLang, localLang, browserLang].find(lang => allowedLangs.includes(lang || '')) || allowedLangs[0];
 
     // 如果本地的语言标识符与当前不一致，则更新本地存储
     if (localLang !== language) {

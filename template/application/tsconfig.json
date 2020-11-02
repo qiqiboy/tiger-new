@@ -5,7 +5,7 @@
     "checkJs": true,
     "module": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "jsx": "react",
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
