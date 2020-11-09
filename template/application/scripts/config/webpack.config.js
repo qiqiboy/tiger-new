@@ -76,7 +76,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                       loader: MiniCssExtractPlugin.loader,
                       options: {
                           publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
-                          sourceMap: shouldUseSourceMap,
                           esModule: true
                       }
                   }

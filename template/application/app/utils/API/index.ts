@@ -12,12 +12,24 @@ interface APIInstance {
     (...args: Array<string | number>): string;
 
     request<T = any>(config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
-    get<T = any>(config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
-    delete(config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise;
-    head(config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise;
-    post<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
-    put<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
-    patch<T = any>(data?: any, config?: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+    get<T = any>(...args: Array<string | number>): AxiosPromise<T>;
+    get<T = any>(config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+    delete(...args: Array<string | number>): AxiosPromise;
+    delete(config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise;
+    head(...args: Array<string | number>): AxiosPromise;
+    head(config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise;
+
+    post<T = any>(...args: Array<string | number>): AxiosPromise<T>;
+    post<T = any>(configOrData: AxiosRequestConfig | any, ...args: Array<string | number>): AxiosPromise<T>;
+    post<T = any>(data: any, config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+
+    put<T = any>(...args: Array<string | number>): AxiosPromise<T>;
+    put<T = any>(configOrData: AxiosRequestConfig | any, ...args: Array<string | number>): AxiosPromise<T>;
+    put<T = any>(data: any, config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
+
+    patch<T = any>(...args: Array<string | number>): AxiosPromise<T>;
+    patch<T = any>(configOrData: AxiosRequestConfig | any, ...args: Array<string | number>): AxiosPromise<T>;
+    patch<T = any>(data: any, config: AxiosRequestConfig, ...args: Array<string | number>): AxiosPromise<T>;
 }
 
 type APIPicker<T extends { [P: string]: any }> = { [P in keyof T]: API<T[P]['API']> };

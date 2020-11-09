@@ -139,6 +139,7 @@ module.exports = {
         'react/no-unsafe': [2, { checkAliases: true }],
         'react/no-deprecated': 2,
         'react/no-string-refs': [1, { noTemplateLiterals: true }],
+        'react/no-this-in-sfc': 2,
         'jsx-a11y/anchor-is-valid': [
             1,
             {
@@ -162,6 +163,12 @@ module.exports = {
             1,
             {
                 groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown']
+            }
+        ],
+        'import/no-useless-path-segments': [
+            1,
+            {
+                noUselessIndex: true
             }
         ],
         eqeqeq: [1, 'smart'],
