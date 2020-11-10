@@ -1,8 +1,6 @@
 import axios from 'axios';
 import API, { axiosMethods } from '.';
 
-jest.mock('axios');
-
 test('should return a url', () => {
     expect(API.PORTAL.userStatus()).toMatch(/^https:\/\//);
 });
