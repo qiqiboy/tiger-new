@@ -362,6 +362,18 @@ function upgradeAppProject(root) {
                         package.babel.plugins.splice(package.babel.plugins.indexOf('react-hot-loader/babel'), 1);
                     }
 
+                    if (!package.eslintConfig || !package.eslintConfig.extends) {
+                        package.eslintConfig = pkgTemp.eslintConfig;
+                    }
+
+                    if (package.eslintConfig.extends.indexOf('react-app/jest') < 0) {
+                        var reactAppIndex = package.eslintConfig.extends.indexOf('react-app');
+
+                        if (reactAppIndex > -1) {
+                            package.eslintConfig.extends.splice(reactAppIndex + 1, 0, 'react-app/jest');
+                        }
+                    }
+
                     if (answers.addLocals) {
                         if (answers.locals) {
                             package.locals = answers.locals.split(/\s+|\s*,\s*/g);
