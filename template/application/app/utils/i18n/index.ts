@@ -49,17 +49,16 @@ const globalTranslation = allowedLangs.reduce((translation, lang) => {
     return translation;
 }, {});
 
-// 从浏览器语言字符串中解析对应的默认语言
-function getBrowserLang(browserlang: string): string {
-    if (/en/i.test(browserlang) && allowedLangs.includes('en_US')) {
-        return 'en_US';
-    } else if (/tw|hk/i.test(browserlang) && allowedLangs.includes('zh_TW')) {
-        return 'zh_TW';
-    } else if (/cn/i.test(browserlang) && allowedLangs.includes('zh_CN')) {
-        return 'zh_CN';
-    }
 
-    return allowedLangs[0];
+const langPatterns = {
+    zh_CN: /cn/i,
+    en_US: /en/i,
+    zh_TW: /tw|hk/i
+};
+
+// 从浏览器语言字符串中解析对应的默认语言
+function getBrowserLang(browserlang: string, langs: string[] = allowedLangs): string {
+    return langs.find(lang => langPatterns[lang]?.test(browserlang)) || langs[0];
 }
 
 /**
