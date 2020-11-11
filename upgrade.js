@@ -55,6 +55,20 @@ function upgradePackageProject(root) {
                 );
                 spinner.succeed(chalk.green('rollup.config.js 已写入！'));
 
+                fs.copySync(
+                    path.resolve(ownPath, 'template/package/eslint.config.js'),
+                    path.resolve(root, 'eslint.config.js'),
+                    {
+                        overwrite: true
+                    }
+                );
+                spinner.succeed(chalk.green('eslint.config.js 已写入！'));
+
+                fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
+                    overwrite: true
+                });
+                spinner.succeed(chalk.green('jest配置 已更新！'));
+
                 if (!fs.existsSync(path.resolve(root, 'jest'))) {
                     fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
                         overwrite: true
@@ -70,6 +84,26 @@ function upgradePackageProject(root) {
                 } else if (!package.prettier.arrowParens) {
                     package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
                 }
+
+                if (!package.eslintConfig || !package.eslintConfig.extends) {
+                    package.eslintConfig = pkgTemp.eslintConfig;
+                }
+
+                if (package.eslintConfig.extends.indexOf('react-app/jest') < 0) {
+                    var reactAppIndex = package.eslintConfig.extends.indexOf('react-app');
+
+                    if (reactAppIndex > -1) {
+                        package.eslintConfig.extends.splice(reactAppIndex + 1, 0, 'react-app/jest');
+                    }
+                }
+
+                if (package.eslintConfig.extends.indexOf('./eslint.config.js') < 0) {
+                    package.eslintConfig.extends.push('./eslint.config.js');
+                }
+
+                package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
+                    'tiger-new': ownPkg.version
+                });
 
                 fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
 

@@ -59,7 +59,7 @@ module.exports = {
                 '^(?!.*\\.(js|jsx|ts|tsx|css|less|sass|scss|json)$)': '<rootDir>/scripts/config/jest/fileTransform.js'
             },
             transformIgnorePatterns: [
-                '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
+                '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|mjs|cjs|ts|tsx)$',
                 '^.+\\.module\\.(css|sass|scss|less)$'
             ],
             modulePaths: [],
@@ -82,6 +82,7 @@ module.exports = {
             ),
             moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node'],
             verbose: false,
+            resetMocks: true,
             watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname']
         }
     ]

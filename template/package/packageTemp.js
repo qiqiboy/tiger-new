@@ -22,7 +22,7 @@ module.exports = {
         presets: ['react-app']
     },
     eslintConfig: {
-        extends: ['react-app']
+        extends: ['react-app', 'react-app/jest', './eslint.config.js']
     },
     commitlint: {
         extends: ['@commitlint/config-conventional'],
@@ -65,5 +65,5 @@ module.exports = {
         extends: 'stylelint-config-recommended'
     },
     peerDependencies: {},
-    engines: { node: '>=8.10.0' }
+    engines: { node: '>=10.13.0' }
 };
