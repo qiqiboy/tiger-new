@@ -15,13 +15,14 @@ const path = require('path');
 const chalk = require('chalk');
 const express = require('express');
 const ora = require('ora');
+const createProxyMiddleware = require('http-proxy-middleware');
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
 const clearConsole = require('react-dev-utils/clearConsole');
 const openBrowser = require('react-dev-utils/openBrowser');
 const { prepareUrls } = require('react-dev-utils/WebpackDevServerUtils');
 const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const history = require('connect-history-api-fallback');
-const { choosePort } = require('./config/helper');
+const { choosePort, prepareProxy } = require('./config/helper');
 const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
 
@@ -31,6 +32,9 @@ const spinner = ora('正在启动服务器...').start();
 
 const isInteractive = process.stdout.isTTY;
 const publicUrlOrPath = getPublicUrlOrPath(true, process.env.BASE_NAME || pkg.homepage || process.env.PUBLIC_URL);
+
+const proxySetting = process.env.PROXY || pkg.proxy;
+const proxyConfig = prepareProxy(proxySetting, paths.appPublic, paths.publicUrlOrPath);
 
 checkBrowsers(paths.root, isInteractive)
     .then(() => {
@@ -67,6 +71,8 @@ checkBrowsers(paths.root, isInteractive)
         if (publicUrlOrPath.startsWith('/') && publicUrlOrPath !== '/') {
             createStatic(paths.publicUrlOrPath);
         }
+
+        server.use(...proxyConfig.map(createProxyMiddleware));
 
         if (paths.useNodeEnv) {
             server.use(async (request, response, next) => {
