@@ -49,6 +49,7 @@ function getClientEnvironment(envRaw) {
                 return env;
             },
             {
+                FAST_REFRESH: 'false',
                 NODE_ENV: process.env.NODE_ENV || 'development',
                 ...envRaw
             }
