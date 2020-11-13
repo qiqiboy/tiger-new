@@ -25,6 +25,7 @@ function appUpgrade(projectName) {
 
 function upgradePackageProject(root) {
     var package = require(path.resolve(root, 'package.json'));
+    var tsconfig = path.resolve(root, 'tsconfig.json');
     var pkgTemp = require(path.resolve(ownPath, 'template/package/packageTemp.js'));
     var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
 
@@ -42,6 +43,15 @@ function upgradePackageProject(root) {
                     chalk.dim('2. 覆盖原来的构建配置 rollup.config.js') +
                     '\n',
                 default: true
+            },
+            {
+                when: function(answers) {
+                    return answers.upgrade && fs.existsSync(tsconfig);
+                },
+                name: 'updateTsconfig',
+                type: 'confirm',
+                message: '是否更新tsconfig.json？',
+                default: false
             }
         ])
         .then(function(answers) {
@@ -63,6 +73,13 @@ function upgradePackageProject(root) {
                     }
                 );
                 spinner.succeed(chalk.green('eslint.config.js 已写入！'));
+
+                if (!fs.existsSync(tsconfig) || answers.updateTsconfig) {
+                    fs.copySync(path.resolve(ownPath, 'template/package/tsconfig.json'), tsconfig, {
+                        overwrite: true
+                    });
+                    spinner.succeed(chalk.green('tsconfig.json已写入！'));
+                }
 
                 fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
                     overwrite: true
