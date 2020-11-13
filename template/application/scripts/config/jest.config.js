@@ -36,6 +36,7 @@ module.exports = {
             ]
         },
         {
+            displayName: 'test',
             globals: {
                 __SSR__: false,
                 __DEV__: true,

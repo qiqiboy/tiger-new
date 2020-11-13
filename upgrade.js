@@ -94,11 +94,71 @@ function upgradePackageProject(root) {
 
                     if (reactAppIndex > -1) {
                         package.eslintConfig.extends.splice(reactAppIndex + 1, 0, 'react-app/jest');
+                    } else {
+                        package.eslintConfig = pkgTemp.eslintConfig;
                     }
+
+                    spinner.succeed(chalk.green('eslint配置 已更新！'));
                 }
 
                 if (package.eslintConfig.extends.indexOf('./eslint.config.js') < 0) {
                     package.eslintConfig.extends.push('./eslint.config.js');
+                }
+
+                if (!package.husky) {
+                    package.husky = pkgTemp.husky;
+                } else {
+                    if (!package.husky.hooks['commit-msg']) {
+                        package.husky.hooks['commit-msg'] = pkgTemp.husky.hooks['commit-msg'];
+                    }
+
+                    if (!package.husky.hooks['pre-commit']) {
+                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
+                    }
+                }
+
+                if (!package.commitlint) {
+                    package['commitlint'] = pkgTemp['commitlint'];
+                }
+
+                if (!package['lint-staged']) {
+                    package['lint-staged'] = pkgTemp['lint-staged'];
+                } else {
+                    package['lint-staged'] = _.mapKeys(package['lint-staged'], (value, key) => {
+                        if (value.indexOf('git add') > -1) {
+                            value.splice(value.indexOf('git add'), 1);
+                        }
+
+                        if (!/\,tests/.test(key)) {
+                            return key.replace(/^\{(.*)\}\//, '{$1,tests}/');
+                        }
+
+                        return key;
+                    });
+                }
+
+                if (!package.scripts.test) {
+                    package.scripts.test = pkgTemp.scripts.test;
+                }
+
+                if (!package.scripts.tsc) {
+                    package.scripts.tsc = pkgTemp.scripts.tsc;
+                }
+
+                if (!package.stylelint) {
+                    package['stylelint'] = pkgTemp['stylelint'];
+                }
+
+                if (!package.browserslist) {
+                    package['browserslist'] = pkgTemp['browserslist'];
+                }
+
+                if (!package.config) {
+                    package.config = {};
+                }
+
+                if (!package.config.commitizen) {
+                    package.config.commitizen = pkgTemp.config.commitizen;
                 }
 
                 package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
@@ -459,10 +519,10 @@ function upgradeAppProject(root) {
 
                     if (!package.config) {
                         package.config = {};
+                    }
 
-                        if (!package.config.commitizen) {
-                            package.config.commitizen = pkgTemp.config.commitizen;
-                        }
+                    if (!package.config.commitizen) {
+                        package.config.commitizen = pkgTemp.config.commitizen;
                     }
 
                     console.log();

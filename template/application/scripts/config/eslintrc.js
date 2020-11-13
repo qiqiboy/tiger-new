@@ -133,7 +133,7 @@ module.exports = {
         __LOCAL_DEV__: true
     },
     settings: {
-        'import/core-modules': Object.keys(pkg.dependencies),
+        'import/core-modules': Object.keys(pkg.dependencies || {}),
         'import/internal-regex': new RegExp(`^(app|libs|${Object.keys(paths.moduleAlias).join('|')})/`)
     },
     parserOptions: {

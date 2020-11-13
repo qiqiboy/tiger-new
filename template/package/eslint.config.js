@@ -17,7 +17,7 @@ module.exports = {
         }
     ],
     settings: {
-        'import/core-modules': [...Object.keys(pkg.dependencies), ...Object.keys(pkg.peerDependencies)]
+        'import/core-modules': [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})]
     },
     rules: {
         'react/react-in-jsx-scope': 2,
