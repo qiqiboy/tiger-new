@@ -1,11 +1,7 @@
 module.exports = {
     files: ['LICENSE', 'README.md', 'dist/', 'src/'],
     scripts: {
-        build: 'npm run lint && npm run clear && npm run build:declaration && npm run build:bundle',
-        'build:bundle': 'rollup -c',
-        'build:declaration': 'tsc --emitDeclarationOnly',
-        clear: 'rimraf dist',
-        lint: "node_modules/.bin/eslint 'src/**/*.{js,jsx,ts,tsx}'",
+        build: 'rimraf dist && tsc --emitDeclarationOnly && rollup -c',
         test: 'node jest/test.js',
         tsc:
             "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --noEmit --checkJs false"

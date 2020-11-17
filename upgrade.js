@@ -92,6 +92,19 @@ function upgradePackageProject(root) {
                     });
                 }
 
+                ['build:bundle', 'build:declaration', 'clear', 'lint'].forEach(name => {
+                    if (package.scripts[name]) {
+                        delete package.scripts[name];
+                    }
+                });
+
+                if (
+                    !package.scripts.build &&
+                    /build:bundle|build:declaration|npm run lint/.test(package.scripts.build)
+                ) {
+                    package.scripts.build = pkgTemp.scripts.build;
+                }
+
                 if (!package.scripts.test) {
                     package.scripts.test = pkgTemp.scripts.test;
                 }
