@@ -49,7 +49,8 @@ function getClientEnvironment(envRaw) {
                 return env;
             },
             {
-                FAST_REFRESH: 'false',
+                // We should set FAST_REFRESH to false(bool) when upgrade react-dev-utils > 11.0.0.
+                FAST_REFRESH: require('semver').gt(require('react-dev-utils/package.json').version, '11.0.0') ? false : 'false',
                 NODE_ENV: process.env.NODE_ENV || 'development',
                 ...envRaw
             }

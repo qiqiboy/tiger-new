@@ -54,6 +54,7 @@
     "i18next-scanner": "2",
     "identity-obj-proxy": "3",
     "imagemin-webpack-plugin": "2",
+    "inquirer": "7",
     "less": "3",
     "less-loader": "7",
     "lint-staged": "10",

@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const checkDependencies = require('check-dependencies');
-const inquirer = require('react-dev-utils/inquirer');
+const inquirer = require('inquirer');
 const spawn = require('cross-spawn');
 const chalk = require('chalk');
 const paths = require('./paths');
