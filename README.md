@@ -47,21 +47,21 @@
 
 ## 安装
 
-    $ npm install tiger-new -g
+不需要安装，你可以直接使用 **`npx tiger-new`** 快速开始。如果你之前安装过`tiger-new`，请卸载它: **`npm uninstall tiger-new -g`**
 
 ## 使用
 
 ### 创建新项目
 
-    $ tiger-new <项目名|路径>
+    $ npx tiger-new <项目名|路径>
 
 ### 升级老项目
 
-    $ tiger-new <项目名|路径> --upgrade
+    $ npx tiger-new <项目名|路径> --upgrade
 
 例如：
 
-    $ tiger-new my-new-project
+    $ npx tiger-new my-new-project
     $ cd my-new-project/
     $ npm start
 
