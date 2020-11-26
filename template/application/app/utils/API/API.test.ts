@@ -24,6 +24,7 @@ test('should throw a error use mockException', async () => {
     try {
         await API.PORTAL.userStatus.get();
     } catch (error) {
+        // eslint-disable-next-line
         expect(error).toEqual(new Error('abc'));
     }
 
