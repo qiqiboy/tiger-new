@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const checkDependencies = require('check-dependencies');
-const inquirer = require('inquirer');
+const inquirer = require('tiger-new-utils/inquirer');
 const spawn = require('cross-spawn');
 const chalk = require('chalk');
 const paths = require('./paths');

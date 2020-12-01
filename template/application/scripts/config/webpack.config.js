@@ -17,13 +17,14 @@ const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const ImageminPlugin = require('imagemin-webpack-plugin').default;
 const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
-const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
+const ForkTsCheckerWebpackPlugin = require('tiger-new-utils/ForkTsCheckerWebpackPlugin');
 const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
-const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
+const typescriptFormatter = require('tiger-new-utils/typescriptFormatter');
 const getClientEnvironment = require('./env');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 const paths = require('./paths');
 const pkg = require(paths.appPackageJson);
+const tsconfig = require(paths.appTsConfig);
 
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 const shouldUseRelativeAssetPath = !paths.publicUrlOrPath.startsWith('http');
@@ -219,8 +220,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             filename: isEnvNode
                 ? '[name].js'
                 : isEnvProduction
-                    ? 'static/js/[name].[contenthash:8].js'
-                    : 'static/js/[name].[hash:8].js',
+                ? 'static/js/[name].[contenthash:8].js'
+                : 'static/js/[name].[hash:8].js',
             // TODO: remove this when upgrading to webpack 5
             futureEmitAssets: true,
             chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
@@ -613,18 +614,32 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             (!isBuilding || isEnvWeb) &&
                 process.env.DISABLE_TSC_CHECK !== 'true' &&
                 new ForkTsCheckerWebpackPlugin({
-                    typescript: resolve.sync('typescript', {
-                        basedir: paths.appNodeModules
-                    }),
-                    async: !isBuilding,
-                    useTypescriptIncrementalApi: true,
-                    checkSyntacticErrors: true,
-                    tsconfig: paths.webpackTsConfig,
-                    compilerOptions: {
-                        jsx: paths.hasJsxRuntime ? (isEnvProduction ? 'react-jsx' : 'react-jsxdev') : 'preserve',
-                        checkJs: false
+                    typescript: {
+                        typescriptPath: resolve.sync('typescript', {
+                            basedir: paths.appNodeModules
+                        }),
+                        mode: 'write-references',
+                        configFile: paths.appTsConfig,
+                        context: paths.root,
+                        configOverwrite: {
+                            compilerOptions: {
+                                types: ['node'],
+                                allowJs: true,
+                                checkJs: false,
+                                jsx: paths.hasJsxRuntime ? (isEnvProduction ? 'react-jsx' : 'react-jsxdev') : 'preserve'
+                            },
+                            exclude: tsconfig.exclude.concat(
+                                'setupTests.ts',
+                                'tests',
+                                '**/*.test.*',
+                                '**/*.spec.*',
+                                '**/__tests__'
+                            )
+                        },
+                        diagnosticOptions: { syntactic: true, semantic: true, declaration: false, global: false }
                     },
-                    silent: true,
+                    async: !isBuilding,
+                    logger: { infrastructure: 'silent', issues: 'silent', devServer: false },
                     formatter: isBuilding ? typescriptFormatter : undefined
                 }),
             new webpack.BannerPlugin({

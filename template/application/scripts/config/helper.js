@@ -1,20 +1,20 @@
 const fs = require('fs');
 const path = require('path');
 const Module = require('module');
+const chalk = require('chalk');
+const tmp = require('tmp');
 const getProcessForPort = require('react-dev-utils/getProcessForPort');
 const clearConsole = require('react-dev-utils/clearConsole');
 const detect = require('detect-port-alt');
-const inquirer = require('inquirer');
-const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const inquirer = require('tiger-new-utils/inquirer');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 const evalSourceMapMiddleware = require('react-dev-utils/evalSourceMapMiddleware');
 const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
-const forkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
+const forkTsCheckerWebpackPlugin = require('tiger-new-utils/ForkTsCheckerWebpackPlugin');
 const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware');
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
-const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
-const chalk = require('chalk');
-const tmp = require('tmp');
+const typescriptFormatter = require('tiger-new-utils/typescriptFormatter');
+const formatWebpackMessages = require('tiger-new-utils/formatWebpackMessages');
 const paths = require('./paths');
 const pkg = require(paths.appPackageJson);
 
@@ -99,8 +99,9 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
 
         forkTsCheckerWebpackPlugin
             .getCompilerHooks(compiler)
-            .receive.tap('afterTypeScriptCheck', (diagnostics, lints) => {
-                const allMsgs = [...diagnostics, ...lints];
+            .issues.tap('afterTypeScriptCheck', (issues, compilation) => {
+                const allMsgs = [...issues];
+
                 const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
 
                 tsCompilerIndex === index &&
@@ -109,6 +110,8 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
                         warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
                     });
             });
+
+        forkTsCheckerWebpackPlugin.getCompilerHooks(compiler).error.tap('hasError', () => {});
     });
 
     // "done" event fires when Webpack has finished recompiling the bundle.

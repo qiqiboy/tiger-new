@@ -104,7 +104,6 @@ module.exports = {
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('app'),
     appTsConfig: resolveApp('tsconfig.json'),
-    webpackTsConfig: resolveApp('.webpack-tsconfig.json'),
     staticSrc: resolveApp('static'),
     locals: resolveApp('locals'),
     proxySetup: resolveApp('setupProxy.js'),
@@ -140,20 +139,3 @@ function hasInstall(command) {
         return false;
     }
 }
-
-const tsconfig = require(module.exports.appTsConfig);
-
-fs.outputJsonSync(
-    module.exports.webpackTsConfig,
-    {
-        extends: './tsconfig.json',
-        compilerOptions: {
-            allowJs: true,
-            checkJs: false
-        },
-        exclude: tsconfig.exclude.concat('setupTests.ts', 'tests', '**/*.test.*', '**/*.spec.*', '**/__tests__')
-    },
-    {
-        spaces: '  '
-    }
-);

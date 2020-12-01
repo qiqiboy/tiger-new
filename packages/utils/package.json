@@ -1,6 +1,6 @@
 {
   "name": "tiger-new-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "The utils for tiger-new",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,8 @@
   "files": [
     "formatWebpackMessages.js",
     "typescriptFormatter.js",
-    "ForkTsCheckerWebpackPlugin.js"
+    "ForkTsCheckerWebpackPlugin.js",
+    "inquirer.js"
   ],
   "peerDependencies": {
     "chalk": "^4.0.0",
@@ -18,6 +19,7 @@
   "author": "qiqiboy",
   "license": "ISC",
   "dependencies": {
-    "fork-ts-checker-webpack-plugin": "^6.0.4"
+    "fork-ts-checker-webpack-plugin": "^6.0.4",
+    "inquirer": "^7.3.3"
   }
 }

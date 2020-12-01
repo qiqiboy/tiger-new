@@ -17,19 +17,20 @@ const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
+const ora = require('ora');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const clearConsole = require('react-dev-utils/clearConsole');
+const { checkBrowsers } = require('react-dev-utils/browsersHelper');
+const formatWebpackMessages = require('tiger-new-utils/formatWebpackMessages');
 const configFactory = require('./config/webpack.config');
 const paths = require('./config/paths');
-const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
-const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const checkMissDependencies = require('./config/checkMissDependencies');
 const { printBuildError, printServeCommand } = require('./config/helper');
-const { checkBrowsers } = require('react-dev-utils/browsersHelper');
 const { ensureLocals } = require('./i18n');
-const ora = require('ora');
+
+const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
+const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const isInteractive = process.stdout.isTTY;
 
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
