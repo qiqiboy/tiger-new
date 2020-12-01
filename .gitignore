@@ -1,5 +1,5 @@
 *.un~
-/node_modules
 /npm-debug.log
 .DS_Store
 npm-debug.*
+node_modules

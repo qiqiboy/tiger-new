@@ -1,0 +1,23 @@
+{
+  "name": "tiger-new-utils",
+  "version": "1.0.1",
+  "description": "The utils for tiger-new",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "formatWebpackMessages.js",
+    "typescriptFormatter.js",
+    "ForkTsCheckerWebpackPlugin.js"
+  ],
+  "peerDependencies": {
+    "chalk": "^4.0.0",
+    "@babel/code-frame": "^7.0.0"
+  },
+  "author": "qiqiboy",
+  "license": "ISC",
+  "dependencies": {
+    "fork-ts-checker-webpack-plugin": "^6.0.4"
+  }
+}
