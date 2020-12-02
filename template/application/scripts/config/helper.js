@@ -101,7 +101,6 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
             .getCompilerHooks(compiler)
             .issues.tap('afterTypeScriptCheck', (issues, compilation) => {
                 const allMsgs = [...issues];
-
                 const format = message => `${message.file}\n${typescriptFormatter(message, true)}`;
 
                 tsCompilerIndex === index &&
@@ -110,8 +109,6 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
                         warnings: allMsgs.filter(msg => msg.severity === 'warning').map(format)
                     });
             });
-
-        forkTsCheckerWebpackPlugin.getCompilerHooks(compiler).error.tap('hasError', () => {});
     });
 
     // "done" event fires when Webpack has finished recompiling the bundle.
