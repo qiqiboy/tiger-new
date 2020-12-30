@@ -72,7 +72,7 @@ checkBrowsers(paths.root, isInteractive)
             createStatic(paths.publicUrlOrPath);
         }
 
-        server.use(...proxyConfig.map(createProxyMiddleware));
+        proxyConfig && server.use(...proxyConfig.map(createProxyMiddleware));
 
         if (paths.useNodeEnv) {
             server.use(async (request, response, next) => {
