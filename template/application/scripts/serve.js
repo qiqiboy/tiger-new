@@ -69,7 +69,7 @@ checkBrowsers(paths.root, isInteractive)
         createStatic('/');
 
         if (publicUrlOrPath.startsWith('/') && publicUrlOrPath !== '/') {
-            createStatic(paths.publicUrlOrPath);
+            createStatic(publicUrlOrPath);
         }
 
         proxyConfig && server.use(...proxyConfig.map(createProxyMiddleware));
