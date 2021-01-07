@@ -99,7 +99,7 @@ function upgradePackageProject(root) {
                 });
 
                 if (
-                    !package.scripts.build &&
+                    !package.scripts.build ||
                     /build:bundle|build:declaration|npm run lint/.test(package.scripts.build)
                 ) {
                     package.scripts.build = pkgTemp.scripts.build;
