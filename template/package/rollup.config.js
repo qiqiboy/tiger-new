@@ -11,6 +11,7 @@ const copy = require('rollup-plugin-copy');
 const sass = require('rollup-plugin-sass');
 const { terser } = require('rollup-plugin-terser');
 const eslint = require('@rollup/plugin-eslint');
+const json = require('@rollup/plugin-json');
 const pkg = require('./package.json');
 
 /**
@@ -69,7 +70,8 @@ function createConfig(env, module) {
             eslint({
                 fix: true,
                 throwOnError: true,
-                throwOnWarning: true
+                throwOnWarning: true,
+                include: '**/*.{js,jsx,ts,tsx,mjs}'
             }),
             nodeResolve({
                 extensions: ['.js', '.jsx', '.ts', '.tsx']
@@ -143,6 +145,7 @@ function createConfig(env, module) {
                 sass({
                     output: `dist/${exportName}.css`
                 }),
+            json(),
             isProd &&
                 terser({
                     output: { comments: false },

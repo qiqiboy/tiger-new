@@ -7,6 +7,7 @@
     "@rollup/plugin-babel": "5",
     "@rollup/plugin-commonjs": "11",
     "@rollup/plugin-eslint": "8",
+    "@rollup/plugin-json": "4",
     "@rollup/plugin-node-resolve": "10",
     "@rollup/plugin-replace": "2",
     "@testing-library/jest-dom": "5",
