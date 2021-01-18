@@ -20,10 +20,11 @@ export default axios;
 
 type ErrorCode = number | string;
 type ErrorMsg = string;
-interface IError extends Error {
+interface HttpError extends Error {
     error_code: ErrorCode;
     error_msg: ErrorMsg;
     response: AxiosResponse;
+    config: AxiosRequestConfig;
 }
 
 interface IData {
@@ -186,11 +187,12 @@ function createError(responseError: AxiosError): Promise<any> {
         error_msg = ERROR_MSG[error_code] || response.statusText || `抱歉，当前请求异常(${error_code})`;
     }
 
-    const error = new Error(error_msg) as IError;
+    const error = new Error(error_msg) as HttpError;
 
     error.error_code = error_code;
     error.error_msg = error_msg;
     error.response = response;
+    error.config = responseError.config;
 
     return Promise.reject(error);
 }
