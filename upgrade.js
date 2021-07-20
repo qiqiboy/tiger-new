@@ -45,7 +45,7 @@ function upgradePackageProject(root) {
                 default: true
             },
             {
-                when: function(answers) {
+                when: function (answers) {
                     return answers.upgrade && fs.existsSync(tsconfig);
                 },
                 name: 'updateTsconfig',
@@ -54,7 +54,7 @@ function upgradePackageProject(root) {
                 default: false
             }
         ])
-        .then(function(answers) {
+        .then(function (answers) {
             if (answers.upgrade) {
                 fs.copySync(
                     path.resolve(ownPath, 'template/package/rollup.config.js'),
@@ -92,7 +92,7 @@ function upgradePackageProject(root) {
                     });
                 }
 
-                ['build:bundle', 'build:declaration', 'clear', 'lint'].forEach(name => {
+                ['build:bundle', 'build:declaration', 'clear', 'lint'].forEach((name) => {
                     if (package.scripts[name]) {
                         delete package.scripts[name];
                     }
@@ -200,11 +200,11 @@ function upgradePackageProject(root) {
                 process.chdir(root);
 
                 install(
-                    Object.keys(newDevDependencies).map(function(key) {
+                    Object.keys(newDevDependencies).map(function (key) {
                         return key + '@' + newDevDependencies[key];
                     }),
                     true,
-                    function() {
+                    function () {
                         console.log();
                         spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
                     }
@@ -258,7 +258,7 @@ function upgradeAppProject(root) {
                 default: true
             }
         ])
-        .then(answers => {
+        .then((answers) => {
             if (answers.upgrade) {
                 var questions = [];
 
@@ -323,10 +323,10 @@ function upgradeAppProject(root) {
                             type: 'input',
                             message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
                             default: 'zh_CN,en_US',
-                            validate: function(input) {
+                            validate: function (input) {
                                 return input ? true : '该字段不能为空';
                             },
-                            when: function(answers) {
+                            when: function (answers) {
                                 return answers.addLocals && !package.locals;
                             }
                         }
@@ -355,7 +355,7 @@ function upgradeAppProject(root) {
                             type: 'confirm',
                             message: '是否更新 global.d.ts 文件？',
                             default: true,
-                            when: function(answers) {
+                            when: function (answers) {
                                 return answers.addSSR;
                             }
                         }
@@ -371,7 +371,7 @@ function upgradeAppProject(root) {
                     });
                 }
 
-                inquirer.prompt(questions).then(answers => {
+                inquirer.prompt(questions).then((answers) => {
                     console.log();
 
                     copyScripts(root);
@@ -606,6 +606,10 @@ function upgradeAppProject(root) {
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
                         package.scripts.pack = 'npm run build && npm run cdn';
+
+                        if (package.cdn['ali-oss'] && typeof package.cdn['ali-oss'] !== 'boolean') {
+                            package.cdn['ali-oss'] = true;
+                        }
                     }
 
                     if (!package.scripts.test) {
@@ -625,11 +629,11 @@ function upgradeAppProject(root) {
                     process.chdir(root);
 
                     install(
-                        Object.keys(newDevDependencies).map(function(key) {
+                        Object.keys(newDevDependencies).map(function (key) {
                             return key + '@' + newDevDependencies[key];
                         }),
                         true,
-                        function() {
+                        function () {
                             console.log();
                             spinner.succeed('项目开发依赖已更新！');
                             console.log();
@@ -638,7 +642,7 @@ function upgradeAppProject(root) {
                                 install(
                                     ['react@latest', 'react-dom@latest', 'react-formutil@latest'],
                                     false,
-                                    function() {
+                                    function () {
                                         console.log();
                                         spinner.succeed('升级react成功！');
 
@@ -691,11 +695,11 @@ function install(packageToInstall, saveDev, callback) {
         stdio: 'inherit'
     });
 
-    child.on('close', function(code) {
+    child.on('close', function (code) {
         callback(code, command, args);
     });
 
-    process.on('exit', function() {
+    process.on('exit', function () {
         child.kill();
     });
 }

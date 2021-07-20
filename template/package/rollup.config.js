@@ -25,10 +25,11 @@ const exportName = pkg.exportName || pkg.name.split('/').slice(-1)[0];
 /**
  * 如果你希望编译后的代码里依然自动包含进去编译后的css，那么这里可以设置为 true
  */
-const shouldPreserveCss = false;
 
 function createConfig(env, module) {
     const isProd = env === 'production';
+    const shouldPreserveCss = module === 'esm';
+
     // for umd globals
     const globals = {
         react: 'React',
@@ -44,8 +45,10 @@ function createConfig(env, module) {
         external:
             module === 'umd'
                 ? Object.keys(globals)
-                : id =>
-                      !externalExclude.some(name => id.startsWith(name)) && !id.startsWith('.') && !path.isAbsolute(id),
+                : (id) =>
+                      !externalExclude.some((name) => id.startsWith(name)) &&
+                      !id.startsWith('.') &&
+                      !path.isAbsolute(id),
         output: {
             name: exportName,
             file: `dist/${exportName}.${module}.${env}.js`,

@@ -343,6 +343,7 @@ function createLibrary(name) {
         author: projectCustom.author,
         main: 'dist/index.cjs.js',
         module: 'dist/index.esm.js',
+        browser: 'dist/index.esm.js',
         types: 'dist/' + path.basename(projectCustom.entryFile, path.extname(projectCustom.entryFile)) + '.d.ts',
         entryFile: projectCustom.entryFile,
         exportName: projectCustom.exportName

@@ -1,10 +1,10 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const path = require('path');
+const OSS = require('ali-oss');
+const lodash = require('lodash');
 const fs = require('fs-extra');
 const Rsync = require('rsync');
-const OSS = require('ali-oss');
 const chalk = require('chalk');
-const lodash = require('lodash');
 const glob = require('glob');
 const ora = require('ora');
 const paths = require('./config/paths');
@@ -22,7 +22,7 @@ let throttleDelay = 0;
 if (process.env.SKIP_CDN === 'true') {
     spinner.info(chalk.cyan('本次构建忽略CDN任务'));
 } else if (pkg.cdn) {
-    if ('server' in pkg.cdn || 'ali-oss' in pkg.cdn) {
+    if ('server' in pkg.cdn || ('ali-oss' in pkg.cdn && process.env.ALIOSS_AUTH_ID)) {
         runCDN();
     } else {
         spinner.fail(chalk.red(`未发现CDN服务连接配置信息！`));
@@ -40,16 +40,18 @@ if (process.env.SKIP_CDN === 'true') {
         "host": "${pkg.cdn.host || 'https://xxx.com'}",
         "path": "${pkg.cdn.path || '/xxx'}",
         ${chalk.cyan(`"server": "host:path",
-        "ali-oss": {
-            ...
-        }`)}
+        "ali-oss": true`)}
    },
    ...
 }
 
 server和ali-oss字段必选其一配置，别对对应下述两种cdn配置方式：
 
-1. 阿里云的OSS存储服务，对应ali-oss配置（具体需要配置的内容可以参考阿里云文档）
+1. 阿里云的OSS存储服务，对应ali-oss配置（具体需要配置的内容可以参考阿里云文档）；另外从安全考虑，默认阿里云配置从系统环境变量中获取:
+    accessKeyId: process.env.ALIOSS_AUTH_ID
+    accessKeySecret: process.env.ALIOSS_AUTH_SECRET
+    bucket: process.env.ALIOSS_AUTH_BUCKET
+    region: process.env.ALIOSS_AUTH_REGION
 2. 通过ssh的rsync命令传到源服务器上，对应server字段配置，即rsync命令的目标服务器与路径，例如：BEIJING_HOST:/data0/webservice/static
 `) // `
         );
@@ -165,7 +167,13 @@ function createRsync(file) {
 function createOSS(file) {
     return new Promise(resolve => {
         setTimeout(() => {
-            const client = new OSS(pkg.cdn['ali-oss']);
+            const client = new OSS({
+                accessKeyId: process.env.ALIOSS_AUTH_ID,
+                accessKeySecret: process.env.ALIOSS_AUTH_SECRET,
+                bucket: process.env.ALIOSS_AUTH_BUCKET,
+                region: process.env.ALIOSS_AUTH_REGION
+            });
+
             const objectName = path.relative(paths.appBuild, file);
 
             client
