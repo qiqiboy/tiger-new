@@ -1,8 +1,8 @@
-$remRootSize: 14; //默认设计字号，实际中可以直接将默认设计宽度的设计稿中的dp除以100换成rem。例如，设计稿中20dp，可以直接写为0.2rem
-$remDefaultWidth: 375; //默认设计宽度
-$remMaxScreenWith: 600; //最大屏幕宽度
+$remRootSize: 14; //默认设计字号，和bootstrap中保持一致，禁止修改
+$remDefaultWidth: 375; //默认设计宽度，这里要和设计稿中的pt/dp尺寸数值一致
+$remMaxScreenWith: 600; //最大屏幕宽度，超过该宽度后基础尺寸不再继续放大
 $remMinScreenWidth: 320; //最小屏幕宽度
-$remFlowStep: 5; //设定rem参考值的递增值
+$remFlowStep: 5; //设定rem参考值的递增值，一般无需修改
 
 html {
     font-size: $remMinScreenWidth / $remMaxScreenWith * $remRootSize + px;

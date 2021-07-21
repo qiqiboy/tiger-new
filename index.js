@@ -107,7 +107,7 @@ if (program.upgrade) {
                             return (
                                 chalk.cyan(input) +
                                 ' 不是一个有效的package名称：\n' +
-                                chalk.red((result.errors || result.warnings).map(text => '* ' + text).join('\n'))
+                                chalk.red((result.errors || result.warnings).map((text) => '* ' + text).join('\n'))
                             );
                         }
                     }
@@ -218,6 +218,12 @@ if (program.upgrade) {
                         type: 'confirm',
                         message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
                         default: false
+                    },
+                    {
+                        name: 'useRem',
+                        type: 'confirm',
+                        message: '是否使用页面等比例缩放模式（使用rem）？',
+                        default: false
                     }
                 );
             }
@@ -298,6 +304,10 @@ function createApp(name) {
         noRewrite: !projectCustom.isSpa,
         proxy: projectCustom.proxy || null
     };
+
+    if (projectCustom.useRem) {
+        packageJson.useRem = true;
+    }
 
     fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(packageJson, null, 2));
 
@@ -418,9 +428,7 @@ function install(packageToInstall, saveDev, callback) {
 }
 
 function getGitRepoUrl() {
-    let result = execSync('git ls-remote --get-url')
-        .toString()
-        .trim();
+    let result = execSync('git ls-remote --get-url').toString().trim();
 
     if (/^(git|http)/.test(result)) {
         return result;

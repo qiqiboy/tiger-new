@@ -71,6 +71,7 @@
     "postcss-flexbugs-fixes": "4",
     "postcss-loader": "3",
     "postcss-preset-env": "6",
+    "postcss-pxtorem": 5,
     "postcss-safe-parser": "4",
     "prettier": "2",
     "raw-loader": "4",

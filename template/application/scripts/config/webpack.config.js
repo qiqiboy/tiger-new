@@ -89,15 +89,22 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 loader: require.resolve('postcss-loader'),
                 options: {
                     ident: 'postcss',
-                    plugins: () => [
-                        require('postcss-flexbugs-fixes'),
-                        require('postcss-preset-env')({
-                            autoprefixer: {
-                                flexbox: 'no-2009'
-                            },
-                            stage: 3
-                        })
-                    ],
+                    plugins: () =>
+                        [
+                            pkg.useRem &&
+                                require('postcss-pxtorem')({
+                                    rootValue: 14,
+                                    propList: ['*'],
+                                    mediaQuery: false
+                                }),
+                            require('postcss-flexbugs-fixes'),
+                            require('postcss-preset-env')({
+                                autoprefixer: {
+                                    flexbox: 'no-2009'
+                                },
+                                stage: 3
+                            })
+                        ].filter(Boolean),
                     sourceMap: shouldUseSourceMap
                 }
             }

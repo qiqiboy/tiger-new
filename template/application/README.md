@@ -17,6 +17,7 @@
     + [`utils/API`](#utilsapi)
     + [`utils/i18n`](#utilsi18n)
 - [开始开发](#开始开发)
+- [页面适配等比例缩放（rem）](#页面适配等比例缩放rem)
 - [环境变量](#环境变量)
 - [部署测试](#部署测试)
 - [上线](#上线)
@@ -246,6 +247,24 @@ $ HOST='local.test.com' npm start
 
 # 指定代理服务器
 $ PROXY='https://api.twitter.com/' npm start
+```
+
+### 页面适配等比例缩放（rem）
+
+如果项目要支持等比例放大模式，只需要以下两步即可：
+
+1. 编辑项目下的 `static/css/vendor.scss`，取消掉 `@improt './rem.scss';` 的注释
+2. 在项目根目录下的`package.json`中添加 `"useRem": true,` 即可
+
+我们通过 postcss 插件实现了对项目中 px 尺寸的自动转换为 rem 支持，所以你无需特地对设计稿到 rem 的尺寸进行计算，直接像普通项目那样书写 px 单位即可。项目编译时会自动转换为 rem。
+
+如果你在某些情况下不希望转换发生，很简单，使用大些`PX`即可（插件会忽略该单位，而浏览器可以正常识别）！
+
+```scss
+.box {
+    font-size: 16px; // 小写的px单位将会转换为rem
+    line-height: 30px; // 大写的PX将会被忽略，不进行转换
+}
 ```
 
 ### 环境变量
