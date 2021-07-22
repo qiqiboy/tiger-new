@@ -95,6 +95,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 require('postcss-pxtorem')({
                                     rootValue: 14,
                                     propList: ['*'],
+                                    selectorBlackList: ['html'],
                                     mediaQuery: false
                                 }),
                             require('postcss-flexbugs-fixes'),
