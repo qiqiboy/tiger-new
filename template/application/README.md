@@ -258,12 +258,20 @@ $ PROXY='https://api.twitter.com/' npm start
 
 我们通过 postcss 插件实现了对项目中 px 尺寸的自动转换为 rem 支持，所以你无需特地对设计稿到 rem 的尺寸进行计算，直接像普通项目那样书写 px 单位即可。项目编译时会自动转换为 rem。
 
-如果你在某些情况下不希望转换发生，很简单，使用大些`PX`即可（插件会忽略该单位，而浏览器可以正常识别）！
+如果你在某些情况下不希望转换发生，很简单，属性值使用大写的`PX`（插件会忽略该单位，而浏览器可以正常识别）或者定义 className 类名时以 `px-` 开头即可！
+
+如果你在某些情况下不希望转换发生，很简单，属性值使用大写的`PX`（插件会忽略该单位，而浏览器可以正常识别）或者定义 className 类名时以 `px-` 开头即可！
 
 ```scss
 .box {
     font-size: 16px; // 小写的px单位将会转换为rem
-    line-height: 30px; // 大写的PX将会被忽略，不进行转换
+    /* prettier-ignore */
+    line-height: 30PX; // 大写的PX将会被忽略，不进行转换(上方的注释不能缺少，否则prettier会将其格式化成小写)
+}
+
+// 以 px- 开头的类选择器下所有属性值都不会被转换
+.px-box {
+    line-height: 30px;
 }
 ```
 
@@ -285,7 +293,7 @@ $ PROXY='https://api.twitter.com/' npm start
 -   `RUNTIME` 运行时标记，`web` 或者 `node`
 -   `COMPILE_ON_WARNING` 构建时允许警告
 -   `TSC_COMPILE_ON_ERROR` 开发时允许 ts 编译器错误
--   `DISABLE_NEW_JSX_TRANSFORM` 不使用react新的JSX transform
+-   `DISABLE_NEW_JSX_TRANSFORM` 不使用 react 新的 JSX transform
 -   `TIGER_*` 任意的以`TIGER_`开头的变量。**该变量也会传递给 webpack 构建，所以你可以在项目代码中访问该变量：`process.env.TIGER_*`**
 
 以上环境变量，你可以在运行相关命令时指定，也可以通过项目根目录下的`.env` `.env.production` `.env.developement` `.env.local` `.env.production.local` `.env.developement.local` 等文件配置。
@@ -297,7 +305,9 @@ $ PROXY='https://api.twitter.com/' npm start
 要在测试环境部署，可以部署测试包：
 
 ```
-$ npm run build:dev
+
+\$ npm run build:dev
+
 ```
 
 该命令会创建与本地开发环境一致的构建包，方便查看、调试错误。
@@ -307,7 +317,9 @@ $ npm run build:dev
 如果项目需要上线，可以运行：
 
 ```
-$ npm run pack
+
+\$ npm run pack
+
 ```
 
 该命令会开启代码压缩混淆、css 提取合并、图片压缩等，构建出尽可能小的代码包。如果创建项目时配置了 cdn 服务，该命令也会在构建完成后自动自行 cdn 上传操作。
@@ -320,7 +332,7 @@ $ npm run pack
 
 我们提供了一个全局语言匹配函数: `__()`，任何需要配置多语言的文本，都可以使用该函数包装。但是，需要注意的是，只能传递普通的文本字符串，**不可传递字符串拼接、变量、或者 ES6 的字符串模板！**
 
-> 请注意，全局的 `__()` 仅可用于纯浏览器端，如果启用了SSR，那么不可以全局调用 `__()`，否则代码在服务端将会报错。SSR模式下i18n使用请参考：[`SSR: 国际化 i18n`](https://github.com/qiqiboy/tiger-new/blob/master/README.md#国际化-i18n))
+> 请注意，全局的 `__()` 仅可用于纯浏览器端，如果启用了 SSR，那么不可以全局调用 `__()`，否则代码在服务端将会报错。SSR 模式下 i18n 使用请参考：[`SSR: 国际化 i18n`](https://github.com/qiqiboy/tiger-new/blob/master/README.md#国际化-i18n))
 
 #### 错误的用法
 
