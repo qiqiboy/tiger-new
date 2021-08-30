@@ -53,7 +53,7 @@ module.exports = {
                 '<rootDir>/app/**/__tests__/**/*.{js,jsx,ts,tsx}',
                 '<rootDir>/{app,tests}/**/*.{spec,test}.{js,jsx,ts,tsx}'
             ],
-            testEnvironment: 'jest-environment-jsdom-fourteen',
+            testEnvironment: 'jsdom',
             transform: {
                 '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
                 '^.+\\.(css|less|sass|scss$)': '<rootDir>/scripts/config/jest/cssTransform.js',
@@ -75,6 +75,7 @@ module.exports = {
                 Object.assign(
                     {
                         '^react-native$': 'react-native-web',
+                        'react-hot-loader': 'tiger-new-utils/react-hot-loader',
                         '^.+\\.module\\.(css|sass|scss|less)$': 'identity-obj-proxy'
                     },
                     rootFiles,

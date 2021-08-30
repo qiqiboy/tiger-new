@@ -14,29 +14,9 @@ function getAttributeValue(attributes, name) {
 module.exports = {
     minimize: false,
     esModule: false,
-    attributes: {
+    sources: {
         list: [
-            {
-                tag: 'audio',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'embed',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'img',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'img',
-                attribute: 'srcset',
-                type: 'srcset'
-            },
-
+            '...',
             {
                 tag: 'img',
                 attribute: 'data-src',
@@ -46,73 +26,6 @@ module.exports = {
                 tag: 'img',
                 attribute: 'data-srcset',
                 type: 'srcset'
-            },
-            {
-                tag: 'input',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'link',
-                attribute: 'href',
-                type: 'src',
-                filter: (tag, attribute, attributes) => {
-                    if (
-                        /image/i.test(getAttributeValue(attributes, 'type')) ||
-                        /icon/i.test(getAttributeValue(attributes, 'rel'))
-                    ) {
-                        return true;
-                    }
-
-                    if (!/stylesheet/i.test(getAttributeValue(attributes, 'rel'))) {
-                        return false;
-                    }
-
-                    if (attributes.type && getAttributeValue(attributes, 'type').trim().toLowerCase() !== 'text/css') {
-                        return false;
-                    }
-
-                    if (!/\.file\.(sass|scss|less|css)$/) {
-                        return false;
-                    }
-
-                    return true;
-                }
-            },
-            {
-                tag: 'object',
-                attribute: 'data',
-                type: 'src'
-            },
-            {
-                tag: 'script',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'source',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'source',
-                attribute: 'srcset',
-                type: 'srcset'
-            },
-            {
-                tag: 'track',
-                attribute: 'src',
-                type: 'src'
-            },
-            {
-                tag: 'video',
-                attribute: 'poster',
-                type: 'src'
-            },
-            {
-                tag: 'video',
-                attribute: 'src',
-                type: 'src'
             }
         ],
         urlFilter: (attribute, value, resourcePath) => {
@@ -126,8 +39,7 @@ module.exports = {
             }
 
             return false;
-        },
-        root: paths.root
+        }
     },
     preprocessor: (content, loaderContext) => {
         return content.replace(/"(static|app)\//g, `"~$1/`);

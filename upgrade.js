@@ -239,8 +239,24 @@ function upgradeAppProject(root) {
 
     var package = require(packageJson);
 
-    var currentDevDependencies = package.devDependencies || {};
-    var newDevDependencies = require(path.join(ownPath, 'template/application/dependencies.json')).devDependencies;
+    var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
+    var newDevDependencies = newDependenciesConfig.devDependencies;
+    var patchDeps = ['url', 'react-refresh'].map((dep) => dep + '@' + newDependenciesConfig.dependencies[dep]);
+    var cleanDeps = [
+        'eslint-loader',
+        'raw-loader',
+        'url-loader',
+        'file-loader',
+        'imagemin-webpack-plugin',
+        'jest-environment-jsdom-fourteen',
+        'jest-environment-jsdom',
+        'jest-resolve',
+        'optimize-css-assets-webpack-plugin',
+        'postcss-safe-parser',
+        'react-dev-utils',
+        'sw-precache-webpack-plugin'
+    ];
+    var cleanFiles = ['config/tslintrc.json', 'config/checkMissDependencies.js'];
 
     inquirer
         .prompt([
@@ -371,8 +387,22 @@ function upgradeAppProject(root) {
                     });
                 }
 
+                if (_.some(package.devDependencies, (v, k) => cleanDeps.includes(k))) {
+                    questions.push({
+                        name: 'cleanDeps',
+                        type: 'confirm',
+                        message: '是否清理过期的devDependencies依赖项？',
+                        default: true
+                    });
+                }
+
                 inquirer.prompt(questions).then((answers) => {
                     console.log();
+
+                    // clean unused files
+                    cleanFiles.forEach((file) => {
+                        fs.removeSync(path.resolve(root, 'scripts', file));
+                    });
 
                     copyScripts(root);
                     spinner.succeed(chalk.green('scripts构建目录已更新！'));
@@ -547,6 +577,12 @@ function upgradeAppProject(root) {
                         );
                     }
 
+                    if (answers.cleanDeps) {
+                        cleanDeps.forEach((key) => {
+                            delete package.devDependencies[key];
+                        });
+                    }
+
                     if (!package.config) {
                         package.config = {};
                     }
@@ -628,33 +664,39 @@ function upgradeAppProject(root) {
 
                     process.chdir(root);
 
-                    install(
-                        Object.keys(newDevDependencies).map(function (key) {
-                            return key + '@' + newDevDependencies[key];
-                        }),
-                        true,
-                        function () {
-                            console.log();
-                            spinner.succeed('项目开发依赖已更新！');
-                            console.log();
-
+                    Promise.all([
+                        install(
+                            Object.keys(newDevDependencies).map(function (key) {
+                                return key + '@' + newDevDependencies[key];
+                            }),
+                            true,
+                            function () {
+                                console.log();
+                                spinner.succeed('项目开发依赖已更新！');
+                                console.log();
+                            }
+                        ),
+                        install(patchDeps, false)
+                    ])
+                        .then(function () {
                             if (answers.upgradeReact) {
-                                install(
+                                return install(
                                     ['react@latest', 'react-dom@latest', 'react-formutil@latest'],
                                     false,
                                     function () {
                                         console.log();
                                         spinner.succeed('升级react成功！');
-
                                         console.log();
-                                        spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
                                     }
                                 );
-                            } else {
-                                spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
                             }
-                        }
-                    );
+                        })
+                        .then(function () {
+                            spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
+                        })
+                        .catch(() => {
+                            spinner.fail(chalk.red('错误：依赖安装失败，请重试！'));
+                        });
                 });
             } else {
                 spinner.fail('升级已取消！');
@@ -680,27 +722,31 @@ function shouldUseCnpm() {
 }
 
 function install(packageToInstall, saveDev, callback) {
-    var command;
-    var args;
+    return new Promise(function (resolve, reject) {
+        var command;
+        var args;
 
-    if (shouldUseCnpm()) {
-        command = 'cnpm';
-    } else {
-        command = 'npm';
-    }
+        if (shouldUseCnpm()) {
+            command = 'cnpm';
+        } else {
+            command = 'npm';
+        }
 
-    args = ['install', saveDev ? '--save-dev' : '--save', '--save-exact'].concat(packageToInstall);
+        args = ['install', saveDev ? '--save-dev' : '--save', '--save-exact'].concat(packageToInstall);
 
-    var child = spawn(command, args, {
-        stdio: 'inherit'
-    });
+        var child = spawn(command, args, {
+            stdio: 'inherit'
+        });
 
-    child.on('close', function (code) {
-        callback(code, command, args);
-    });
+        child.on('close', function (code) {
+            callback && callback();
+            resolve();
+        });
 
-    process.on('exit', function () {
-        child.kill();
+        process.on('exit', function () {
+            reject();
+            child.kill();
+        });
     });
 }
 

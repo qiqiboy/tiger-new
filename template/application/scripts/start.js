@@ -9,19 +9,20 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
-const chalk = require('react-dev-utils/chalk');
+const chalk = require('tiger-new-utils/chalk');
 const webpack = require('webpack');
-const ora = require('ora');
+const ora = require('tiger-new-utils/ora');
 const WebpackDevServer = require('webpack-dev-server');
-const clearConsole = require('react-dev-utils/clearConsole');
-const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const { prepareUrls } = require('react-dev-utils/WebpackDevServerUtils');
-const openBrowser = require('react-dev-utils/openBrowser');
-const { checkBrowsers } = require('react-dev-utils/browsersHelper');
-const { choosePort, createCompiler, prepareProxy, createDevServerConfig } = require('./config/helper');
+const clearConsole = require('tiger-new-utils/clearConsole');
+const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
+const { prepareUrls } = require('tiger-new-utils/WebpackDevServerUtils');
+const openBrowser = require('tiger-new-utils/openBrowser');
+const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
+const { choosePort, createCompiler, prepareProxy } = require('tiger-new-utils/WebpackDevServerUtils');
+const checkMissDependencies = require('tiger-new-utils/checkMissDependencies');
+const { createDevServerConfig } = require('./config/helper');
 const paths = require('./config/paths');
 const configFactory = require('./config/webpack.config');
-const checkMissDependencies = require('./config/checkMissDependencies');
 const { ensureLocals } = require('./i18n');
 const pkg = require(paths.appPackageJson);
 
@@ -40,7 +41,7 @@ const spinner = ora('webpack启动中...').start();
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
-checkMissDependencies(spinner).then(() => {
+checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
     return checkBrowsers(paths.root, isInteractive)
         .then(() => {
             return choosePort(HOST, DEFAULT_PORT, spinner);
@@ -66,8 +67,10 @@ checkMissDependencies(spinner).then(() => {
             const tscCompileOnError = process.env.TSC_COMPILE_ON_ERROR === 'true';
             const urls = prepareUrls(protocol, HOST, port, paths.publicUrlOrPath.slice(0, -1));
             const devSocket = {
-                warnings: warnings => devServer.sockWrite(devServer.sockets, 'warnings', warnings),
-                errors: errors => devServer.sockWrite(devServer.sockets, 'errors', errors)
+                warnings: warnings => devServer.sendMessage(devServer.webSocketServer.clients, 'warnings', warnings),
+                errors: errors => {
+                    devServer.sendMessage(devServer.webSocketServer.clients, 'errors', errors);
+                }
             };
             const compiler = createCompiler({
                 appName,
@@ -80,14 +83,10 @@ checkMissDependencies(spinner).then(() => {
             });
             const proxySetting = process.env.PROXY || pkg.proxy;
             const proxyConfig = prepareProxy(proxySetting, paths.appPublic, paths.publicUrlOrPath);
-            const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig, spinner);
-            const devServer = new WebpackDevServer(compiler, serverConfig);
+            const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig, HOST, port, spinner);
+            const devServer = new WebpackDevServer(serverConfig, compiler);
 
-            devServer.listen(port, HOST, err => {
-                if (err) {
-                    return console.log(err);
-                }
-
+            devServer.startCallback(() => {
                 if (isInteractive) {
                     clearConsole();
                 }

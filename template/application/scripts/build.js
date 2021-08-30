@@ -14,18 +14,18 @@ process.on('unhandledRejection', err => {
 require('./config/env');
 
 const path = require('path');
-const chalk = require('chalk');
+const chalk = require('tiger-new-utils/chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
-const ora = require('ora');
-const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
-const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
-const clearConsole = require('react-dev-utils/clearConsole');
-const { checkBrowsers } = require('react-dev-utils/browsersHelper');
+const ora = require('tiger-new-utils/ora');
+const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
+const FileSizeReporter = require('tiger-new-utils/FileSizeReporter');
+const clearConsole = require('tiger-new-utils/clearConsole');
+const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
 const formatWebpackMessages = require('tiger-new-utils/formatWebpackMessages');
+const checkMissDependencies = require('tiger-new-utils/checkMissDependencies');
 const configFactory = require('./config/webpack.config');
 const paths = require('./config/paths');
-const checkMissDependencies = require('./config/checkMissDependencies');
 const { printBuildError, printServeCommand } = require('./config/helper');
 const { ensureLocals } = require('./i18n');
 
@@ -49,7 +49,7 @@ const config = configFactory(useDevConfig ? 'development' : 'production');
 const nodeConfig = configFactory(useDevConfig ? 'development' : 'production', 'node');
 
 checkBrowsers(paths.root, isInteractive).then(() => {
-    return checkMissDependencies(spinner)
+    return checkMissDependencies(paths.root, paths.npmCommander, spinner)
         .then(() => {
             return measureFileSizesBeforeBuild(paths.appBuild);
         })

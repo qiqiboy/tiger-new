@@ -36,7 +36,7 @@ module.exports = function createEvalSourceMapMiddleware(server) {
         next();
       }
 
-      const source = getSourceById(server, id);console.log(source)
+      const source = getSourceById(server, id);
       const sourceMapURL = `//# sourceMappingURL=${base64SourceMap(source)}`;
       const sourceURL = `//# sourceURL=webpack-internal:///${module.id}`;
       res.end(`${source.source()}\n${sourceMapURL}\n${sourceURL}`);

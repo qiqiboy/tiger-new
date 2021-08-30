@@ -10,6 +10,7 @@
     - [升级老项目](#升级老项目)
     - [功能说明](#功能说明)
 * [更新日志](#更新日志)
+    - [v7.x 新功能](#v7x-新功能)
     - [v6.x 新功能](#v6x-新功能)
     - [v5.x 新功能](#v5x-新功能)
     - [v4.x 新功能](#v4x-新功能)
@@ -108,6 +109,11 @@
 **更多功能请创建项目后查看项目的 README.md 文件**
 
 ## 更新日志
+
+### v7.x 新功能
+
+-   支持`webpack@5`
+-   进一步提高编译性能
 
 ### v6.x 新功能
 
@@ -233,7 +239,7 @@ app.use(async (req, res, next) => {
 
 app.listen(port);
 
-process.on('SIGINT', function() {
+process.on('SIGINT', function () {
     process.exit(0);
 });
 ```
@@ -459,11 +465,9 @@ export default renderer;
 import React from 'react';
 import withSSR, { SSRProps } from 'utils/withSSR';
 
-const Home: React.FC<
-    SSRProps<{
-        homeData: any;
-    }>
-> = props => {
+const Home: React.FC<SSRProps<{
+    homeData: any;
+}>> = (props) => {
     return <div className="home">{props.homeData}</div>;
 };
 
@@ -525,7 +529,7 @@ function withSSR<SelfProps, More = {}>(
 
 ```typescript
 withSSR(MyComponent, () =>
-    fetch('/data.json').then(resp => ({
+    fetch('/data.json').then((resp) => ({
         data: resp.toJSON()
     }))
 );
@@ -567,7 +571,7 @@ const MyComp: React.FC<
         passToComponentPropName: string;
     }> &
         RouteComponentProps
-> = props => {
+> = (props) => {
     if (props.__loading__) {
         return 'loading...';
     }

@@ -18,8 +18,8 @@ const issueOrigins = {
 };
 
 function formatter(issue) {
-  const { origin, severity, file, message, code, location } = issue;
-  const { start: { line, column } } = location;
+  const { origin, severity, file, message, code, location = {} } = issue;
+  const { start: { line = 0, column = 0 } = {} } = location;
 
   const colors = new chalk.Instance();
   const messageColor = severity === 'warning' ? colors.yellow : colors.red;

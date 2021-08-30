@@ -1,9 +1,10 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const path = require('path');
+const execSync = require('child_process').execSync;
 const fs = require('fs-extra');
 const glob = require('glob');
-const execSync = require('child_process').execSync;
-const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
+const semver = require('semver');
+const getPublicUrlOrPath = require('tiger-new-utils/getPublicUrlOrPath');
 const isDev = process.env.NODE_ENV === 'development';
 const lodash = require('lodash');
 
@@ -31,6 +32,16 @@ const hasJsxRuntime = (() => {
         require.resolve('react/jsx-runtime');
 
         return true;
+    } catch (e) {
+        return false;
+    }
+})();
+
+const useReactRefresh = (() => {
+    try {
+        const react = require(require.resolve('react'));
+
+        return semver.gt(react.version, '16.9.0');
     } catch (e) {
         return false;
     }
@@ -110,7 +121,7 @@ module.exports = {
     appNodeModules: resolveApp('node_modules'),
     ownNodeModules: resolveApp('node_modules'),
     jestConfigFile: resolveApp('scripts/config/jest.config.js'),
-    nodePaths: nodePaths,
+    nodePaths,
     publicUrlOrPath,
     webModuleFileExtensions,
     nodeModuleFileExtensions,
@@ -125,7 +136,8 @@ module.exports = {
     serve: hasInstall('serve'),
     npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
     useNodeEnv,
-    hasJsxRuntime
+    hasJsxRuntime,
+    useReactRefresh
 };
 
 function hasInstall(command) {

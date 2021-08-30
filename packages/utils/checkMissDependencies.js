@@ -1,13 +1,11 @@
-/* eslint @typescript-eslint/no-var-requires: 0 */
 const checkDependencies = require('check-dependencies');
-const inquirer = require('tiger-new-utils/inquirer');
+const inquirer = require('inquirer');
 const spawn = require('cross-spawn');
 const chalk = require('chalk');
-const paths = require('./paths');
 
-async function checkMissDeps(spinner) {
+async function checkMissDeps(appPath, npmCommander, spinner) {
     const result = await checkDependencies({
-        packageDir: paths.root
+        packageDir: appPath
     });
 
     if (result.status !== 0) {
@@ -35,7 +33,7 @@ async function checkMissDeps(spinner) {
 
         if (reInstall) {
             await new Promise((resolve, reject) => {
-                install(function(code, command, args) {
+                install(npmCommander, function(code, command, args) {
                     if (code !== 0) {
                         spinner.fail(`\`${command} ${args.join(' ')}\` 运行失败`);
 
@@ -53,15 +51,14 @@ async function checkMissDeps(spinner) {
             spinner.warn(chalk.yellow('你需要按照下面命令操作后才能继续：'));
             console.log();
 
-            console.log(chalk.green(`   ${paths.npmCommander} install`));
+            console.log(chalk.green(`   ${npmCommander} install`));
 
             return Promise.reject();
         }
     }
 }
 
-function install(callback) {
-    let command = paths.npmCommander;
+function install(command, callback) {
     let args = ['install'];
 
     var child = spawn(command, args, {

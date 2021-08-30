@@ -12,17 +12,16 @@ process.on('unhandledRejection', err => {
 require('./config/env');
 
 const path = require('path');
-const chalk = require('chalk');
+const chalk = require('tiger-new-utils/chalk');
 const express = require('express');
-const ora = require('ora');
+const ora = require('tiger-new-utils/ora');
 const createProxyMiddleware = require('http-proxy-middleware');
-const { checkBrowsers } = require('react-dev-utils/browsersHelper');
-const clearConsole = require('react-dev-utils/clearConsole');
-const openBrowser = require('react-dev-utils/openBrowser');
-const { prepareUrls } = require('react-dev-utils/WebpackDevServerUtils');
-const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
+const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
+const clearConsole = require('tiger-new-utils/clearConsole');
+const openBrowser = require('tiger-new-utils/openBrowser');
+const { prepareUrls, choosePort, prepareProxy } = require('tiger-new-utils/WebpackDevServerUtils');
+const getPublicUrlOrPath = require('tiger-new-utils/getPublicUrlOrPath');
 const history = require('connect-history-api-fallback');
-const { choosePort, prepareProxy } = require('./config/helper');
 const paths = require('./config/paths');
 const pkg = require(paths.appPackageJson);
 

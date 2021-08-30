@@ -49,8 +49,11 @@ function getClientEnvironment(envRaw) {
                 return env;
             },
             {
-                FAST_REFRESH: false,
+                FAST_REFRESH: paths.useReactRefresh,
                 NODE_ENV: process.env.NODE_ENV || 'development',
+                WDS_SOCKET_HOST: process.env.WDS_SOCKET_HOST || '',
+                WDS_SOCKET_PATH: process.env.WDS_SOCKET_PATH || '',
+                WDS_SOCKET_PORT: process.env.WDS_SOCKET_PORT || '',
                 ...envRaw
             }
         );

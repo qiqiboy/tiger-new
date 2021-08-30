@@ -31,7 +31,7 @@ function devRendererMiddleware(paths, registerSourceMap, spinner) {
 
     return async (req, res, next) => {
         let cache = {};
-        let { webpackStats, fs: memoryFs } = res.locals;
+        let { stats: webpackStats, outputFileSystem: memoryFs } = res.locals.webpack.devMiddleware;
         let entryName = (req.path.split(/\/+/)[1] || 'index').replace(/\.html$/, '');
         let htmlEntryFile = path.join(appNodeBuild, `${entryName}.html`);
 
@@ -83,12 +83,14 @@ function devRendererMiddleware(paths, registerSourceMap, spinner) {
                 ? 'index'
                 : Object.keys(nodeEntries)[0];
             const nodeEntrypoints = node.entrypoints[jsEntryName].assets
-                .filter((asset) => new RegExp(`${jsEntryName}\\.js$`).test(asset))
-                .map((asset) => path.join(appNodeBuild, asset));
+                .filter((asset) => new RegExp(`${jsEntryName}\\.js$`).test(asset.name))
+                .map((asset) => path.join(appNodeBuild, asset.name));
 
             // Find any source map files, and pass them to the calling app so that
             // it can transform any error stack traces appropriately.
             for (let { name } of node.assets) {
+                if (!name) continue;
+
                 let pathname = path.join(appNodeBuild, name);
 
                 if (/\.map$/.test(pathname) && memoryFs.existsSync(pathname)) {

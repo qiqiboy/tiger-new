@@ -13,6 +13,7 @@ const chalk = require('chalk');
 const detect = require('detect-port-alt');
 const clearConsole = require('./clearConsole');
 const formatWebpackMessages = require('./formatWebpackMessages');
+const typescriptFormatter = require('./typescriptFormatter.js');
 const getProcessForPort = require('./getProcessForPort');
 const forkTsCheckerWebpackPlugin = require('./ForkTsCheckerWebpackPlugin');
 const inquirer = require('./inquirer');

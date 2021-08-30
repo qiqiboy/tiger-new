@@ -4,27 +4,29 @@ const webpack = require('webpack');
 const resolve = require('resolve');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const safePostCssParser = require('postcss-safe-parser');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
-const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
-const ImageminPlugin = require('imagemin-webpack-plugin').default;
-const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const InterpolateHtmlPlugin = require('tiger-new-utils/InterpolateHtmlPlugin');
+const getCSSModuleLocalIdent = require('tiger-new-utils/getCSSModuleLocalIdent');
+const InlineChunkHtmlPlugin = require('tiger-new-utils/InlineChunkHtmlPlugin');
+const ImageMinimizerPlugin = require('tiger-new-utils/ImageMinimizerPlugin');
+const ModuleNotFoundPlugin = require('tiger-new-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('tiger-new-utils/ForkTsCheckerWebpackPlugin');
-const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath');
 const typescriptFormatter = require('tiger-new-utils/typescriptFormatter');
+const createEnvironmentHash = require('tiger-new-utils/createEnvironmentHash');
 const getClientEnvironment = require('./env');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 const paths = require('./paths');
 const pkg = require(paths.appPackageJson);
 const tsconfig = require(paths.appTsConfig);
+
+const webpackDevClientEntry = require.resolve('tiger-new-utils/webpackHotDevClient');
+const reactRefreshOverlayEntry = require.resolve('tiger-new-utils/refreshOverlayInterop');
 
 const isBuilding = process.env.WEBPACK_BUILDING === 'true';
 const shouldUseRelativeAssetPath = !paths.publicUrlOrPath.startsWith('http');
@@ -46,6 +48,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         : process.env.GENERATE_SOURCEMAP !== 'false';
     const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
     const shouldUseSW = process.env.GENERATE_SW === 'true' || !!pkg.pwa;
+    const shouldUseReactRefresh = paths.useReactRefresh;
 
     const env = getClientEnvironment({
         PUBLIC_URL: paths.publicUrlOrPath.slice(0, -1),
@@ -88,24 +91,30 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             {
                 loader: require.resolve('postcss-loader'),
                 options: {
-                    ident: 'postcss',
-                    plugins: () =>
-                        [
-                            pkg.useRem &&
-                                require('postcss-pxtorem')({
+                    postcssOptions: {
+                        ident: 'postcss',
+                        plugins: [
+                            pkg.useRem && [
+                                'postcss-pxtorem',
+                                {
                                     rootValue: 14,
                                     propList: ['*'],
                                     selectorBlackList: [/^html$/i, /\.px-/],
                                     mediaQuery: false
-                                }),
-                            require('postcss-flexbugs-fixes'),
-                            require('postcss-preset-env')({
-                                autoprefixer: {
-                                    flexbox: 'no-2009'
-                                },
-                                stage: 3
-                            })
-                        ].filter(Boolean),
+                                }
+                            ],
+                            'postcss-flexbugs-fixes',
+                            [
+                                'postcss-preset-env',
+                                {
+                                    autoprefixer: {
+                                        flexbox: 'no-2009'
+                                    },
+                                    stage: 3
+                                }
+                            ]
+                        ].filter(Boolean)
+                    },
                     sourceMap: shouldUseSourceMap
                 }
             }
@@ -120,7 +129,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     preProcessor === 'less-loader'
                         ? {
                               lessOptions: {
-                                  javascriptEnabled: true
+                                  javascriptEnabled: true,
+                                  rewriteUrls: 'all',
+                                  math: 'always'
                               }
                           }
                         : {
@@ -162,7 +173,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             filename,
                             template,
                             inject: true,
-                            chunksSortMode: 'manual'
+                            chunksSortMode: 'manual',
+                            scriptLoading: 'blocking'
                         },
                         isEnvProduction
                             ? {
@@ -210,17 +222,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             ? paths.nodeEntries
             : Object.assign(
                   {
-                      _vendor_: [
-                          require.resolve('./polyfills'),
-                          !isBuilding && require.resolve('react-dev-utils/webpackHotDevClient'),
-                          !isBuilding && 'react-hot-loader/patch'
-                      ]
+                      _vendor_: [require.resolve('./polyfills'), !isBuilding && webpackDevClientEntry]
                           .concat(pkg.vendor || [])
                           .filter(Boolean)
                   },
                   paths.entries
               ),
-        target: isEnvWeb ? 'web' : 'node',
+        target: isEnvWeb ? 'browserslist' : 'node',
         output: {
             libraryTarget: isEnvNode ? 'commonjs2' : undefined,
             path: isEnvWeb ? paths.appBuild : paths.appNodeBuild,
@@ -229,16 +237,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 ? '[name].js'
                 : isEnvProduction
                 ? 'static/js/[name].[contenthash:8].js'
-                : 'static/js/[name].[hash:8].js',
-            // TODO: remove this when upgrading to webpack 5
-            futureEmitAssets: true,
-            chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[hash:8].js',
+                : 'static/js/[name].[fullhash:8].js',
+            chunkFilename: isEnvProduction ? 'static/js/[name].[contenthash:8].js' : 'static/js/[name].[fullhash:8].js',
+            assetModuleFilename: 'static/media/[name].[hash:8][ext]',
             publicPath: paths.publicUrlOrPath,
             devtoolModuleFilenameTemplate: isEnvProduction
                 ? info => path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, '/')
-                : info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
-            jsonpFunction: `webpackJsonp${pkg.name}`,
-            globalObject: isEnvWeb ? 'this' : 'global'
+                : info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')
         },
         externals: isEnvWeb
             ? undefined
@@ -247,6 +252,21 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                       allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
                   })
               ],
+        cache: isBuilding
+            ? {
+                  type: 'filesystem',
+                  version: createEnvironmentHash(env.raw),
+                  cacheDirectory: path.resolve(paths.appNodeModules, '.cache/webpack'),
+                  store: 'pack',
+                  buildDependencies: {
+                      config: [__filename],
+                      tsconfig: [paths.appTsConfig]
+                  }
+              }
+            : true,
+        infrastructureLogging: {
+            level: 'none'
+        },
         optimization: {
             minimize: isEnvProduction,
             minimizer: [
@@ -273,35 +293,22 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             ascii_only: true
                         }
                     },
-                    parallel: true,
-                    cache: true,
-                    sourceMap: shouldUseSourceMap
+                    parallel: true
                 }),
-                new OptimizeCSSAssetsPlugin({
-                    cssProcessorOptions: {
-                        parser: safePostCssParser,
-                        map: shouldUseSourceMap
-                            ? {
-                                  inline: false,
-                                  annotation: isEnvDevelopment
-                              }
-                            : false
-                    },
-                    cssProcessorPluginOptions: {
-                        preset: ['default', { minifyFontValues: { removeQuotes: false } }]
-                    }
-                })
+                new CssMinimizerPlugin()
             ],
             splitChunks: {
-                chunks: 'async',
-                name: false,
                 cacheGroups: isEnvWeb
                     ? {
                           vendors: {
                               priority: 10,
                               chunks: 'all',
-                              test: '_vendor_',
-                              name: 'vendor'
+                              name: 'vendor',
+                              test(module, { chunkGraph }) {
+                                  const chunks = Array.from(chunkGraph.getOrderedModuleChunksIterable(module));
+
+                                  return chunks.some(chunk => chunk.name === '_vendor_');
+                              }
                           },
                           i18n: {
                               priority: 100,
@@ -322,6 +329,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             ),
             alias: {
                 'react-native': 'react-native-web',
+                'react-hot-loader': 'tiger-new-utils/react-hot-loader',
                 ...(isEnvProductionProfile && {
                     'react-dom$': 'react-dom/profiling',
                     'scheduler/tracing': 'scheduler/tracing-profiling'
@@ -338,22 +346,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         module: {
             strictExportPresence: true,
             rules: [
-                { parser: { requireEnsure: false } },
-                {
-                    test: /\.(js|mjs|jsx|ts|tsx)$/,
+                shouldUseSourceMap && {
                     enforce: 'pre',
-                    use: [
-                        {
-                            options: {
-                                cache: true,
-                                formatter: require.resolve('react-dev-utils/eslintFormatter'),
-                                eslintPath: require.resolve('eslint'),
-                                resolvePluginsRelativeTo: __dirname
-                            },
-                            loader: require.resolve('eslint-loader')
-                        }
-                    ],
-                    include: paths.appSrc
+                    exclude: /@babel(?:\/|\\{1,2})runtime/,
+                    test: /\.(js|mjs|jsx|ts|tsx|css)$/,
+                    use: 'source-map-loader'
                 },
                 {
                     oneOf: [
@@ -385,6 +382,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                     ]
                                 ],
                                 plugins: [
+                                    // @TODO babel-preset-react-app@11 后删除
+                                    [
+                                        require('@babel/plugin-proposal-private-property-in-object').default,
+                                        {
+                                            loose: true
+                                        }
+                                    ],
                                     require.resolve('babel-plugin-auto-css-modules-flag'),
                                     [
                                         require.resolve('babel-plugin-named-asset-import'),
@@ -396,7 +400,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                             }
                                         }
                                     ],
-                                    !isBuilding && isEnvWeb && 'react-hot-loader/babel'
+                                    !isBuilding && isEnvWeb && shouldUseReactRefresh && 'react-refresh/babel'
                                 ].filter(Boolean),
                                 cacheDirectory: true,
                                 cacheCompression: false,
@@ -461,14 +465,18 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             use: getStyleLoaders({
                                 importLoaders: 1,
                                 modules: {
-                                    getLocalIdent: getCSSModuleLocalIdent
+                                    getLocalIdent: getCSSModuleLocalIdent,
+                                    mode: 'local'
                                 }
                             })
                         },
                         {
                             test: cssRegex,
                             use: getStyleLoaders({
-                                importLoaders: 1
+                                importLoaders: 1,
+                                modules: {
+                                    mode: 'icss'
+                                }
                             }),
                             sideEffects: true
                         },
@@ -479,7 +487,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 {
                                     importLoaders: 2,
                                     modules: {
-                                        getLocalIdent: getCSSModuleLocalIdent
+                                        getLocalIdent: getCSSModuleLocalIdent,
+                                        mode: 'local'
                                     }
                                 },
                                 'sass-loader'
@@ -489,7 +498,10 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             test: sassRegex,
                             use: getStyleLoaders(
                                 {
-                                    importLoaders: 2
+                                    importLoaders: 2,
+                                    modules: {
+                                        mode: 'icss'
+                                    }
                                 },
                                 'sass-loader'
                             ),
@@ -502,7 +514,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 {
                                     importLoaders: 2,
                                     modules: {
-                                        getLocalIdent: getCSSModuleLocalIdent
+                                        getLocalIdent: getCSSModuleLocalIdent,
+                                        mode: 'local'
                                     }
                                 },
                                 'less-loader'
@@ -512,7 +525,10 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             test: lessRegex,
                             use: getStyleLoaders(
                                 {
-                                    importLoaders: 2
+                                    importLoaders: 2,
+                                    modules: {
+                                        mode: 'icss'
+                                    }
                                 },
                                 'less-loader'
                             ),
@@ -520,27 +536,15 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         },
                         {
                             test: /\.(txt|htm)$/,
-                            loader: require.resolve('raw-loader')
+                            type: 'asset/source'
                         },
                         {
-                            test: /\.(mp4|webm|wav|mp3|m4a|aac|oga)$/,
-                            loader: require.resolve('file-loader'),
-                            options: {
-                                name: 'static/media/[name].[hash:8].[ext]',
-                                esModule: true
-                            }
-                        },
-                        {
-                            exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/, /\.(txt|htm)$/],
-                            loader: require.resolve('file-loader'),
-                            options: {
-                                name: 'static/images/[name].[hash:8].[ext]',
-                                esModule: true
-                            }
+                            exclude: [/^$/, /\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/, /\.(txt|htm)$/],
+                            type: 'asset/resource'
                         }
                     ]
                 }
-            ]
+            ].filter(Boolean)
         },
         plugins: [
             ...htmlInjects,
@@ -558,67 +562,64 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             new webpack.DefinePlugin({
                 __SSR__: JSON.stringify(paths.useNodeEnv && executionEnv),
                 __DEV__: JSON.stringify(isEnvDevelopment),
-                __LOCAL_DEV__: JSON.stringify(!isBuilding)
+                __LOCAL_DEV__: JSON.stringify(!isBuilding),
+                'process.env': JSON.stringify(env.raw)
             }),
             !isBuilding && new CaseSensitivePathsPlugin(),
-            !isBuilding && new WatchMissingNodeModulesPlugin(paths.appNodeModules),
             isEnvProduction &&
-                new ImageminPlugin({
-                    cacheFolder: path.resolve(paths.appNodeModules, '.cache/imagemin'),
-                    pngquant: {
-                        // quality: '95-100'
+                new ImageMinimizerPlugin({
+                    minimizerOptions: {
+                        plugins: [
+                            ['gifsicle', { interlaced: true }],
+                            ['jpegtran', { progressive: true }],
+                            ['optipng', { optimizationLevel: 3 }],
+                            [
+                                'svgo',
+                                {
+                                    name: 'preset-default',
+                                    params: {
+                                        overrides: {
+                                            removeViewBox: true,
+                                            addAttributesToSVGElement: {
+                                                attributes: [{ xmlns: 'http://www.w3.org/2000/svg' }]
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        ]
                     }
                 }),
             isBuilding &&
                 new MiniCssExtractPlugin({
                     filename: isEnvProduction
                         ? 'static/css/[name].[contenthash:8].css'
-                        : 'static/css/[name].[hash:8].css',
+                        : 'static/css/[name].[fullhash:8].css',
                     ignoreOrder: !!pkg.ignoreCssOrderWarnings || process.env.IGNORE_CSS_ORDER_WARNINGS === 'true'
                 }),
             new webpack.IgnorePlugin({
                 resourceRegExp: /^\.\/locale$/,
                 contextRegExp: /moment$/
             }),
-            isEnvProduction &&
+            !isBuilding &&
                 isEnvWeb &&
-                shouldUseSW &&
-                new SWPrecacheWebpackPlugin({
-                    cacheId: pkg.name,
-                    dontCacheBustUrlsMatching: /\.\w{8}\./,
-                    filename: 'service-worker.js',
-                    logger(message) {
-                        if (message.indexOf('Total precache size is') === 0) {
-                            // This message occurs for every build and is a bit too noisy.
-                            return;
-                        }
-
-                        if (message.indexOf('Skipping static resource') === 0) {
-                            // This message obscures real errors so we ignore it.
-                            // https://github.com/facebookincubator/create-react-app/issues/2612
-                            return;
-                        }
-
-                        console.log(message);
-                    },
-                    minify: true,
-
-                    mergeStaticsConfig: true,
-                    staticFileGlobs: `${path.basename(paths.appBuild)}/*.html`,
-                    stripPrefix: `${path.basename(paths.appBuild)}/`,
-
-                    // For unknown URLs, fallback to the index page
-                    navigateFallback:
-                        getPublicUrlOrPath(false, process.env.BASE_NAME || pkg.homepage || process.env.PUBLIC_URL) +
-                        path.basename(paths.appHtml),
-                    // Ignores URLs starting from /__ (useful for Firebase):
-                    // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
-                    navigateFallbackWhitelist: [/^(?!\/__).*/],
-                    // Don't precache sourcemaps (they're large) and build asset manifest:
-                    // /^\/.*\.html$/ 去掉webpack编译阶段由html-webpack-plugin带入的入口html文件
-                    // 因为这种文件是绝对路径，以 / 开头的
-                    staticFileGlobsIgnorePatterns: [/\.map$/, /manifest\.json$/, /^\/.*\.html$/]
+                shouldUseReactRefresh &&
+                new ReactRefreshWebpackPlugin({
+                    overlay: {
+                        entry: webpackDevClientEntry,
+                        module: reactRefreshOverlayEntry,
+                        sockIntegration: false
+                    }
                 }),
+            new ESLintPlugin({
+                extensions: ['js', 'mjs', 'jsx', 'ts', 'tsx'],
+                formatter: require.resolve('tiger-new-utils/eslintFormatter'),
+                eslintPath: require.resolve('eslint'),
+                context: paths.appSrc,
+                cache: true,
+                cacheLocation: path.resolve(paths.appNodeModules, '.cache/eslint'),
+                cwd: paths.root
+            }),
             (!isBuilding || isEnvWeb) &&
                 process.env.DISABLE_TSC_CHECK !== 'true' &&
                 new ForkTsCheckerWebpackPlugin({
@@ -655,20 +656,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 entryOnly: true
             })
         ].filter(Boolean),
-        // Some libraries import Node modules but don't use them in the browser.
-        // Tell webpack to provide empty mocks for them so importing them works.
-        node: {
-            __filename: isEnvWeb,
-            __dirname: isEnvWeb,
-            module: 'empty',
-            dgram: 'empty',
-            dns: 'mock',
-            fs: 'empty',
-            http2: 'empty',
-            net: 'empty',
-            tls: 'empty',
-            child_process: 'empty'
-        },
+        ignoreWarnings: [/Failed to parse source map from/],
+        stats: 'none',
         // Turn off performance processing because we utilize
         // our own hints via the FileSizeReporter
         performance: false
