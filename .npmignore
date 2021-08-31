@@ -3,3 +3,4 @@ npm-debug.log
 .DS_Store
 npm-debug.*
 node_modules
+packages
