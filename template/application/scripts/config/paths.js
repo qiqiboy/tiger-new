@@ -39,12 +39,14 @@ const hasJsxRuntime = (() => {
 
 const useReactRefresh = (() => {
     try {
-        const react = require(require.resolve('react'));
+        if (process.env.FAST_REFRESH !== 'false') {
+            const react = require(require.resolve('react'));
 
-        return semver.gt(react.version, '16.9.0');
-    } catch (e) {
-        return false;
-    }
+            return semver.gt(react.version, '16.9.0');
+        }
+    } catch (e) {}
+
+    return false;
 })();
 
 const webModuleFileExtensions = moduleFileExtensions.map(ext => `web.${ext}`).concat(moduleFileExtensions, 'json');

@@ -294,6 +294,7 @@ $ PROXY='https://api.twitter.com/' npm start
 -   `COMPILE_ON_WARNING` 构建时允许警告
 -   `TSC_COMPILE_ON_ERROR` 开发时允许 ts 编译器错误
 -   `DISABLE_NEW_JSX_TRANSFORM` 不使用 react 新的 JSX transform
+-   `FAST_REFRESH` 设置为`false`以禁用`react-refresh`，对于超大型项目这很有用，因为目前的`react-refresh`存在较严重的性能问题
 -   `TIGER_*` 任意的以`TIGER_`开头的变量。**该变量也会传递给 webpack 构建，所以你可以在项目代码中访问该变量：`process.env.TIGER_*`**
 
 以上环境变量，你可以在运行相关命令时指定，也可以通过项目根目录下的`.env` `.env.production` `.env.developement` `.env.local` `.env.production.local` `.env.developement.local` 等文件配置。

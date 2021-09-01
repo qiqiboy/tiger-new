@@ -197,7 +197,7 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
             }
 
             if (isInteractive) {
-                // clearConsole();
+                clearConsole();
             }
         }
 
