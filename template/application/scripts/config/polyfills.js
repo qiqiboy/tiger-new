@@ -21,6 +21,6 @@ require('core-js/features/array');
 require('core-js/features/string');
 require('core-js/features/number');
 require('core-js/features/symbol');
+require('core-js/features/global-this');
 
 // require('core-js/features/url');
-// require('core-js/features/url-search-params');

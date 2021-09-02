@@ -44,6 +44,9 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
             serveIndex: !paths.useNodeEnv,
             directory: paths.appPublic,
             publicPath: paths.publicUrlOrPath,
+            staticOptions: paths.useNodeEnv ? {
+                index: !paths.useNodeEnv
+            } : undefined,
             watch: {
                 ignored: ignoredFiles(paths.appSrc)
             }
@@ -64,6 +67,7 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
             publicPath: paths.publicUrlOrPath.slice(0, -1),
             ...(paths.useNodeEnv
                 ? {
+                      index: '',
                       serverSideRender: true
                   }
                 : {})

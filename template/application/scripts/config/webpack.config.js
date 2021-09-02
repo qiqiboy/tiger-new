@@ -230,7 +230,10 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
               ),
         target: isEnvWeb ? 'browserslist' : 'node',
         output: {
-            libraryTarget: isEnvNode ? 'commonjs2' : undefined,
+            globalObject: 'globalThis',
+            library: isEnvNode ? {
+                type: 'commonjs2'
+            } : undefined,
             path: isEnvWeb ? paths.appBuild : paths.appNodeBuild,
             pathinfo: isEnvDevelopment,
             filename: isEnvNode
@@ -254,6 +257,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
               ],
         cache: isBuilding
             ? {
+                  name: `${webpackEnv}-${executionEnv}`,
                   type: 'filesystem',
                   version: createEnvironmentHash(env.raw),
                   cacheDirectory: path.resolve(paths.appNodeModules, '.cache/webpack'),
