@@ -231,9 +231,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         target: isEnvWeb ? 'browserslist' : 'node',
         output: {
             globalObject: 'globalThis',
-            library: isEnvNode ? {
-                type: 'commonjs2'
-            } : undefined,
+            library: isEnvNode
+                ? {
+                      type: 'commonjs2'
+                  }
+                : undefined,
             path: isEnvWeb ? paths.appBuild : paths.appNodeBuild,
             pathinfo: isEnvDevelopment,
             filename: isEnvNode
@@ -386,13 +388,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                     ]
                                 ],
                                 plugins: [
-                                    // @TODO babel-preset-react-app@11 后删除
-                                    [
-                                        require('@babel/plugin-proposal-private-property-in-object').default,
-                                        {
-                                            loose: true
-                                        }
-                                    ],
                                     require.resolve('babel-plugin-auto-css-modules-flag'),
                                     [
                                         require.resolve('babel-plugin-named-asset-import'),
@@ -438,21 +433,13 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                           ],
                                           plugins: [
                                               ...(pkg.babel && pkg.babel.plugins),
-                                              [
-                                                  require('@babel/plugin-proposal-class-properties').default,
-                                                  {
-                                                      loose: true
-                                                  }
-                                              ],
+                                              [require('@babel/plugin-proposal-class-properties').default],
                                               isEnvProduction && [
                                                   require('babel-plugin-transform-react-remove-prop-types').default,
                                                   {
                                                       removeImport: true
                                                   }
-                                              ],
-                                              require('@babel/plugin-proposal-numeric-separator').default,
-                                              require('@babel/plugin-proposal-optional-chaining').default,
-                                              require('@babel/plugin-proposal-nullish-coalescing-operator').default
+                                              ]
                                           ].filter(Boolean)
                                       })
                             }
@@ -567,7 +554,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 __SSR__: JSON.stringify(paths.useNodeEnv && executionEnv),
                 __DEV__: JSON.stringify(isEnvDevelopment),
                 __LOCAL_DEV__: JSON.stringify(!isBuilding),
-                'process.env': JSON.stringify(env.raw)
+                ...(isEnvWeb ? { 'process.env': JSON.stringify(env.raw) } : {})
             }),
             !isBuilding && new CaseSensitivePathsPlugin(),
             isEnvProduction &&
@@ -636,10 +623,19 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         context: paths.root,
                         configOverwrite: {
                             compilerOptions: {
-                                types: ['node'],
+                                sourceMap: shouldUseSourceMap,
                                 allowJs: true,
                                 checkJs: false,
-                                jsx: paths.hasJsxRuntime ? (isEnvProduction ? 'react-jsx' : 'react-jsxdev') : 'preserve'
+                                jsx: paths.hasJsxRuntime
+                                    ? isEnvProduction
+                                        ? 'react-jsx'
+                                        : 'react-jsxdev'
+                                    : 'preserve',
+                                inlineSourceMap: false,
+                                declarationMap: false,
+                                noEmit: true,
+                                incremental: true,
+                                tsBuildInfoFile: path.resolve(paths.appNodeModules, '.cache/tsbuildinfo')
                             },
                             exclude: tsconfig.exclude.concat(
                                 'setupTests.ts',

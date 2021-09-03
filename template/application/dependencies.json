@@ -1,7 +1,5 @@
 {
   "devDependencies": {
-    "@babel/core": "7",
-    "@babel/plugin-proposal-decorators": "7",
     "@commitlint/cli": "13",
     "@commitlint/config-conventional": "13",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
@@ -24,8 +22,8 @@
     "babel-jest": "26",
     "babel-loader": "8",
     "babel-plugin-auto-css-modules-flag": "latest",
-    "babel-plugin-named-asset-import": "1.0.0-next.75",
-    "babel-preset-react-app": "11.0.0-next.75",
+    "babel-plugin-named-asset-import": "1.0.0-next.81",
+    "babel-preset-react-app": "11.0.0-next.81",
     "case-sensitive-paths-webpack-plugin": "2",
     "classlist-polyfill": "1",
     "core-js": "3",

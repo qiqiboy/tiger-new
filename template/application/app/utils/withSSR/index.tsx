@@ -17,7 +17,9 @@ declare module 'react-router' {
     }
 }
 
-export { RouteItem, prefetchRoutesInitialProps };
+export { prefetchRoutesInitialProps };
+
+export type { RouteItem };
 
 export type SSRProps<More> = {
     __error__: Error | undefined;

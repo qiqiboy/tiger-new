@@ -13,6 +13,7 @@
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
     "noImplicitReturns": true,

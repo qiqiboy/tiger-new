@@ -183,6 +183,8 @@ function build(previousFileSizes) {
                 return reject(new Error(messages.errors.join('\n\n')));
             }
 
+            compiler.close();
+
             const resolveArgs = {
                 stats,
                 previousFileSizes,
