@@ -230,7 +230,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
               ),
         target: isEnvWeb ? 'browserslist' : 'node',
         output: {
-            globalObject: 'globalThis',
             library: isEnvNode
                 ? {
                       type: 'commonjs2'

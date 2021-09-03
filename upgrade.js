@@ -245,6 +245,7 @@ function upgradeAppProject(root) {
     var cleanDeps = [
         'ora',
         'inquirer',
+        'chalk',
         'eslint-loader',
         'raw-loader',
         'url-loader',
