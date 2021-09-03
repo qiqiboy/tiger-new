@@ -656,7 +656,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 entryOnly: true
             })
         ].filter(Boolean),
-        ignoreWarnings: [/Failed to parse source map from/],
+        ignoreWarnings: [/Failed to parse source map/],
         stats: 'none',
         // Turn off performance processing because we utilize
         // our own hints via the FileSizeReporter

@@ -243,6 +243,8 @@ function upgradeAppProject(root) {
     var newDevDependencies = newDependenciesConfig.devDependencies;
     var patchDeps = ['url', 'react-refresh'].map((dep) => dep + '@' + newDependenciesConfig.dependencies[dep]);
     var cleanDeps = [
+        'ora',
+        'inquirer',
         'eslint-loader',
         'raw-loader',
         'url-loader',
