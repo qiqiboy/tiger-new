@@ -43,6 +43,7 @@
     "eslint-plugin-react-hooks": "4",
     "eslint-plugin-testing-library": "4",
     "eslint-webpack-plugin": "3",
+    "file-loader": "6",
     "fs-extra": "10",
     "glob": "7",
     "html-loader": "2",

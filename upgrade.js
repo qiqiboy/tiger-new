@@ -249,7 +249,6 @@ function upgradeAppProject(root) {
         'eslint-loader',
         'raw-loader',
         'url-loader',
-        'file-loader',
         'imagemin-webpack-plugin',
         'jest-environment-jsdom-fourteen',
         'jest-environment-jsdom',

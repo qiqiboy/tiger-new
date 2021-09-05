@@ -360,6 +360,12 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 {
                     oneOf: [
                         {
+                            resourceQuery(query) {
+                                return new URLSearchParams(query).has('raw');
+                            },
+                            type: 'asset/source'
+                        },
+                        {
                             test: /\.html$/,
                             use: [
                                 {
@@ -371,6 +377,30 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                     options: htmlAttrsOptions
                                 }
                             ]
+                        },
+                        {
+                            test: /\.svg$/,
+                            use: [
+                                {
+                                    loader: '@svgr/webpack',
+                                    options: {
+                                        prettier: false,
+                                        svgo: false,
+                                        titleProp: true,
+                                        ref: true
+                                    }
+                                },
+                                {
+                                    loader: 'file-loader',
+                                    options: {
+                                        name: 'static/media/[name].[hash:8].[ext]'
+                                    }
+                                }
+                            ],
+                            type: 'javascript/auto',
+                            issuer: {
+                                and: [/\.(ts|tsx|js|jsx|mjs|md|mdx)$/]
+                            }
                         },
                         {
                             test: /\.(js|mjs|jsx|ts|tsx)$/,
@@ -388,16 +418,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 ],
                                 plugins: [
                                     require.resolve('babel-plugin-auto-css-modules-flag'),
-                                    [
-                                        require.resolve('babel-plugin-named-asset-import'),
-                                        {
-                                            loaderMap: {
-                                                svg: {
-                                                    ReactComponent: '@svgr/webpack?-svgo,+titleProp,+ref![path]'
-                                                }
-                                            }
-                                        }
-                                    ],
                                     !isBuilding && isEnvWeb && shouldUseReactRefresh && 'react-refresh/babel'
                                 ].filter(Boolean),
                                 cacheDirectory: true,
