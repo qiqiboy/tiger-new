@@ -257,7 +257,7 @@ function upgradeAppProject(root) {
         'postcss-safe-parser',
         'react-dev-utils',
         'sw-precache-webpack-plugin',
-        '@babel/core',
+        '@babel/core'
     ];
     var cleanFiles = ['config/tslintrc.json', 'config/checkMissDependencies.js'];
 
@@ -320,7 +320,7 @@ function upgradeAppProject(root) {
                     });
                 }
 
-                if (!package.babel.plugins) {
+                if (package.babel && !package.babel.plugins) {
                     questions.push({
                         name: 'supportDecorator',
                         type: 'confirm',
@@ -381,7 +381,7 @@ function upgradeAppProject(root) {
                     );
                 }
 
-                if (semver.lt(package.dependencies.react, '17.0.0')) {
+                if (package.dependencies && semver.lt(package.dependencies.react || '0.0.0', '17.0.0')) {
                     questions.push({
                         name: 'upgradeReact',
                         type: 'confirm',
@@ -492,12 +492,26 @@ function upgradeAppProject(root) {
                         package.husky.hooks['pre-push'] = pkgTemp.husky.hooks['pre-push'];
                     }
 
-                    if (!package.babel.plugins) {
-                        package.babel.plugins = [];
-                    }
+                    if (package.babel) {
+                        if (!package.babel.plugins) {
+                            package.babel.plugins = [];
+                        }
 
-                    if (answers.supportDecorator) {
-                        package.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
+                        if (answers.supportDecorator) {
+                            package.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
+                        }
+
+                        if (package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
+                            package.babel.plugins.splice(
+                                package.babel.plugins.indexOf('transform-decorators-legacy'),
+                                1,
+                                ['@babel/plugin-proposal-decorators', { legacy: true }]
+                            );
+                        }
+
+                        if (package.babel.plugins.indexOf('react-hot-loader/babel') > -1) {
+                            package.babel.plugins.splice(package.babel.plugins.indexOf('react-hot-loader/babel'), 1);
+                        }
                     }
 
                     if (!package.stylelint) {
@@ -506,17 +520,6 @@ function upgradeAppProject(root) {
 
                     if (!package.browserslist) {
                         package['browserslist'] = pkgTemp['browserslist'];
-                    }
-
-                    if (package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
-                        package.babel.plugins.splice(package.babel.plugins.indexOf('transform-decorators-legacy'), 1, [
-                            '@babel/plugin-proposal-decorators',
-                            { legacy: true }
-                        ]);
-                    }
-
-                    if (package.babel.plugins.indexOf('react-hot-loader/babel') > -1) {
-                        package.babel.plugins.splice(package.babel.plugins.indexOf('react-hot-loader/babel'), 1);
                     }
 
                     if (!package.eslintConfig || !package.eslintConfig.extends) {
