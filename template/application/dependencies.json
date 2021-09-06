@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "7",
     "@commitlint/cli": "13",
     "@commitlint/config-conventional": "13",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
@@ -15,8 +16,8 @@
     "@types/react-is": "17",
     "@types/react-router-dom": "5",
     "@types/react-transition-group": "4",
-    "@typescript-eslint/eslint-plugin": "4.29",
-    "@typescript-eslint/parser": "4.29",
+    "@typescript-eslint/eslint-plugin": "4.30",
+    "@typescript-eslint/parser": "4.30",
     "ali-oss": "6",
     "babel-eslint": "10",
     "babel-jest": "26",
@@ -75,7 +76,7 @@
     "stylelint-config-recommended": "5",
     "terser-webpack-plugin": "5",
     "tiger-new-utils": "2",
-    "typescript": "4.3",
+    "typescript": "4.4",
     "webpack": "5",
     "webpack-dev-server": "4",
     "webpack-node-externals": "3"

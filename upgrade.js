@@ -258,7 +258,6 @@ function upgradeAppProject(root) {
         'react-dev-utils',
         'sw-precache-webpack-plugin',
         '@babel/core',
-        '@babel/plugin-proposal-decorators'
     ];
     var cleanFiles = ['config/tslintrc.json', 'config/checkMissDependencies.js'];
 

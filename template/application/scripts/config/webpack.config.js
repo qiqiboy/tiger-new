@@ -207,6 +207,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     }
 
     return {
+        name: `${executionEnv}`,
         mode: isEnvProduction ? 'production' : 'development',
         bail: isEnvProduction,
         devtool: shouldUseSourceMap
