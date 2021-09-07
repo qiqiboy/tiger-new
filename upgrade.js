@@ -648,10 +648,6 @@ function upgradeAppProject(root) {
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
                         package.scripts.pack = 'npm run build && npm run cdn';
-
-                        if (package.cdn['ali-oss'] && typeof package.cdn['ali-oss'] !== 'boolean') {
-                            package.cdn['ali-oss'] = true;
-                        }
                     }
 
                     if (!package.scripts.test) {

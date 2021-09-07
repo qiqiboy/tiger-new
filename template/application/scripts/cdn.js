@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const path = require('path');
-const OSS = require('ali-oss');
 const lodash = require('lodash');
+const OSS = require('ali-oss');
 const fs = require('fs-extra');
 const Rsync = require('rsync');
 const chalk = require('tiger-new-utils/chalk');
@@ -22,7 +22,7 @@ let throttleDelay = 0;
 if (process.env.SKIP_CDN === 'true') {
     spinner.info(chalk.cyan('本次构建忽略CDN任务'));
 } else if (pkg.cdn) {
-    if ('server' in pkg.cdn || ('ali-oss' in pkg.cdn && process.env.ALIOSS_AUTH_ID)) {
+    if ('server' in pkg.cdn || 'ali-oss' in pkg.cdn) {
         runCDN();
     } else {
         spinner.fail(chalk.red(`未发现CDN服务连接配置信息！`));
@@ -167,12 +167,16 @@ function createRsync(file) {
 function createOSS(file) {
     return new Promise(resolve => {
         setTimeout(() => {
-            const client = new OSS({
-                accessKeyId: process.env.ALIOSS_AUTH_ID,
-                accessKeySecret: process.env.ALIOSS_AUTH_SECRET,
-                bucket: process.env.ALIOSS_AUTH_BUCKET,
-                region: process.env.ALIOSS_AUTH_REGION
-            });
+            const client = new OSS(
+                typeof pkg.cdn['ali-oss'] === 'boolean'
+                    ? {
+                          accessKeyId: process.env.ALIOSS_AUTH_ID,
+                          accessKeySecret: process.env.ALIOSS_AUTH_SECRET,
+                          bucket: process.env.ALIOSS_AUTH_BUCKET,
+                          region: process.env.ALIOSS_AUTH_REGION
+                      }
+                    : pkg.cdn['ali-oss']
+            );
 
             const objectName = path.relative(paths.appBuild, file);
 
