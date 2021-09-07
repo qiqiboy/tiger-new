@@ -18,7 +18,6 @@ const ImageMinimizerPlugin = require('tiger-new-utils/ImageMinimizerPlugin');
 const ModuleNotFoundPlugin = require('tiger-new-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('tiger-new-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('tiger-new-utils/typescriptFormatter');
-const createEnvironmentHash = require('tiger-new-utils/createEnvironmentHash');
 const getClientEnvironment = require('./env');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 const paths = require('./paths');
@@ -257,19 +256,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                       allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
                   })
               ],
-        cache: isBuilding
-            ? {
-                  name: `${webpackEnv}-${executionEnv}`,
-                  type: 'filesystem',
-                  version: createEnvironmentHash(env.raw),
-                  cacheDirectory: path.resolve(paths.appNodeModules, '.cache/webpack'),
-                  store: 'pack',
-                  buildDependencies: {
-                      config: [__filename],
-                      tsconfig: [paths.appTsConfig]
-                  }
-              }
-            : true,
+        cache: !isBuilding,
         infrastructureLogging: {
             level: 'none'
         },
