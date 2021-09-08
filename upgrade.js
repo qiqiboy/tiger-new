@@ -248,6 +248,7 @@ function upgradeAppProject(root) {
         'ora',
         'inquirer',
         'chalk',
+        'raf-dom',
         'eslint-loader',
         'raw-loader',
         'url-loader',

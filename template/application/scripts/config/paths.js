@@ -24,22 +24,20 @@ const publicUrlOrPath = getPublicUrlOrPath(
 const moduleFileExtensions = ['mjs', 'js', 'ts', 'tsx', 'jsx'];
 
 const hasJsxRuntime = (() => {
-    if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
-        return false;
-    }
-
     try {
-        require.resolve('react/jsx-runtime');
+        if (process.env.DISABLE_NEW_JSX_TRANSFORM !== 'true') {
+            require.resolve('react/jsx-runtime');
 
-        return true;
-    } catch (e) {
-        return false;
-    }
+            return true;
+        }
+    } catch (e) {}
+
+    return false;
 })();
 
 const useReactRefresh = (() => {
     try {
-        if (process.env.FAST_REFRESH !== 'false') {
+        if (process.env.DISABLE_FAST_REFRESH !== 'true') {
             const react = require(require.resolve('react'));
 
             return semver.gt(react.version, '16.9.0');

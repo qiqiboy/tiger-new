@@ -18,6 +18,7 @@ const ImageMinimizerPlugin = require('tiger-new-utils/ImageMinimizerPlugin');
 const ModuleNotFoundPlugin = require('tiger-new-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('tiger-new-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('tiger-new-utils/typescriptFormatter');
+const createEnvironmentHash = require('tiger-new-utils/createEnvironmentHash');
 const getClientEnvironment = require('./env');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 const paths = require('./paths');
@@ -48,6 +49,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     const shouldInlineRuntimeChunk = process.env.INLINE_RUNTIME_CHUNK !== 'false';
     const shouldUseSW = process.env.GENERATE_SW === 'true' || !!pkg.pwa;
     const shouldUseReactRefresh = paths.useReactRefresh;
+    const shouldUseWebpackCache = process.env.DISABLE_WEBPACK_CACHE !== 'true';
 
     const env = getClientEnvironment({
         PUBLIC_URL: paths.publicUrlOrPath.slice(0, -1),
@@ -256,7 +258,17 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                       allowlist: [/\.(?!(?:jsx?|json)$).{1,5}$/i]
                   })
               ],
-        cache: !isBuilding,
+        cache:
+            shouldUseWebpackCache &&
+            (isBuilding
+                ? {
+                      type: 'filesystem',
+                      version: createEnvironmentHash(env.raw),
+                      buildDependencies: {
+                          config: [__filename]
+                      }
+                  }
+                : true),
         infrastructureLogging: {
             level: 'none'
         },
