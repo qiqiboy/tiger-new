@@ -24,9 +24,10 @@ const clearConsole = require('tiger-new-utils/clearConsole');
 const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
 const formatWebpackMessages = require('tiger-new-utils/formatWebpackMessages');
 const checkMissDependencies = require('tiger-new-utils/checkMissDependencies');
+const printBuildError = require('tiger-new-utils/printBuildError');
 const configFactory = require('./config/webpack.config');
 const paths = require('./config/paths');
-const { printBuildError, printServeCommand } = require('./config/helper');
+const { printServeCommand } = require('./config/helper');
 const { ensureLocals } = require('./i18n');
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;

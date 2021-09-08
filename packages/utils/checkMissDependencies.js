@@ -52,6 +52,7 @@ async function checkMissDeps(appPath, npmCommander, spinner) {
             console.log();
 
             console.log(chalk.green(`   ${npmCommander} install`));
+            console.log();
 
             return Promise.reject();
         }
