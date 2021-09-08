@@ -13,10 +13,10 @@ var spinner = ora();
 
 var ownPath = __dirname;
 
-function appUpgrade(projectName) {
+function appUpgrade(projectName, mode) {
     var root = path.resolve(projectName);
 
-    if (fs.pathExistsSync(path.join(root, 'scripts'))) {
+    if (mode === 'application' || (!mode && fs.pathExistsSync(path.join(root, 'scripts')))) {
         upgradeAppProject(root);
     } else {
         upgradePackageProject(root);
@@ -241,7 +241,9 @@ function upgradeAppProject(root) {
 
     var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
     var newDevDependencies = newDependenciesConfig.devDependencies;
-    var patchDeps = ['url', 'react-refresh'].map((dep) => dep + '@' + newDependenciesConfig.dependencies[dep]);
+    var patchDeps = ['url', 'react-refresh', 'raf-dom'].map(
+        (dep) => dep + '@' + newDependenciesConfig.dependencies[dep]
+    );
     var cleanDeps = [
         'ora',
         'inquirer',
@@ -381,14 +383,16 @@ function upgradeAppProject(root) {
                     );
                 }
 
-                if (package.dependencies && semver.lt(package.dependencies.react || '0.0.0', '17.0.0')) {
-                    questions.push({
-                        name: 'upgradeReact',
-                        type: 'confirm',
-                        message: '是否升级react@17.x ？',
-                        default: true
-                    });
-                }
+                try {
+                    if (package.dependencies && semver.lt(package.dependencies.react || '0.0.0', '17.0.0')) {
+                        questions.push({
+                            name: 'upgradeReact',
+                            type: 'confirm',
+                            message: '是否升级react@17.x ？',
+                            default: true
+                        });
+                    }
+                } catch (e) {}
 
                 if (_.some(package.devDependencies, (v, k) => cleanDeps.includes(k))) {
                     questions.push({
@@ -409,6 +413,22 @@ function upgradeAppProject(root) {
 
                     copyScripts(root);
                     spinner.succeed(chalk.green('scripts构建目录已更新！'));
+
+                    if (!fs.existsSync(path.resolve(root, 'app')) && fs.existsSync(path.resolve(root, 'src'))) {
+                        fs.moveSync(path.resolve(root, 'src'), path.resolve(root, 'app'));
+                        spinner.succeed(chalk.green('已将代码路径由 src/ 移动到 app/ !'));
+                    }
+
+                    if (!fs.existsSync(path.resolve(root, 'public'))) {
+                        fs.copySync(
+                            path.resolve(ownPath, 'template/application/public'),
+                            path.resolve(root, 'public'),
+                            {
+                                overwrite: true
+                            }
+                        );
+                        spinner.succeed(chalk.green('已创建 public 目录!'));
+                    }
 
                     if (!fs.existsSync(tsconfig) || answers.updateTsconfig) {
                         fs.copySync(path.resolve(ownPath, 'template/application/tsconfig.json'), tsconfig, {
@@ -626,6 +646,12 @@ function upgradeAppProject(root) {
                         });
                     }
 
+                    _.each(pkgTemp.scripts, (value, key) => {
+                        if (!package.scripts[key]) {
+                            package.scripts[key] = value;
+                        }
+                    });
+
                     if (!package.scripts.tsc || /^node -pe/.test(package.scripts.tsc)) {
                         package.scripts.tsc = pkgTemp.scripts.tsc;
                         package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
@@ -648,14 +674,6 @@ function upgradeAppProject(root) {
                     if (package.cdn) {
                         package.scripts.cdn = 'node scripts/cdn.js';
                         package.scripts.pack = 'npm run build && npm run cdn';
-                    }
-
-                    if (!package.scripts.test) {
-                        package.scripts.test = pkgTemp.scripts.test;
-                    }
-
-                    if (!package.scripts.serve) {
-                        package.scripts.serve = pkgTemp.scripts.serve;
                     }
 
                     package.engines = Object.assign({}, package.engines, pkgTemp.engines, {

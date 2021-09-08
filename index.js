@@ -38,11 +38,19 @@ var projectName;
 var projectCustom = {};
 
 var program = commander
-    .version(require('./package.json').version)
+    .version(require('./package.json').version, '-v, --version')
     .arguments('<project-directory>')
     .usage(chalk.green('<project-directory>') + ' [options]')
     .option('-u, --upgrade', '升级项目到tiger-new最新构建版本')
-    .action(function(name) {
+    .option('-m, --mode <mode>', '选择模板类型，application 或 package', function(val) {
+        if (['application', 'package'].indexOf(val) < 0) {
+            spinner.fail('参数错误：-m --mode 只能是 application 或 package');
+            process.exit(1);
+        }
+
+        return val;
+    })
+    .action(function(name, mode) {
         projectName = name;
     })
     .parse(process.argv);
@@ -57,8 +65,10 @@ if (typeof projectName === 'undefined') {
     process.exit(1);
 }
 
+var mode = program.mode;
+
 if (program.upgrade) {
-    appUpgrade(projectName);
+    appUpgrade(projectName, mode);
 } else if (!isSafeToCreateProjectIn(path.resolve(projectName))) {
     spinner.fail('该文件夹（' + chalk.green(projectName) + '）已经存在，且存在导致冲突的文件.');
     console.log('  请使用一个新的文件夹名，或者使用升级命令将项目构建方式升级到最新版本：');
@@ -77,10 +87,15 @@ if (program.upgrade) {
                     { name: 'npm包项目(package)', value: 'package' }
                 ],
                 message: '请选择该项目用途？',
-                default: 'application'
+                default: 'application',
+                when: !mode
             }
         ])
         .then(function(answers) {
+            if (!answers.type) {
+                answers.type = mode;
+            }
+
             Object.assign(projectCustom, answers);
 
             const questions = [

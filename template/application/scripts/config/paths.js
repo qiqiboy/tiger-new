@@ -106,12 +106,13 @@ module.exports = {
     appBuild: resolveApp(appBuildName),
     appNodeBuild: resolveApp(appBuildName, 'node'),
     appPublic: resolveApp('public'),
-    appHtml: webHtmlEntries.index || Object.values(webHtmlEntries)[0],
+    appHtml: webHtmlEntries.index || Object.values(webHtmlEntries)[0] || resolveApp('public/index.html'),
     appNodeHtml:
         nodeHtmlEntries.index ||
         webHtmlEntries.index ||
         Object.values(nodeHtmlEntries)[0] ||
-        Object.values(webHtmlEntries)[0],
+        Object.values(webHtmlEntries)[0] ||
+        resolveApp('public/index.html'),
     appIndexJs: webJSEntries.index || Object.values(webJSEntries)[0],
     appNodeIndexJs: nodeJSEntries.index || Object.values(nodeJSEntries)[0],
     appPackageJson: resolveApp('package.json'),
