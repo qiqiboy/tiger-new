@@ -18,16 +18,19 @@ async function checkMissDeps(appPath, npmCommander, spinner) {
 
         console.log();
 
-        const { reInstall } = await inquirer.prompt([
-            {
-                name: 'reInstall',
-                type: 'confirm',
-                message: `你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n${chalk.dim(
-                    '重新运行 npm install 安装所有依赖项.'
-                )}`,
-                default: true
-            }
-        ]);
+        const { reInstall } =
+            process.env.CI !== 'true'
+                ? await inquirer.prompt([
+                      {
+                          name: 'reInstall',
+                          type: 'confirm',
+                          message: `你当前安装的依赖版本和要求的不一致，是否要重新安装所有依赖？\n${chalk.dim(
+                              '重新运行 npm install 安装所有依赖项.'
+                          )}`,
+                          default: true
+                      }
+                  ])
+                : { reInstall: true };
 
         console.log();
 
