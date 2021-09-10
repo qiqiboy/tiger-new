@@ -63,6 +63,9 @@ var hasCompileErrors = false;
 var retries = 0;
 
 function createConnection() {
+    // reset to true
+    isFirstCompilation = true;
+
     // Connect to WebpackDevServer via a socket.
     var connection = (window.connection = new WebSocket(
         url.format({
