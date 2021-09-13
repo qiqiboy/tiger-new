@@ -12,7 +12,7 @@ const lodash = require('lodash');
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
 const nodePaths = (process.env.NODE_PATH || '').split(path.delimiter).filter(Boolean).map(resolveApp);
-const pkg = require(resolveApp('package.json'));
+const pkg = fs.readJsonSync(resolveApp('package.json'));
 const publicUrlOrPath = getPublicUrlOrPath(
     process.env.NODE_ENV === 'development' && process.env.WEBPACK_BUILDING !== 'true',
     pkg.homepage || (pkg.noRewrite ? '.' : undefined),
@@ -113,7 +113,7 @@ module.exports = {
         resolveApp('public/index.html'),
     appIndexJs: webJSEntries.index || Object.values(webJSEntries)[0],
     appNodeIndexJs: nodeJSEntries.index || Object.values(nodeJSEntries)[0],
-    appPackageJson: resolveApp('package.json'),
+    appPackageJson: pkg,
     appSrc: resolveApp('app'),
     appTsConfig: resolveApp('tsconfig.json'),
     staticSrc: resolveApp('static'),

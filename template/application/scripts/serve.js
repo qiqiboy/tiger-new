@@ -23,7 +23,7 @@ const { prepareUrls, choosePort, prepareProxy } = require('tiger-new-utils/Webpa
 const getPublicUrlOrPath = require('tiger-new-utils/getPublicUrlOrPath');
 const history = require('connect-history-api-fallback');
 const paths = require('./config/paths');
-const pkg = require(paths.appPackageJson);
+const pkg = paths.appPackageJson;
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5000;
 const HOST = process.env.HOST || '0.0.0.0';

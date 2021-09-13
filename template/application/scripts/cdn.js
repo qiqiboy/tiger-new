@@ -8,8 +8,8 @@ const chalk = require('tiger-new-utils/chalk');
 const glob = require('glob');
 const ora = require('tiger-new-utils/ora');
 const paths = require('./config/paths');
-const pkg = require(paths.appPackageJson);
 const { printServeCommand } = require('./config/helper');
+const pkg = paths.appPackageJson;
 
 const staticFileName = 'static.config.json';
 const staticConfigFile = path.resolve(paths.root, staticFileName);

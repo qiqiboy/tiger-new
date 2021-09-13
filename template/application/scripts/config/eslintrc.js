@@ -1,5 +1,5 @@
 const paths = require('./paths');
-const pkg = require(paths.appPackageJson);
+const pkg = paths.appPackageJson;
 
 /**
  * 0: off

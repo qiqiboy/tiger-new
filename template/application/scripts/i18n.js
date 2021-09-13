@@ -1,4 +1,5 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
+const path = require('path');
 const fs = require('fs-extra');
 const glob = require('glob');
 const Parser = require('i18next-scanner').Parser;
@@ -7,8 +8,7 @@ const chalk = require('tiger-new-utils/chalk');
 const ora = require('tiger-new-utils/ora');
 const lodash = require('lodash');
 const paths = require('./config/paths');
-const path = require('path');
-const pkg = require(paths.appPackageJson);
+const pkg = paths.appPackageJson;
 
 const spinner = ora();
 

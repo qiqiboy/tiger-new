@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
-const pkg = require(paths.appPackageJson);
+const pkg = paths.appPackageJson;
 
 delete require.cache[require.resolve('./paths')];
 

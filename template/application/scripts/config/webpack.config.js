@@ -22,8 +22,8 @@ const createEnvironmentHash = require('tiger-new-utils/createEnvironmentHash');
 const getClientEnvironment = require('./env');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 const paths = require('./paths');
-const pkg = require(paths.appPackageJson);
 const tsconfig = require(paths.appTsConfig);
+const pkg = paths.appPackageJson;
 
 const webpackDevClientEntry = require.resolve('tiger-new-utils/webpackHotDevClient');
 const reactRefreshOverlayEntry = require.resolve('tiger-new-utils/refreshOverlayInterop');
@@ -582,7 +582,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         plugins: [
                             ['gifsicle', { interlaced: true }],
                             ['jpegtran', { progressive: true }],
-                            ['optipng', { optimizationLevel: 3 }],
+                            'pngquant',
                             [
                                 'svgo',
                                 {

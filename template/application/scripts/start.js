@@ -24,7 +24,7 @@ const { createDevServerConfig } = require('./config/helper');
 const paths = require('./config/paths');
 const configFactory = require('./config/webpack.config');
 const { ensureLocals } = require('./i18n');
-const pkg = require(paths.appPackageJson);
+const pkg = paths.appPackageJson;
 
 const isInteractive = process.stdout.isTTY;
 

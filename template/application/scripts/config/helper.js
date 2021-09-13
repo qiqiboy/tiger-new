@@ -8,7 +8,7 @@ const getHttpsConfig = require('tiger-new-utils/getHttpsConfig');
 const ignoredFiles = require('tiger-new-utils/ignoredFiles');
 const devRendererMiddleware = require('tiger-new-utils/devRendererMiddleware');
 const paths = require('./paths');
-const pkg = require(paths.appPackageJson);
+const pkg = paths.appPackageJson;
 
 const sourceMaps = {};
 
