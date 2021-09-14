@@ -580,8 +580,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 new ImageMinimizerPlugin({
                     minimizerOptions: {
                         plugins: [
-                            ['gifsicle', { interlaced: true }],
-                            ['jpegtran', { progressive: true }],
+                            'jpegtran',
                             'pngquant',
                             [
                                 'svgo',

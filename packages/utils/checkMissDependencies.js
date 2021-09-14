@@ -36,7 +36,7 @@ async function checkMissDeps(appPath, npmCommander, spinner) {
 
         if (reInstall) {
             await new Promise((resolve, reject) => {
-                install(npmCommander, function(code, command, args) {
+                install(appPath, npmCommander, function(code, command, args) {
                     if (code !== 0) {
                         spinner.fail(`\`${command} ${args.join(' ')}\` 运行失败`);
 
@@ -62,11 +62,12 @@ async function checkMissDeps(appPath, npmCommander, spinner) {
     }
 }
 
-function install(command, callback) {
+function install(cwd, command, callback) {
     let args = ['install'];
 
     var child = spawn(command, args, {
-        stdio: 'inherit'
+        stdio: 'inherit',
+        cwd
     });
 
     child.on('close', function(code) {

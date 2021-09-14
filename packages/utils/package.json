@@ -1,6 +1,6 @@
 {
   "name": "tiger-new-utils",
-  "version": "2.0.16",
+  "version": "2.0.17",
   "description": "The utils for tiger-new",
   "main": "index.js",
   "scripts": {
