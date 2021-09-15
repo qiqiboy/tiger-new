@@ -581,7 +581,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     minimizerOptions: {
                         plugins: [
                             'jpegtran',
-                            'pngquant',
+                            'optipng',
                             [
                                 'svgo',
                                 {
