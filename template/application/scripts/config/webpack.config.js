@@ -669,10 +669,12 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     logger: { infrastructure: 'silent', issues: 'silent', devServer: false },
                     formatter: isBuilding ? typescriptFormatter : undefined
                 }),
-            new webpack.BannerPlugin({
-                banner: `@author ${pkg.author}`,
-                entryOnly: true
-            })
+            isBuilding &&
+                new webpack.BannerPlugin({
+                    test: /\.(js|css)$/,
+                    banner: `@author ${pkg.author}`,
+                    entryOnly: true
+                })
         ].filter(Boolean),
         ignoreWarnings: [/Failed to parse source map/],
         stats: 'none',
