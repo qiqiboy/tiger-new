@@ -116,7 +116,7 @@ function upgradePackageProject(root) {
                         package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
                     }
 
-                    if (!package.prettier.jsxBracketSameLine) {
+                    if (package.prettier.jsxBracketSameLine) {
                         delete package.prettier.jsxBracketSameLine;
                         package.prettier.bracketSameLine = pkgTemp.prettier.bracketSameLine;
                     }
