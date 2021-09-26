@@ -111,8 +111,15 @@ function upgradePackageProject(root) {
 
                 if (!package.prettier) {
                     package.prettier = pkgTemp.prettier;
-                } else if (!package.prettier.arrowParens) {
-                    package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
+                } else {
+                    if (!package.prettier.arrowParens) {
+                        package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
+                    }
+
+                    if (!package.prettier.jsxBracketSameLine) {
+                        delete package.prettier.jsxBracketSameLine;
+                        package.prettier.bracketSameLine = pkgTemp.prettier.bracketSameLine;
+                    }
                 }
 
                 if (!package.eslintConfig || !package.eslintConfig.extends) {

@@ -46,7 +46,7 @@ module.exports = {
         printWidth: 120,
         tabWidth: 4,
         trailingComma: 'none',
-        jsxBracketSameLine: true,
+        bracketSameLine: true,
         semi: true,
         arrowParens: 'avoid',
         singleQuote: true,
