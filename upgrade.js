@@ -631,6 +631,11 @@ function upgradeAppProject(root) {
                         package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
                     }
 
+                    if (package.prettier.jsxBracketSameLine) {
+                        delete package.prettier.jsxBracketSameLine;
+                        package.prettier.bracketSameLine = pkgTemp.prettier.bracketSameLine;
+                    }
+
                     if (!package['lint-staged']) {
                         package['lint-staged'] = pkgTemp['lint-staged'];
                     } else {
