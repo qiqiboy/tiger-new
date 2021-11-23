@@ -52,7 +52,7 @@ module.exports = {
         singleQuote: true,
         overrides: [
             {
-                files: '*.json',
+                files: ['*.json', '*.yml'],
                 options: {
                     tabWidth: 2
                 }

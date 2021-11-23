@@ -3,7 +3,7 @@
     "@babel/plugin-proposal-decorators": "7",
     "@commitlint/cli": "13",
     "@commitlint/config-conventional": "13",
-    "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
+    "@pmmmwh/react-refresh-webpack-plugin": "0.5",
     "@svgr/webpack": "5",
     "@testing-library/jest-dom": "5",
     "@testing-library/react": "12",
@@ -16,8 +16,8 @@
     "@types/react-is": "17",
     "@types/react-router-dom": "5",
     "@types/react-transition-group": "4",
-    "@typescript-eslint/eslint-plugin": "4.30",
-    "@typescript-eslint/parser": "4.30",
+    "@typescript-eslint/eslint-plugin": "4.33",
+    "@typescript-eslint/parser": "4.33",
     "ali-oss": "6",
     "babel-eslint": "10",
     "babel-jest": "26",
@@ -76,7 +76,7 @@
     "stylelint-config-recommended": "5",
     "terser-webpack-plugin": "5",
     "tiger-new-utils": "2",
-    "typescript": "4.4",
+    "typescript": "4.5",
     "webpack": "5",
     "webpack-dev-server": "4",
     "webpack-node-externals": "3"
@@ -101,7 +101,7 @@
     "react-router-config": "5",
     "react-router-dom": "5",
     "react-transition-group": "4",
-    "react-refresh": "0.10",
+    "react-refresh": "0.11",
     "url": "0.11",
     "water-wave": "latest"
   }
