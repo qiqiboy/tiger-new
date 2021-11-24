@@ -248,9 +248,7 @@ function upgradeAppProject(root) {
 
     var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
     var newDevDependencies = newDependenciesConfig.devDependencies;
-    var patchDeps = ['url', 'react-refresh', 'raf-dom'].map(
-        (dep) => dep + '@' + newDependenciesConfig.dependencies[dep]
-    );
+    var patchDeps = ['url', 'raf-dom'].map((dep) => dep + '@' + newDependenciesConfig.dependencies[dep]);
     var cleanDeps = [
         'ora',
         'inquirer',
@@ -616,6 +614,8 @@ function upgradeAppProject(root) {
                             delete package.devDependencies[key];
                         });
                     }
+
+                    package.dependencie && (delete package.dependencies['react-refresh']);
 
                     if (!package.config) {
                         package.config = {};

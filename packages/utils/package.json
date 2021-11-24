@@ -1,6 +1,6 @@
 {
   "name": "tiger-new-utils",
-  "version": "2.0.17",
+  "version": "2.0.18",
   "description": "The utils for tiger-new",
   "main": "index.js",
   "scripts": {
@@ -68,11 +68,9 @@
     "globby": "11.0.1",
     "gzip-size": "5.1.1",
     "image-minimizer-webpack-plugin": "^2.2.0",
-    "imagemin-gifsicle": "^7.0.0",
     "imagemin-jpegtran": "^7.0.0",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-optipng": "^8.0.0",
-    "imagemin-pngquant": "^9.0.2",
     "imagemin-svgo": "^9.0.0",
     "immer": "8.0.4",
     "inquirer": "8.1.2",
