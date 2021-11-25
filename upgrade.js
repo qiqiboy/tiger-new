@@ -615,7 +615,7 @@ function upgradeAppProject(root) {
                         });
                     }
 
-                    package.dependencie && (delete package.dependencies['react-refresh']);
+                    package.dependencies && (delete package.dependencies['react-refresh']);
 
                     if (!package.config) {
                         package.config = {};
