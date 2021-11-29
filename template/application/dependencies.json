@@ -3,7 +3,7 @@
     "@babel/plugin-proposal-decorators": "7",
     "@commitlint/cli": "13",
     "@commitlint/config-conventional": "13",
-    "@pmmmwh/react-refresh-webpack-plugin": "github:pmmmwh/react-refresh-webpack-plugin#77be80c859d44ff4528478e754aedf5f6df48965",
+    "@pmmmwh/react-refresh-webpack-plugin": "0.5",
     "@svgr/webpack": "5",
     "@testing-library/jest-dom": "5",
     "@testing-library/react": "12",
