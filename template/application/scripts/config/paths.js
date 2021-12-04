@@ -11,7 +11,7 @@ const lodash = require('lodash');
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
-const nodePaths = (process.env.NODE_PATH || '').split(path.delimiter).filter(Boolean).map(resolveApp);
+const nodePaths = (process.env.NODE_PATH || '').split(path.delimiter).filter(Boolean).map(n => resolveApp(n));
 const pkg = fs.readJsonSync(resolveApp('package.json'));
 const publicUrlOrPath = getPublicUrlOrPath(
     process.env.NODE_ENV === 'development' && process.env.WEBPACK_BUILDING !== 'true',
