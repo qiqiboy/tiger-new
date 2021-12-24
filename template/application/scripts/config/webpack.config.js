@@ -300,7 +300,32 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     },
                     parallel: true
                 }),
-                new CssMinimizerPlugin()
+                new CssMinimizerPlugin(),
+                new ImageMinimizerPlugin({
+                    minimizer: {
+                        implementation: ImageMinimizerPlugin.imageminMinify,
+                        options: {
+                            plugins: [
+                                'gifsicle',
+                                [
+                                    'mozjpeg',
+                                    {
+                                        quality: 85
+                                    }
+                                ],
+                                [
+                                    'pngquant',
+                                    {
+                                        quality: [0.7, 0.9]
+                                    }
+                                ],
+                                'svgo'
+                            ]
+                        }
+                    },
+                    loader: false,
+                    severityError: 'off'
+                })
             ],
             splitChunks: {
                 cacheGroups: isEnvWeb
@@ -576,29 +601,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 ...(isEnvWeb ? { 'process.env': JSON.stringify(env.raw) } : {})
             }),
             !isBuilding && new CaseSensitivePathsPlugin(),
-            isEnvProduction &&
-                new ImageMinimizerPlugin({
-                    minimizerOptions: {
-                        plugins: [
-                            'jpegtran',
-                            'optipng',
-                            [
-                                'svgo',
-                                {
-                                    name: 'preset-default',
-                                    params: {
-                                        overrides: {
-                                            removeViewBox: true,
-                                            addAttributesToSVGElement: {
-                                                attributes: [{ xmlns: 'http://www.w3.org/2000/svg' }]
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        ]
-                    }
-                }),
             isBuilding &&
                 new MiniCssExtractPlugin({
                     filename: isEnvProduction
