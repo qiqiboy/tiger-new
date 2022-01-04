@@ -92,7 +92,7 @@
     "raf-dom": "1.1",
     "react": "17",
     "react-animated-router": "latest",
-    "react-bootstrap": "latest",
+    "react-bootstrap": "1",
     "react-bootstrap-formutil": "latest",
     "react-dom": "17",
     "react-formutil": "latest",

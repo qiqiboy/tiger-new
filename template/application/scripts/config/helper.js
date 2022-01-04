@@ -44,9 +44,11 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
             serveIndex: !paths.useNodeEnv,
             directory: paths.appPublic,
             publicPath: paths.publicUrlOrPath,
-            staticOptions: paths.useNodeEnv ? {
-                index: !paths.useNodeEnv
-            } : undefined,
+            staticOptions: paths.useNodeEnv
+                ? {
+                      index: !paths.useNodeEnv
+                  }
+                : undefined,
             watch: {
                 ignored: ignoredFiles(paths.appSrc)
             }
@@ -72,25 +74,25 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
                   }
                 : {})
         },
-        onBeforeSetupMiddleware(server) {
-            const app = server.app;
+        setupMiddlewares(middlewares, devServer) {
+            const app = devServer.app;
 
-            app.use(evalSourceMapMiddleware(server));
-            app.use(errorOverlayMiddleware());
+            middlewares.unshift(evalSourceMapMiddleware(devServer), errorOverlayMiddleware());
+
+            middlewares.push(
+                redirectServedPath(paths.publicUrlOrPath),
+                noopServiceWorkerMiddleware(paths.publicUrlOrPath)
+            );
+
+            if (paths.useNodeEnv) {
+                middlewares.push(devRendererMiddleware(paths, registerSourceMap, spinner));
+            }
 
             if (fs.existsSync(paths.proxySetup)) {
                 require(paths.proxySetup)(app);
             }
-        },
-        onAfterSetupMiddleware(server) {
-            const app = server.app;
 
-            app.use(redirectServedPath(paths.publicUrlOrPath));
-            app.use(noopServiceWorkerMiddleware(paths.publicUrlOrPath));
-
-            if (paths.useNodeEnv) {
-                app.use(devRendererMiddleware(paths, registerSourceMap, spinner));
-            }
+            return middlewares;
         }
     };
 }
