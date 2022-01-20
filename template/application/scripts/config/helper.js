@@ -79,6 +79,10 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
 
             middlewares.unshift(evalSourceMapMiddleware(devServer), errorOverlayMiddleware());
 
+            if (fs.existsSync(paths.proxySetup)) {
+                require(paths.proxySetup)(app);
+            }
+
             middlewares.push(
                 redirectServedPath(paths.publicUrlOrPath),
                 noopServiceWorkerMiddleware(paths.publicUrlOrPath)
@@ -86,10 +90,6 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
 
             if (paths.useNodeEnv) {
                 middlewares.push(devRendererMiddleware(paths, registerSourceMap, spinner));
-            }
-
-            if (fs.existsSync(paths.proxySetup)) {
-                require(paths.proxySetup)(app);
             }
 
             return middlewares;

@@ -58,7 +58,7 @@ if (module.hot && typeof module.hot.dispose === 'function') {
 
 // Remember some state related to hot module replacement.
 var isFirstCompilation = true;
-var mostRecentCompilationHash = null;
+var mostRecentCompilationHash = '';
 var hasCompileErrors = false;
 var retries = 0;
 
@@ -244,7 +244,7 @@ function isUpdateAvailable() {
     /* globals __webpack_hash__ */
     // __webpack_hash__ is the hash of the current compilation.
     // It's a global variable injected by webpack.
-    return mostRecentCompilationHash !== __webpack_hash__;
+    return !mostRecentCompilationHash.startsWith(__webpack_hash__);
 }
 
 // webpack disallows updates in other states.
