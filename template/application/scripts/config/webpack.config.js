@@ -323,7 +323,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             ]
                         }
                     },
-                    loader: false,
+                    loader: true,
                     severityError: 'off'
                 })
             ],
