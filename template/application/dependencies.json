@@ -77,7 +77,7 @@
     "terser-webpack-plugin": "5",
     "tiger-new-utils": "2",
     "typescript": "4.5",
-    "webpack": "5",
+    "webpack": "5.65",
     "webpack-dev-server": "4",
     "webpack-node-externals": "3"
   },
