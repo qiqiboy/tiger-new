@@ -86,7 +86,7 @@ if (axios?.interceptors.response.handlers?.length === 0) {
 
         // 增加对表单数组提交的支持
         if (config.useForm && (config.method === 'post' || config.method === 'put')) {
-            config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+            config.headers = { ...config.headers, 'Content-Type': 'application/x-www-form-urlencoded' };
             config.transformRequest = dataSerializer;
         }
 

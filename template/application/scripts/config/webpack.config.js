@@ -310,7 +310,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 [
                                     'mozjpeg',
                                     {
-                                        quality: 85
+                                        quality: 60
                                     }
                                 ],
                                 [
