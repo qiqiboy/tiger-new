@@ -229,12 +229,6 @@ if (program.upgrade) {
                         default: true
                     },
                     {
-                        name: 'enableSW',
-                        type: 'confirm',
-                        message: '是否启用' + chalk.red('Service Worker Precache') + '离线功能支持?',
-                        default: false
-                    },
-                    {
                         name: 'useRem',
                         type: 'confirm',
                         message: '是否使用页面等比例缩放模式（使用rem）？',
@@ -295,10 +289,6 @@ function createApp(name) {
         case 3:
             pkgVendor.push('jquery', 'react', 'react-dom');
             break;
-    }
-
-    if (projectCustom.enableSW) {
-        pkgVendor.push('utils/serviceWorker/register');
     }
 
     pkgVendor.push('./static/css/vendor.scss');

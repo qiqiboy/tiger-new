@@ -30,7 +30,6 @@
 
 -   CLI-QA 形式初始化配置项目
 -   生成的项目支持 `webpack` + `es6` 开发环境
--   支持 `Service Worker Precache`，生成离线应用
 -   也支持 jsx 语法，所以也同时可以用来开发 `react` 应用
 -   提供渐进式对`typescript`语法的支持，支持`tsx`开发`react`应用
 -   不仅支持 SPA，也支持**多页面**项目开发
