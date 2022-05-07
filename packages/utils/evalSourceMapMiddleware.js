@@ -14,8 +14,9 @@ function base64SourceMap(source) {
 }
 
 function getSourceById(server, id) {
-  const module = Array.from(server.stats.compilation.modules).find(
-    (m) => server.stats.compilation.chunkGraph.getModuleId(m) == id,
+  const stats = server.stats.stats ? server.stats.stats[0] : server.stats;
+  const module = Array.from(stats.compilation.modules).find(
+    (m) => stats.compilation.chunkGraph.getModuleId(m) == id,
   );
   return module.originalSource();
 }
