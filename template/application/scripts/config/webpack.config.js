@@ -218,7 +218,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         ? 'source-map'
                         : 'hidden-source-map'
                     : 'cheap-module-source-map'
-                : 'eval-cheap-module-source-map'
+                : 'cheap-module-source-map'
             : false,
         entry: isEnvNode
             ? paths.nodeEntries
