@@ -285,6 +285,10 @@ function printInstructions(fileName, errorMessage) {
 
 let _childProcess = null;
 function launchEditor(fileName, lineNumber, colNumber) {
+  if (fileName && fileName.startsWith('webpack://')) {
+    fileName = path.join(process.cwd(), fileName.replace(/^webpack:\/\//i, ''))
+  }
+
   if (!fs.existsSync(fileName)) {
     return;
   }
