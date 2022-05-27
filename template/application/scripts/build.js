@@ -131,8 +131,10 @@ checkBrowsers(paths.root, isInteractive).then(() => {
                 }
             };
 
-            logProgress();
-            spinner.start();
+            if (config.cache) {
+                logProgress();
+                spinner.start();
+            }
 
             return new Promise((resolve, reject) =>
                 compiler.close(err => {
@@ -143,6 +145,8 @@ checkBrowsers(paths.root, isInteractive).then(() => {
                     if (config.cache) {
                         logProgress(`本地缓存已生成：${path.resolve(paths.appNodeModules, '.cache/webpack')} | `, true);
                     }
+
+                    resolve();
                 })
             );
         })
