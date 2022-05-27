@@ -14,9 +14,9 @@ process.on('unhandledRejection', err => {
 require('./config/env');
 
 const path = require('path');
-const chalk = require('tiger-new-utils/chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
+const chalk = require('tiger-new-utils/chalk');
 const ora = require('tiger-new-utils/ora');
 const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
 const FileSizeReporter = require('tiger-new-utils/FileSizeReporter');
@@ -63,7 +63,7 @@ checkBrowsers(paths.root, isInteractive).then(() => {
             // Start the webpack build
             return build(previousFileSizes);
         })
-        .then(({ stats, previousFileSizes, warnings }) => {
+        .then(({ stats, previousFileSizes, warnings, compiler }) => {
             if (warnings.length) {
                 spinner.warn(chalk.yellow('编译有警告产生：'));
                 console.log();
@@ -115,6 +115,36 @@ checkBrowsers(paths.root, isInteractive).then(() => {
             }
 
             console.log();
+
+            let timer;
+            const startTime = Date.now();
+            const logProgress = function(prefix, isStop) {
+                let text = `${prefix || '正在生成本地缓存...'}已耗时：${((Date.now() - startTime) / 1000).toFixed(3)}s`;
+
+                if (isStop) {
+                    clearTimeout(timer);
+                    spinner.succeed(chalk.green(text));
+                } else {
+                    spinner.text = chalk.cyan(text);
+
+                    timer = setTimeout(logProgress, 100);
+                }
+            };
+
+            logProgress();
+            spinner.start();
+
+            return new Promise((resolve, reject) =>
+                compiler.close(err => {
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    if (config.cache) {
+                        logProgress(`本地缓存已生成：${path.resolve(paths.appNodeModules, '.cache/webpack')} | `, true);
+                    }
+                })
+            );
         })
         .catch(err => {
             spinner.fail(chalk.red('编译失败！！'));
@@ -184,12 +214,11 @@ function build(previousFileSizes) {
                 return reject(new Error(messages.errors.join('\n\n')));
             }
 
-            compiler.close();
-
             const resolveArgs = {
                 stats,
                 previousFileSizes,
-                warnings: messages.warnings
+                warnings: messages.warnings,
+                compiler
             };
 
             return resolve(resolveArgs);

@@ -680,6 +680,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         ].filter(Boolean),
         ignoreWarnings: [/Failed to parse source map/],
         stats: 'none',
+        snapshot: {
+            managedPaths: [/node_modules\/.*\/(node_modules)/]
+        },
         // Turn off performance processing because we utilize
         // our own hints via the FileSizeReporter
         performance: false
