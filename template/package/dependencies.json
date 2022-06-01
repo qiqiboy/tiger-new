@@ -18,20 +18,20 @@
     "@types/react": "17",
     "@types/react-dom": "17",
     "@types/react-is": "17",
-    "@typescript-eslint/eslint-plugin": "4",
-    "@typescript-eslint/parser": "4",
+    "@typescript-eslint/eslint-plugin": "5.4",
+    "@typescript-eslint/parser": "5.4",
     "babel-eslint": "10",
     "babel-jest": "26",
     "babel-preset-react-app": "10",
     "eslint": "7",
     "eslint-config-react-app": "6",
     "eslint-plugin-flowtype": "5",
-    "eslint-plugin-import": "2",
+    "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jest": "24",
     "eslint-plugin-jsx-a11y": "6",
     "eslint-plugin-react": "7",
     "eslint-plugin-react-hooks": "4",
-    "eslint-plugin-testing-library": "3",
+    "eslint-plugin-testing-library": "4",
     "husky": "3",
     "lint-staged": "10",
     "jest": "26",
@@ -49,6 +49,6 @@
     "rollup-plugin-filesize": "9",
     "rollup-plugin-sass": "1",
     "rollup-plugin-terser": "7",
-    "typescript": "4"
+    "typescript": "4.5"
   }
 }

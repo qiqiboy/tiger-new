@@ -83,6 +83,7 @@ function createConfig(env, module) {
                 include: /node_modules/
             }),
             replace({
+                preventAssignment: true,
                 'process.env.NODE_ENV': JSON.stringify(env)
             }),
             babel({
@@ -121,9 +122,21 @@ function createConfig(env, module) {
                         }
                     ],
                     [
+                        require('@babel/plugin-proposal-private-methods').default,
+                        {
+                            loose: true,
+                        },
+                    ],
+                    [
+                        require('@babel/plugin-proposal-private-property-in-object').default,
+                        {
+                            loose: true,
+                        },
+                    ],
+                    [
                         '@babel/plugin-transform-runtime',
                         {
-                            version: require('@babel/helpers/package.json').version,
+                            version: require('@babel/runtime/package.json').version,
                             corejs: false,
                             helpers: true,
                             regenerator: true,
