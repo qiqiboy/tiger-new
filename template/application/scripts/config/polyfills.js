@@ -13,13 +13,13 @@ if (typeof window !== 'undefined') {
 }
 
 // ECMAScript
-require('core-js/actual/object');
-require('core-js/actual/promise');
-require('core-js/actual/map');
-require('core-js/actual/set');
-require('core-js/actual/array');
-require('core-js/actual/string');
-require('core-js/actual/number');
-require('core-js/actual/symbol');
-require('core-js/actual/global-this');
-require('core-js/actual/url');
+require('core-js/features/object');
+require('core-js/features/promise');
+require('core-js/features/map');
+require('core-js/features/set');
+require('core-js/features/array');
+require('core-js/features/string');
+require('core-js/features/number');
+require('core-js/features/symbol');
+require('core-js/features/global-this');
+require('core-js/features/url');
