@@ -14,9 +14,6 @@ module.exports = {
                 'lint-staged && export StagedFiles=$(git diff --diff-filter AM --name-only --relative --staged | grep -E \'^src/.*\\.m?[jt]sx?$\') && if [ -n "$StagedFiles"  ]; then npm run tsc ; fi'
         }
     },
-    babel: {
-        presets: ['react-app']
-    },
     eslintConfig: {
         extends: ['react-app', 'react-app/jest', './eslint.config.js']
     },

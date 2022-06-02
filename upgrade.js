@@ -28,32 +28,56 @@ function upgradePackageProject(root) {
     var tsconfig = path.resolve(root, 'tsconfig.json');
     var pkgTemp = require(path.resolve(ownPath, 'template/package/packageTemp.js'));
     var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
+    var cleanDeps = [
+        '@babel/cli',
+        '@babel/core',
+        /* '@babel/runtime',
+         * '@typescript-eslint/eslint-plugin',
+         * '@typescript-eslint/parser',
+         * 'babel-eslint',
+         * 'eslint-config-react-app',
+         * 'eslint-plugin-flowtype',
+         * 'eslint-plugin-import',
+         * 'eslint-plugin-jest',
+         * 'eslint-plugin-jsx-a11y',
+         * 'eslint-plugin-react',
+         * 'eslint-plugin-react-hooks',
+         * 'eslint-plugin-testing-library'  */
+    ];
 
     inquirer
-        .prompt([
-            {
-                name: 'upgrade',
-                type: 'confirm',
-                message:
-                    '请确认是否要将 ' +
-                    package.name +
-                    ' 升级到最新？\n' +
-                    chalk.dim('1. 向package.json的devDependencies字段下写入需要的依赖') +
-                    '\n' +
-                    chalk.dim('2. 覆盖原来的构建配置 rollup.config.js') +
-                    '\n',
-                default: true
-            },
-            {
-                when: function (answers) {
-                    return answers.upgrade && fs.existsSync(tsconfig);
+        .prompt(
+            [
+                {
+                    name: 'upgrade',
+                    type: 'confirm',
+                    message:
+                        '请确认是否要将 ' +
+                        package.name +
+                        ' 升级到最新？\n' +
+                        chalk.dim('1. 向package.json的devDependencies字段下写入需要的依赖') +
+                        '\n' +
+                        chalk.dim('2. 覆盖原来的构建配置 rollup.config.js') +
+                        '\n',
+                    default: true
                 },
-                name: 'updateTsconfig',
-                type: 'confirm',
-                message: '是否更新tsconfig.json？',
-                default: false
-            }
-        ])
+                {
+                    when: function (answers) {
+                        return answers.upgrade && fs.existsSync(tsconfig);
+                    },
+                    name: 'updateTsconfig',
+                    type: 'confirm',
+                    message: '是否更新tsconfig.json？',
+                    default: false
+                },
+                _.some(package.devDependencies, (v, k) => cleanDeps.includes(k)) && {
+                    name: 'cleanDeps',
+                    type: 'confirm',
+                    message: '是否清理过期的devDependencies依赖项？',
+                    default: true
+                }
+            ].filter(Boolean)
+        )
         .then(function (answers) {
             if (answers.upgrade) {
                 fs.copySync(
@@ -89,6 +113,12 @@ function upgradePackageProject(root) {
                 if (!fs.existsSync(path.resolve(root, 'jest'))) {
                     fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
                         overwrite: true
+                    });
+                }
+
+                if (answers.cleanDeps) {
+                    cleanDeps.forEach((key) => {
+                        delete package.devDependencies[key];
                     });
                 }
 
@@ -265,7 +295,19 @@ function upgradeAppProject(root) {
         'postcss-safe-parser',
         'react-dev-utils',
         'sw-precache-webpack-plugin',
-        '@babel/core'
+        '@babel/core',
+        '@babel/runtime',
+        '@typescript-eslint/eslint-plugin',
+        '@typescript-eslint/parser',
+        'babel-eslint',
+        'eslint-config-react-app',
+        'eslint-plugin-flowtype',
+        'eslint-plugin-import',
+        'eslint-plugin-jest',
+        'eslint-plugin-jsx-a11y',
+        'eslint-plugin-react',
+        'eslint-plugin-react-hooks',
+        'eslint-plugin-testing-library'
     ];
     var cleanFiles = ['config/tslintrc.json', 'config/checkMissDependencies.js'];
 
@@ -615,7 +657,7 @@ function upgradeAppProject(root) {
                         });
                     }
 
-                    package.dependencies && (delete package.dependencies['react-refresh']);
+                    package.dependencies && delete package.dependencies['react-refresh'];
 
                     if (!package.config) {
                         package.config = {};

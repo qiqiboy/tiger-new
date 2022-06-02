@@ -134,7 +134,7 @@ module.exports = {
     },
     settings: {
         'import/core-modules': Object.keys(pkg.dependencies || {}),
-        'import/internal-regex': new RegExp(`^(app|libs|${Object.keys(paths.moduleAlias).join('|')})/`)
+        'import/internal-regex': `^(app|libs|static|${Object.keys(paths.moduleAlias).join('|')})/`
     },
     parserOptions: {
         ecmaFeatures: {
@@ -170,7 +170,9 @@ module.exports = {
         'import/order': [
             1,
             {
-                groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown']
+                groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown'],
+                alphabetize: { order: 'asc', caseInsensitive: false },
+                'newlines-between': 'never'
             }
         ],
         'import/no-useless-path-segments': [

@@ -1,7 +1,5 @@
 {
   "devDependencies": {
-    "@babel/cli": "7",
-    "@babel/core": "7",
     "@commitlint/cli": "11",
     "@commitlint/config-conventional": "11",
     "@rollup/plugin-babel": "5",
