@@ -30,7 +30,7 @@ function upgradePackageProject(root) {
     var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
     var cleanDeps = [
         '@babel/cli',
-        '@babel/core',
+        '@babel/core'
         /* '@babel/runtime',
          * '@typescript-eslint/eslint-plugin',
          * '@typescript-eslint/parser',
@@ -559,6 +559,12 @@ function upgradeAppProject(root) {
                     if (!package.husky.hooks['pre-push']) {
                         package.husky.hooks['pre-push'] = pkgTemp.husky.hooks['pre-push'];
                     }
+
+                    ['pre-commit', 'pre-push'].forEach(function (hook) {
+                        if (!/NODE_ENV=/.test(package.husky.hooks[hook])) {
+                            package.husky.hooks[hook] = pkgTemp.husky.hooks[hook];
+                        }
+                    });
 
                     if (package.babel) {
                         if (!package.babel.plugins) {
