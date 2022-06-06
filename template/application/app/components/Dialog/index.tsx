@@ -1,6 +1,6 @@
 import React, { Component, isValidElement } from 'react';
-import Modal from 'components/Modal';
 import Button from 'components/Button';
+import Modal from 'components/Modal';
 import './style.scss';
 
 export interface DialogProps {

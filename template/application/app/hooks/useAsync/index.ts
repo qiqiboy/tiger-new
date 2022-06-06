@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import useAsyncBase, { LoaderState, RunAsync } from 'hooks/useAsyncBase';
 import Toast from 'components/Toast';
+import useAsyncBase, { LoaderState, RunAsync } from 'hooks/useAsyncBase';
 
 type OnChangeOrToast<T> = boolean | string | ((state: LoaderState<T>) => void);
 

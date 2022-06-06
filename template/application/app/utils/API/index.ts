@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios';
 import 'utils/http';
-
 // 导入接口定义
 import * as PORTAL from './apis/PORTAL';
 

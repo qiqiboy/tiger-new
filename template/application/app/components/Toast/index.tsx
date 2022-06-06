@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { render as reactRender, unmountComponentAtNode } from 'react-dom';
 import Loading from 'components/Loading';
+import Portal from 'components/Portal';
 import { Fade } from 'components/Transition';
 import { TransitionProps } from 'components/Transition/withTransition';
-import Portal from 'components/Portal';
 import classlist from 'utils/classlist';
 import './style.scss';
 

@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
 import loadable from '@loadable/component';
-import Loading from 'components/Loading';
+import React, { Component } from 'react';
 import ErrorBox from 'components/ErrorBox';
+import Loading from 'components/Loading';
 
 interface LoadableState {
     error: any;

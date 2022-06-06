@@ -23,10 +23,10 @@
  *
  * 更详细用法，参考项目README.md
  */
-import { createContext } from 'react';
 import cookick from 'cookick';
-import URL from 'utils/URL';
+import { createContext } from 'react';
 import pkg from 'package.json';
+import URL from 'utils/URL';
 
 // 可用的语言
 // @ts-ignore
@@ -48,7 +48,6 @@ const globalTranslation = allowedLangs.reduce((translation, lang) => {
 
     return translation;
 }, {});
-
 
 const langPatterns = {
     zh_CN: /cn/i,

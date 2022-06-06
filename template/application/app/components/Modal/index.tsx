@@ -1,6 +1,6 @@
 import React, { Children, cloneElement, Component } from 'react';
-import { render as reactRender, unmountComponentAtNode, createPortal, Renderer } from 'react-dom';
 import { Modal, ModalProps as BSModalProps } from 'react-bootstrap';
+import { render as reactRender, unmountComponentAtNode, createPortal, Renderer } from 'react-dom';
 import { isValidElementType } from 'react-is';
 import './style.scss';
 

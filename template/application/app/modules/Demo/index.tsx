@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { ButtonToolbar, ToggleButtonGroup, ToggleButton, Jumbotron, Card, CardDeck, Form } from 'react-bootstrap';
 import { withForm, $Formutil, FormGroup, CheckboxGroup, RadioGroup, SwitchGroup } from 'react-bootstrap-formutil';
+import Button from 'components/Button';
 import Debug from 'components/Debug';
+import Dialog from 'components/Dialog';
 import ErrorBox from 'components/ErrorBox';
 import Loading from 'components/Loading';
-import Button from 'components/Button';
 import Modal from 'components/Modal';
-import Dialog from 'components/Dialog';
 import Toast from 'components/Toast';
 import { Fade, Zoom, Flow, Flip, Collapse } from 'components/Transition';
 import './style.scss';
