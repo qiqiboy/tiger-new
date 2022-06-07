@@ -171,7 +171,7 @@ module.exports = {
             1,
             {
                 groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown'],
-                alphabetize: { order: 'asc', caseInsensitive: false },
+                alphabetize: { order: 'asc', caseInsensitive: true },
                 'newlines-between': 'never'
             }
         ],

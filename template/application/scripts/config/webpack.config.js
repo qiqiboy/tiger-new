@@ -230,7 +230,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                   },
                   paths.entries
               ),
-        target: isEnvWeb ? 'browserslist' : 'node',
+        target: isEnvWeb ? 'browserslist' : 'node12.0',
         output: {
             library: isEnvNode
                 ? {
@@ -458,7 +458,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                                   require('@babel/preset-env').default,
                                                   {
                                                       targets: {
-                                                          node: 10
+                                                          node: 12
                                                       },
                                                       useBuiltIns: 'entry',
                                                       corejs: 3,
