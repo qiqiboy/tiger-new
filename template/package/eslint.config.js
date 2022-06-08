@@ -1,3 +1,7 @@
+if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'development';
+}
+
 const pkg = require('./package.json');
 
 /**
@@ -6,16 +10,6 @@ const pkg = require('./package.json');
  * 2: error
  */
 module.exports = {
-    overrides: [
-        {
-            files: ['**/__tests__/**/*', '**/*.{spec,test}.*'],
-            rules: {
-                'jest/consistent-test-it': [1, { fn: 'test' }],
-                'jest/expect-expect': 1,
-                'jest/no-deprecated-functions': 2
-            }
-        }
-    ],
     settings: {
         'import/core-modules': [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})]
     },
@@ -91,5 +85,15 @@ module.exports = {
             { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },
             { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] }
         ]
-    }
+    },
+    overrides: [
+        {
+            files: ['**/__tests__/**/*', '**/*.{spec,test}.*'],
+            rules: {
+                'jest/consistent-test-it': [1, { fn: 'test' }],
+                'jest/expect-expect': 1,
+                'jest/no-deprecated-functions': 2
+            }
+        }
+    ]
 };
