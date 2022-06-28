@@ -1,3 +1,4 @@
+/* eslint import/order:0 */
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -151,7 +152,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
 
     if (isEnvWeb) {
         Object.keys(paths.pageEntries).forEach(function(name) {
-            const chunks = ['_vendor_'];
+            const chunks = ['vendor'];
             const file = paths.pageEntries[name];
             const nodeFile = paths.nodePageEntries[name];
 
@@ -166,11 +167,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 chunks.push(matches[1]);
             }
 
-            const createHtmlWebpaclPlugin = function(filename, template) {
+            const createHtmlWebpackPlugin = function(filename, template) {
                 return new HtmlWebpackPlugin(
                     Object.assign(
                         {
-                            chunks: chunks,
+                            chunks,
                             filename,
                             template,
                             inject: true,
@@ -198,11 +199,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 );
             };
 
-            htmlInjects.push(createHtmlWebpaclPlugin(`${name}.html`, file || nodeFile));
+            htmlInjects.push(createHtmlWebpackPlugin(`${name}.html`, file || nodeFile));
 
             paths.useNodeEnv &&
                 htmlInjects.push(
-                    createHtmlWebpaclPlugin(path.join(paths.appNodeBuild, `${name}.html`), nodeFile || file)
+                    createHtmlWebpackPlugin(path.join(paths.appNodeBuild, `${name}.html`), nodeFile || file)
                 );
         });
     }
@@ -224,11 +225,20 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             ? paths.nodeEntries
             : Object.assign(
                   {
-                      _vendor_: [require.resolve('./polyfills'), !isBuilding && webpackDevClientEntry]
+                      vendor: [require.resolve('./polyfills'), !isBuilding && webpackDevClientEntry]
                           .concat(pkg.vendor || [])
                           .filter(Boolean)
                   },
-                  paths.entries
+                  Object.keys(paths.entries).reduce(
+                      (entries, name) =>
+                          Object.assign(entries, {
+                              [name]: {
+                                  import: paths.entries[name],
+                                  dependOn: 'vendor'
+                              }
+                          }),
+                      {}
+                  )
               ),
         target: isEnvWeb ? 'browserslist' : 'node12.0',
         output: {
@@ -330,18 +340,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             splitChunks: {
                 cacheGroups: isEnvWeb
                     ? {
-                          vendors: {
-                              priority: 10,
-                              chunks: 'all',
-                              name: 'vendor',
-                              test(module, { chunkGraph }) {
-                                  const chunks = Array.from(chunkGraph.getOrderedModuleChunksIterable(module));
-
-                                  return chunks.some(chunk => chunk.name === '_vendor_');
-                              }
-                          },
                           i18n: {
-                              priority: 100,
                               chunks: 'all',
                               test: /locals\/\w+\.json$/,
                               enforce: true,
