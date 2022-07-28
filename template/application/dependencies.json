@@ -74,7 +74,7 @@
   "dependencies": {
     "@loadable/component": "5",
     "axios": "latest",
-    "bootstrap": "4",
+    "bootstrap": "5",
     "classnames": "latest",
     "cookick": "latest",
     "moment": "2",
@@ -82,7 +82,7 @@
     "raf-dom": "1.1",
     "react": "17",
     "react-animated-router": "latest",
-    "react-bootstrap": "1",
+    "react-bootstrap": "2",
     "react-bootstrap-formutil": "latest",
     "react-dom": "17",
     "react-formutil": "latest",

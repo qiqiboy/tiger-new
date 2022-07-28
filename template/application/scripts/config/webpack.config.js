@@ -273,7 +273,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
             (isBuilding
                 ? {
                       type: 'filesystem',
-                      version: createEnvironmentHash(env.raw),
+                      version: createEnvironmentHash(pkg.engines || {}),
                       buildDependencies: {
                           config: [__filename]
                       }
