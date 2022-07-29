@@ -28,7 +28,8 @@ export interface ButtonProps extends Omit<BSButtonProps, 'type' | 'variant' | 's
 
 class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<'button'>, 'type'>> {
     static defaultProps = {
-        type: 'primary'
+        type: 'primary',
+        htmlType: 'button'
     };
 
     public render() {
