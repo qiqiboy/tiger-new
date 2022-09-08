@@ -628,7 +628,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 context: paths.appSrc,
                 cache: true,
                 cacheLocation: path.resolve(paths.appNodeModules, '.cache/eslint'),
-                cwd: paths.root
+                cwd: paths.root,
+                fix: isBuilding
             }),
             (!isBuilding || isEnvWeb) &&
                 process.env.DISABLE_TSC_CHECK !== 'true' &&

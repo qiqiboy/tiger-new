@@ -60,6 +60,13 @@ module.exports = {
                 'newlines-between': 'never'
             }
         ],
+        'sort-imports': [
+            1,
+            {
+                ignoreCase: true,
+                ignoreDeclarationSort: true
+            }
+        ],
         'import/no-useless-path-segments': [
             1,
             {
@@ -188,6 +195,17 @@ module.exports = {
             { blankLine: 'any', prev: ['cjs-import', 'import'], next: ['cjs-import', 'import'] },
             { blankLine: 'any', prev: ['export', 'cjs-export'], next: ['export', 'cjs-export'] },
             { blankLine: 'any', prev: ['const', 'let', 'var'], next: ['const', 'let', 'var'] }
+        ],
+        'no-restricted-imports': [
+            'error',
+            {
+                paths: [
+                    {
+                        name: 'moment',
+                        message: 'Please use dayjs instead.'
+                    }
+                ]
+            }
         ]
     },
     overrides: [

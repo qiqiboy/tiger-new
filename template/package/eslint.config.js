@@ -36,6 +36,13 @@ module.exports = {
                 groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown']
             }
         ],
+        'sort-imports': [
+            1,
+            {
+                ignoreCase: true,
+                ignoreDeclarationSort: true
+            }
+        ],
         'import/no-useless-path-segments': [
             1,
             {
