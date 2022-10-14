@@ -14,6 +14,17 @@ const spinner = ora();
 
 const terminalArg = process.argv[2];
 
+const langBaseConfig = [
+    {
+        prefix: 'zh',
+        lang: 'zh_CN'
+    },
+    {
+        prefix: 'en',
+        lang: 'en_US'
+    }
+];
+
 if (terminalArg === '--scan') {
     ensureLocalsConfig();
     scanner();
@@ -78,13 +89,16 @@ function scanner() {
 
     lodash.each(i18nJson, ({ translation }, key) => {
         const langFile = path.join(paths.locals, `${key}.json`);
+        const baseKey = langBaseConfig.find(({ prefix }) => key.startsWith(prefix))?.lang;
+        const baselangFile = baseKey && path.join(paths.locals, `${baseKey}.json`);
 
-        const currentLangs = fs.existsSync(langFile) ? JSON.parse(fs.readFileSync(langFile)) : {};
+        const currentLangs = langFile ? requireJson(langFile) : {};
+        const baseLangs = baselangFile ? requireJson(baselangFile) : {};
         const newLangs = lodash.pickBy(currentLangs, (value, key) => key in translation);
 
         lodash.each(translation, (value, key) => {
-            if (!(key in newLangs)) {
-                newLangs[key] = value;
+            if (!(key in newLangs) && baseKey === key) {
+                newLangs[key] = baseLangs[key] || value;
             }
         });
 
@@ -145,10 +159,19 @@ function convertExcel2Json(file) {
     langs.forEach((lang, index) => {
         const destination = path.join(paths.locals, `${lang}.json`);
         const jsonData = requireJson(destination);
+        const langBase = langBaseConfig.find(({ prefix }) => lang.startsWith(prefix))?.lang;
+        const langBaseIndex = langs.indexOf(langBase);
 
         sheets.slice(2).forEach(item => {
             if (item.length) {
-                jsonData[item[0]] = item[index + 1];
+                if (
+                    item[0] !== item[index + 1] &&
+                    (langBaseIndex < 1 || langBaseIndex === index || item[langBaseIndex + 1] !== item[index + 1])
+                ) {
+                    jsonData[item[0]] = item[index + 1];
+                } else {
+                    delete jsonData[item[0]];
+                }
             }
         });
 

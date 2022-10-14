@@ -34,6 +34,12 @@ const allowedLangs = pkg.locals || ['zh_CN', 'en_US'];
 const LOCAL_LANG_FLAG = 'lang';
 const isBrowser = typeof window !== 'undefined';
 
+// 根据语言前缀映射支持的语言
+const langBaseMap = {
+    zh: 'zh_CN',
+    en: 'en_US'
+};
+
 /**
  * globalTranslation为以语言标识符作为key，对应的语言包json为内容的对象
  */
@@ -55,9 +61,11 @@ const langPatterns = {
     zh_TW: /tw|hk/i
 };
 
-// 从浏览器语言字符串中解析对应的默认语言
-function getBrowserLang(browserlang: string, langs: string[] = allowedLangs): string {
-    return langs.find(lang => langPatterns[lang]?.test(browserlang)) || langs[0];
+// 从浏览器语言字符串中解析对应的默认语言, 例如：zh-CN,zh;q=0.9,en;q=0.8
+function getBrowserLang(browserlang: string, langs: string[] = allowedLangs): string | undefined {
+    const validLang = browserlang?.split(';')[0].split(',')[0]?.replace('-', '_');
+
+    return langs.includes(validLang) ? validLang : langs.find(lang => langPatterns[lang]?.test(validLang));
 }
 
 /**
@@ -126,7 +134,9 @@ export function createI18n(
     const browserLang = getBrowserLang(browserLanguage);
 
     const language =
-        [queryLang, localLang, browserLang].find(lang => allowedLangs.includes(lang || '')) || allowedLangs[0];
+        [queryLang, queryLang && langBaseMap[queryLang.slice(0, 2)], localLang, browserLang].find(lang =>
+            allowedLangs.includes(lang || '')
+        ) || allowedLangs[0];
 
     // 如果本地的语言标识符与当前不一致，则更新本地存储
     if (localLang !== language) {
@@ -134,13 +144,14 @@ export function createI18n(
     }
 
     const translation = globalTranslation[language] || {};
+    const baseTranslation = globalTranslation[langBaseMap[language.slice(0, 2)]] || {};
 
     /**
      * @description
      * 语言包匹配
      */
     function __(text: string): string {
-        return translation[text] || text;
+        return translation[text] ?? baseTranslation[text] ?? text;
     }
 
     const i18n = {
