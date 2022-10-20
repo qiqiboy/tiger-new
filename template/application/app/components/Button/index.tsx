@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, ButtonProps as BSButtonProps, Spinner } from 'react-bootstrap';
+import { ButtonProps as BSButtonProps, Button, Spinner } from 'react-bootstrap';
 import WaterWave, { WaterWaveProps } from 'water-wave';
 import 'water-wave/style.css';
 import classlist from 'utils/classlist';

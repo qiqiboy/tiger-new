@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { ButtonToolbar, ToggleButtonGroup, ToggleButton, Card, Form } from 'react-bootstrap';
-import { withForm, $Formutil, FormGroup, CheckboxGroup, RadioGroup, SwitchGroup } from 'react-bootstrap-formutil';
+import { ButtonToolbar, Card, Form, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { $Formutil, CheckboxGroup, FormGroup, RadioGroup, SwitchGroup, withForm } from 'react-bootstrap-formutil';
 import Button from 'components/Button';
 import Debug from 'components/Debug';
 import Dialog from 'components/Dialog';
@@ -8,7 +8,7 @@ import ErrorBox from 'components/ErrorBox';
 import Loading from 'components/Loading';
 import Modal from 'components/Modal';
 import Toast from 'components/Toast';
-import { Fade, Zoom, Flow, Flip, Collapse } from 'components/Transition';
+import { Collapse, Fade, Flip, Flow, Zoom } from 'components/Transition';
 import './style.scss';
 
 interface DemoProps {
@@ -233,9 +233,15 @@ class ComDemo extends Component<DemoProps> {
                             controlId="demo3.toggleButtonCheckbox"
                             $defaultValue={[2]}>
                             <ToggleButtonGroup type="checkbox">
-                                <ToggleButton value={1} id="t1">Option 1</ToggleButton>
-                                <ToggleButton value={2} id="t2">Option 2</ToggleButton>
-                                <ToggleButton value={3} id="t3">Option 3</ToggleButton>
+                                <ToggleButton value={1} id="t1">
+                                    Option 1
+                                </ToggleButton>
+                                <ToggleButton value={2} id="t2">
+                                    Option 2
+                                </ToggleButton>
+                                <ToggleButton value={3} id="t3">
+                                    Option 3
+                                </ToggleButton>
                             </ToggleButtonGroup>
                         </FormGroup>
 
@@ -246,9 +252,15 @@ class ComDemo extends Component<DemoProps> {
                             controlId="demo3.toggleButtonRadio"
                             $defaultValue={2}>
                             <ToggleButtonGroup type="radio" name="demo3.toggleButtonRadio">
-                                <ToggleButton value={1} id="t4">Option 1</ToggleButton>
-                                <ToggleButton value={2} id="t5">Option 2</ToggleButton>
-                                <ToggleButton value={3} id="t6">Option 3</ToggleButton>
+                                <ToggleButton value={1} id="t4">
+                                    Option 1
+                                </ToggleButton>
+                                <ToggleButton value={2} id="t5">
+                                    Option 2
+                                </ToggleButton>
+                                <ToggleButton value={3} id="t6">
+                                    Option 3
+                                </ToggleButton>
                             </ToggleButtonGroup>
                         </FormGroup>
 
@@ -527,12 +539,24 @@ class ComDemo extends Component<DemoProps> {
                 <h3>Transition</h3>
                 <FormGroup name="transition" $defaultValue="Fade">
                     <ToggleButtonGroup type="radio" name="1">
-                        <ToggleButton value="Fade" id="t-fade">Fade</ToggleButton>
-                        <ToggleButton value="Zoom" id="t-zoom">Zoom</ToggleButton>
-                        <ToggleButton value="Flow" id="t-flow">Flow</ToggleButton>
-                        <ToggleButton value="Flip" id="tflip">Flip</ToggleButton>
-                        <ToggleButton value="CollapseV" id="t-cv">Collapse Vertical</ToggleButton>
-                        <ToggleButton value="CollapseH" id="t-ch">Collapse Horizontal</ToggleButton>
+                        <ToggleButton value="Fade" id="t-fade">
+                            Fade
+                        </ToggleButton>
+                        <ToggleButton value="Zoom" id="t-zoom">
+                            Zoom
+                        </ToggleButton>
+                        <ToggleButton value="Flow" id="t-flow">
+                            Flow
+                        </ToggleButton>
+                        <ToggleButton value="Flip" id="tflip">
+                            Flip
+                        </ToggleButton>
+                        <ToggleButton value="CollapseV" id="t-cv">
+                            Collapse Vertical
+                        </ToggleButton>
+                        <ToggleButton value="CollapseH" id="t-ch">
+                            Collapse Horizontal
+                        </ToggleButton>
                     </ToggleButtonGroup>
                 </FormGroup>
                 <p>

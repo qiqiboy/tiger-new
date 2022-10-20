@@ -1,6 +1,6 @@
 import React, { Children, cloneElement, Component } from 'react';
-import { Modal, ModalProps as BSModalProps } from 'react-bootstrap';
-import { render as reactRender, unmountComponentAtNode, createPortal, Renderer } from 'react-dom';
+import { ModalProps as BSModalProps, Modal } from 'react-bootstrap';
+import { createPortal, render as reactRender, Renderer, unmountComponentAtNode } from 'react-dom';
 import { isValidElementType } from 'react-is';
 import './style.scss';
 
@@ -9,9 +9,7 @@ const _Modal = Modal;
 export default _Modal as INewModal;
 
 type INewModal = typeof Modal & {
-    open: (
-        config: ModalProps
-    ) => ModalHandler & {
+    open: (config: ModalProps) => ModalHandler & {
         result: Promise<any>;
         render(component: RenderCompoenent): void;
     };

@@ -1,5 +1,5 @@
 // 文档查看：https://github.com/mzabriskie/axios
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 declare module 'axios' {
     interface AxiosInstance {
@@ -168,7 +168,7 @@ function createError(responseError: AxiosError): Promise<any> {
             error_code = 'OFF_LINE';
         } else if (responseError.code === 'ECONNABORTED') {
             error_code = 504;
-            error_msg = `网络请求超时(${responseError.config.timeout}ms)，请确认网络正常并重试`;
+            error_msg = `网络请求超时(${responseError.config!.timeout}ms)，请确认网络正常并重试`;
         }
     } else {
         // 请求未发出
@@ -192,7 +192,7 @@ function createError(responseError: AxiosError): Promise<any> {
     error.error_code = error_code;
     error.error_msg = error_msg;
     error.response = response;
-    error.config = responseError.config;
+    error.config = responseError.config!;
 
     return Promise.reject(error);
 }
