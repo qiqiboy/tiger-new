@@ -1,6 +1,6 @@
 // Type definitions
 
-export interface IUser {
+export interface CurrentUser {
     name: string;
     age: number;
 }

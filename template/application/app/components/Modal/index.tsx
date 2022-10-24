@@ -1,6 +1,7 @@
 import React, { Children, cloneElement, Component } from 'react';
 import { ModalProps as BSModalProps, Modal } from 'react-bootstrap';
-import { createPortal, render as reactRender, Renderer, unmountComponentAtNode } from 'react-dom';
+import { createPortal, render as reactRender, unmountComponentAtNode } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { isValidElementType } from 'react-is';
 import './style.scss';
 
@@ -47,7 +48,7 @@ type ModalProps = Partial<
     >
 > & {
     component: RenderCompoenent;
-    animation?: boolean | 'slide' | 'fade';
+    animation?: boolean | 'slide' | 'fade' | 'drawer';
 };
 
 export interface ModalHandler {
@@ -55,11 +56,25 @@ export interface ModalHandler {
     dismiss(reason?: any): void;
 }
 
+/**
+ * 兼容react16、17、18
+ */
+let _createRoot =
+    createRoot ||
+    ((container: HTMLElement) => {
+        return {
+            render(reactElement: React.ReactElement<any>) {
+                return reactRender(reactElement, container);
+            },
+            unmount() {
+                return unmountComponentAtNode(container);
+            }
+        };
+    });
+
 const defaultSettings = {
     animation: true
 };
-
-let renderToRoot = reactRender;
 
 /**
  * @desc 给react-bootstrap的Modal扩展一个open方法，用来方便的创建更灵活的modal。
@@ -92,6 +107,7 @@ export const open = ((_Modal as INewModal).open = config => {
     const settings = { ...defaultSettings, ...config };
 
     const div = document.createElement('div');
+    const root = _createRoot(div);
 
     document.body.appendChild(div);
 
@@ -99,7 +115,7 @@ export const open = ((_Modal as INewModal).open = config => {
         if (!destroyed) {
             destroyed = true;
 
-            unmountComponentAtNode(div);
+            root.unmount();
 
             document.body.removeChild(div);
         }
@@ -136,7 +152,7 @@ export const open = ((_Modal as INewModal).open = config => {
             children = TheComponent;
         }
 
-        renderToRoot(
+        root.render(
             <Modal
                 // @ts-ignore
                 onHide={onHide}
@@ -155,11 +171,10 @@ export const open = ((_Modal as INewModal).open = config => {
                     }
 
                     callback!();
-                    destroy();
+                    setTimeout(destroy);
                 }}>
                 {Children.map(children, child => cloneElement(child as React.ReactElement<any>, childProps))}
-            </Modal>,
-            div
+            </Modal>
         );
 
         // 如果关闭动画，则直接执行回调
@@ -198,33 +213,32 @@ export class ModalRoot extends Component<{}, ModalRootState> {
     root: HTMLDivElement;
 
     public componentDidMount() {
-        renderToRoot = ((element, target) => {
-            if (!target.id) {
-                target.id = `bs-modal-${Date.now() + Math.random()}`;
-            }
+        _createRoot = () => {
+            const id = `bs-modal-${Date.now() + Math.random()}`;
 
-            const { modals } = this.state;
-            const originalCallback = element.props.onExited;
-
-            modals[target.id] = cloneElement(element, {
-                key: target.id,
-                onExited: () => {
-                    originalCallback?.();
-
+            return {
+                render: (element: React.ReactElement<ModalProps>) => {
                     const { modals } = this.state;
 
-                    delete modals[target.id];
+                    modals[id] = cloneElement(element, {
+                        key: id
+                    });
+
+                    this.setState({
+                        modals
+                    });
+                },
+                unmount: () => {
+                    const { modals } = this.state;
+
+                    delete modals[id];
 
                     this.setState({
                         modals
                     });
                 }
-            });
-
-            this.setState({
-                modals
-            });
-        }) as Renderer;
+            };
+        };
     }
 
     public componentWillUnmount() {

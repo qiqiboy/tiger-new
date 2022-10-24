@@ -1,10 +1,10 @@
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from 'modules/App';
 
-const rootNode = document.getElementById('wrap')!;
+const container = document.getElementById('wrap')!;
 
 if (__SSR__) {
-    hydrateRoot(rootNode, <App />);
+    hydrateRoot(container, <App />);
 } else {
-    createRoot(rootNode).render(<App />);
+    createRoot(container).render(<App />);
 }

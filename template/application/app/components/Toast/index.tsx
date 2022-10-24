@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { render as reactRender, unmountComponentAtNode } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Loading from 'components/Loading';
 import Portal from 'components/Portal';
 import { Fade } from 'components/Transition';
@@ -115,6 +115,7 @@ function open(content: React.ReactNode, others?: object) {
     let withResolve;
 
     const div = document.createElement('div');
+    const root = createRoot(div);
 
     document.body.appendChild(div);
 
@@ -122,7 +123,7 @@ function open(content: React.ReactNode, others?: object) {
         if (!destroyed) {
             destroyed = true;
 
-            unmountComponentAtNode(div);
+            root.unmount();
 
             document.body.removeChild(div);
         }
@@ -139,14 +140,13 @@ function open(content: React.ReactNode, others?: object) {
             }
 
             callback!();
-            destroy();
+            setTimeout(destroy)
         };
 
-        reactRender(
+        root.render(
             <Toast {...others} visible={visible} onExited={onExited}>
                 {content}
-            </Toast>,
-            div
+            </Toast>
         );
 
         if (!visible) {

@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import { ButtonProps as BSButtonProps, Button, Spinner } from 'react-bootstrap';
+import { Button as BSBUtton, ButtonProps as BSButtonProps, Spinner } from 'react-bootstrap';
 import WaterWave, { WaterWaveProps } from 'water-wave';
 import 'water-wave/style.css';
 import classlist from 'utils/classlist';
@@ -26,56 +25,57 @@ export interface ButtonProps extends Omit<BSButtonProps, 'type' | 'variant' | 's
     pressEffect?: WaterWaveProps['effect'];
 }
 
-class TGButton extends Component<ButtonProps & Omit<React.ComponentPropsWithRef<'button'>, 'type'>> {
-    static defaultProps = {
-        type: 'primary',
-        htmlType: 'button'
+const Button: React.FC<ButtonProps> = ({
+    children,
+    loading,
+    round,
+    ghost,
+    type = 'primary',
+    htmlType = 'button',
+    pressEffect,
+    ...props
+}) => {
+    let variant;
+
+    if (type === 'default') {
+        variant = 'light';
+    } else {
+        variant = type;
+    }
+
+    if (ghost && variant && !/^outline-/.test(variant)) {
+        variant = `outline-${variant}`;
+    }
+
+    const overrideProps = {
+        variant,
+        type: htmlType
     };
 
-    public render() {
-        const { children, loading, round, ghost, type, htmlType, pressEffect, ...props } = this.props;
-        let variant;
+    return (
+        // @ts-ignore
+        <BSBUtton
+            {...props}
+            {...overrideProps}
+            className={classlist(props.className, {
+                'btn-loading': loading,
+                'btn-round': round,
+                'btn-ghost': ghost
+            })}>
+            {loading && (
+                <>
+                    <Spinner
+                        as="span"
+                        className={props.size === 'lg' ? 'align-middle' : undefined}
+                        animation="border"
+                        size="sm"
+                    />{' '}
+                </>
+            )}
+            {children}
+            <WaterWave press="down" disabled={props.disabled} effect={pressEffect} />
+        </BSBUtton>
+    );
+};
 
-        if (type === 'default') {
-            variant = 'light';
-        } else {
-            variant = type;
-        }
-
-        if (ghost && variant && !/^outline-/.test(variant)) {
-            variant = `outline-${variant}`;
-        }
-
-        const overrideProps = {
-            variant,
-            type: htmlType
-        };
-
-        return (
-            // @ts-ignore
-            <Button
-                {...props}
-                {...overrideProps}
-                className={classlist(props.className, {
-                    'btn-loading': loading,
-                    'btn-round': round,
-                    'btn-ghost': ghost
-                })}>
-                {loading && (
-                    <>
-                        <Spinner
-                            as="span"
-                            className={props.size === 'lg' ? 'align-middle' : undefined}
-                            animation="border"
-                            size="sm"
-                        />{' '}
-                    </>
-                )}
-                {children}
-                <WaterWave press="down" disabled={props.disabled} effect={pressEffect} />
-            </Button>
-        );
-    }
-}
-
-export default TGButton;
+export default Button;
