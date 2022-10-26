@@ -4,7 +4,7 @@
 
 // add .btn-xs
 .btn-xs {
-  @include button-size(0.15rem, 0.35rem, 0.75rem, 0.15rem);
+    @include button-size(0.15rem, 0.35rem, 0.75rem, 0.15rem);
 }
 
 html,

@@ -117,12 +117,12 @@ function upgradePackageProject(root) {
                 }
 
                 if (answers.cleanDeps) {
-                    cleanDeps.forEach((key) => {
+                    cleanDeps.forEach(key => {
                         delete package.devDependencies[key];
                     });
                 }
 
-                ['build:bundle', 'build:declaration', 'clear', 'lint'].forEach((name) => {
+                ['build:bundle', 'build:declaration', 'clear', 'lint'].forEach(name => {
                     if (package.scripts[name]) {
                         delete package.scripts[name];
                     }
@@ -238,7 +238,9 @@ function upgradePackageProject(root) {
 
                 install(
                     Object.keys(newDevDependencies).map(function (key) {
-                        return key + '@' + newDevDependencies[key];
+                        return !newDevDependencies[key] || newDevDependencies[key] === 'latest'
+                            ? key
+                            : key + '@' + newDevDependencies[key];
                     }),
                     true,
                     function () {
@@ -278,7 +280,7 @@ function upgradeAppProject(root) {
 
     var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
     var newDevDependencies = newDependenciesConfig.devDependencies;
-    var patchDeps = ['url', 'raf-dom'].map((dep) => dep + '@' + newDependenciesConfig.dependencies[dep]);
+    var patchDeps = ['url', 'raf-dom', 'react', 'react-dom', 'prop-types'].map(dep => dep + '@' + newDependenciesConfig.dependencies[dep]);
     var cleanDeps = [
         'ora',
         'inquirer',
@@ -327,7 +329,7 @@ function upgradeAppProject(root) {
                 default: true
             }
         ])
-        .then((answers) => {
+        .then(answers => {
             if (answers.upgrade) {
                 var questions = [];
 
@@ -451,11 +453,11 @@ function upgradeAppProject(root) {
                     });
                 }
 
-                inquirer.prompt(questions).then((answers) => {
+                inquirer.prompt(questions).then(answers => {
                     console.log();
 
                     // clean unused files
-                    cleanFiles.forEach((file) => {
+                    cleanFiles.forEach(file => {
                         fs.removeSync(path.resolve(root, 'scripts', file));
                     });
 
@@ -658,7 +660,7 @@ function upgradeAppProject(root) {
                     }
 
                     if (answers.cleanDeps) {
-                        cleanDeps.forEach((key) => {
+                        cleanDeps.forEach(key => {
                             delete package.devDependencies[key];
                         });
                     }

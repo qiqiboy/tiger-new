@@ -42,7 +42,7 @@ var program = commander
     .arguments('<project-directory>')
     .usage(chalk.green('<project-directory>') + ' [options]')
     .option('-u, --upgrade', '升级项目到tiger-new最新构建版本')
-    .option('-m, --mode <mode>', '选择模板类型，application 或 package', function(val) {
+    .option('-m, --mode <mode>', '选择模板类型，application 或 package', function (val) {
         if (['application', 'package'].indexOf(val) < 0) {
             spinner.fail('参数错误：-m --mode 只能是 application 或 package');
             process.exit(1);
@@ -50,7 +50,7 @@ var program = commander
 
         return val;
     })
-    .action(function(name, mode) {
+    .action(function (name, mode) {
         projectName = name;
     })
     .parse(process.argv);
@@ -91,7 +91,7 @@ if (program.upgrade) {
                 when: !mode
             }
         ])
-        .then(function(answers) {
+        .then(function (answers) {
             if (!answers.type) {
                 answers.type = mode;
             }
@@ -104,7 +104,7 @@ if (program.upgrade) {
                     type: 'input',
                     message: '请输入项目版本号(version):',
                     default: answers.type === 'application' ? '1.0.0' : '0.0.1',
-                    validate: function(input) {
+                    validate: function (input) {
                         return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号';
                     }
                 },
@@ -113,7 +113,7 @@ if (program.upgrade) {
                     type: 'input',
                     message: '请输入项目名称(name):',
                     default: path.basename(path.resolve(projectName)),
-                    validate: function(input) {
+                    validate: function (input) {
                         const result = validatePkgName(input);
 
                         if (result.validForNewPackages) {
@@ -122,7 +122,7 @@ if (program.upgrade) {
                             return (
                                 chalk.cyan(input) +
                                 ' 不是一个有效的package名称：\n' +
-                                chalk.red((result.errors || result.warnings).map((text) => '* ' + text).join('\n'))
+                                chalk.red((result.errors || result.warnings).map(text => '* ' + text).join('\n'))
                             );
                         }
                     }
@@ -136,7 +136,7 @@ if (program.upgrade) {
                     name: 'author',
                     type: 'input',
                     message: '请输入项目所属者（组织）的名字或邮箱:',
-                    validate: function(input) {
+                    validate: function (input) {
                         return !!input || '该字段不能为空';
                     }
                 }
@@ -157,10 +157,10 @@ if (program.upgrade) {
                         type: 'input',
                         message: '请输入cdn服务器host地址:',
                         default: 'https://static.example.com',
-                        validate: function(input) {
+                        validate: function (input) {
                             return /^http/.test(input) ? true : '请输入一个服务器地址';
                         },
-                        when: function(answers) {
+                        when: function (answers) {
                             return answers.useCdn;
                         }
                     },
@@ -169,12 +169,12 @@ if (program.upgrade) {
                         type: 'input',
                         message: '请输入项目在cdn服务器上的存储文件夹名:',
                         default: '/' + path.basename(projectName),
-                        validate: function(input) {
+                        validate: function (input) {
                             return /\s|\//.test(input.replace(/^\//, ''))
                                 ? '文件夹名不能包含 空格、/ 等其它字符'
                                 : true;
                         },
-                        when: function(answers) {
+                        when: function (answers) {
                             return answers.useCdn;
                         }
                     },
@@ -189,10 +189,10 @@ if (program.upgrade) {
                         type: 'input',
                         message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
                         default: 'zh_CN,en_US',
-                        validate: function(input) {
+                        validate: function (input) {
                             return input ? true : '该字段不能为空';
                         },
-                        when: function(answers) {
+                        when: function (answers) {
                             return answers.useLocals;
                         }
                     },
@@ -218,7 +218,7 @@ if (program.upgrade) {
                         name: 'proxy',
                         type: 'input',
                         message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
-                        validate: function(input) {
+                        validate: function (input) {
                             return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
                         }
                     },
@@ -244,25 +244,25 @@ if (program.upgrade) {
                         type: 'input',
                         default: 'src/index.ts',
                         message: '请输入项目入口文件:',
-                        validate: function(input) {
+                        validate: function (input) {
                             return !!input || '该字段不能为空';
                         }
                     },
                     {
                         name: 'exportName',
                         type: 'input',
-                        default: function(answers) {
+                        default: function (answers) {
                             return answers.name.split('/').slice(-1)[0];
                         },
                         message: '请输入模块导出名称:',
-                        validate: function(input) {
+                        validate: function (input) {
                             return /^[\w-]+$/.test(input) || '只能输入数字、字母和短横杠字符';
                         }
                     }
                 );
             }
 
-            return inquirer.prompt(questions).then(function(answers) {
+            return inquirer.prompt(questions).then(function (answers) {
                 Object.assign(projectCustom, answers);
 
                 if (projectCustom.type === 'application') {
@@ -321,7 +321,7 @@ function createApp(name) {
     console.log('即将安装package依赖，这将花费几分钟时间...');
     console.log();
 
-    run(root, appName, function() {
+    run(root, appName, function () {
         console.log();
         spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(root));
         console.log();
@@ -371,7 +371,7 @@ function createLibrary(name) {
     console.log('即将安装package依赖，这将花费几分钟时间...');
     console.log();
 
-    run(root, appName, function() {
+    run(root, appName, function () {
         console.log();
         spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(root));
         console.log();
@@ -423,11 +423,11 @@ function install(packageToInstall, saveDev, callback) {
         stdio: 'inherit'
     });
 
-    child.on('close', function(code) {
+    child.on('close', function (code) {
         callback(code, command, args);
     });
 
-    process.on('exit', function() {
+    process.on('exit', function () {
         child.kill();
     });
 }
@@ -503,9 +503,9 @@ function run(appPath, appName, onSuccess) {
         'npmignore'
     ];
 
-    dotfiles.forEach(function(file) {
+    dotfiles.forEach(function (file) {
         if (fs.existsSync(path.join(appPath, file))) {
-            fs.move(path.join(appPath, file), path.join(appPath, '.' + file), { overwrite: true }, function(err) {
+            fs.move(path.join(appPath, file), path.join(appPath, '.' + file), { overwrite: true }, function (err) {
                 if (err) {
                     if (err.code === 'EEXIST' && (file === 'gitignore' || file === 'npmignore')) {
                         var data = fs.readFileSync(path.join(appPath, file), 'utf8');
@@ -525,7 +525,7 @@ function run(appPath, appName, onSuccess) {
     if (fs.pathExistsSync(path.join(appPath, 'npm'))) {
         var exportName = projectCustom.exportName;
 
-        ['index.cjs.js', 'index.esm.js', 'index.umd.js'].forEach(function(file) {
+        ['index.cjs.js', 'index.esm.js', 'index.umd.js'].forEach(function (file) {
             var data = fs.readFileSync(path.join(appPath, 'npm', file), 'utf8');
 
             fs.outputFileSync(path.join(appPath, 'npm', file), data.replace(/\{name\}/g, exportName));
@@ -547,11 +547,13 @@ function run(appPath, appName, onSuccess) {
         var templateDependencies = require(templateDependenciesPath).devDependencies;
 
         install(
-            Object.keys(templateDependencies).map(function(key) {
-                return key + '@' + templateDependencies[key];
+            Object.keys(templateDependencies).map(function (key) {
+                return !templateDependencies[key] || templateDependencies[key] === 'latest'
+                    ? key
+                    : key + '@' + templateDependencies[key];
             }),
             true,
-            function(code, command, args) {
+            function (code, command, args) {
                 if (code !== 0) {
                     console.error('`' + command + ' ' + args.join(' ') + '` 运行失败');
 
@@ -562,11 +564,13 @@ function run(appPath, appName, onSuccess) {
 
                 if (templateDependencies) {
                     install(
-                        Object.keys(templateDependencies).map(function(key) {
-                            return key + '@' + templateDependencies[key].replace(/^[\^~]/, '');
+                        Object.keys(templateDependencies).map(function (key) {
+                            return !templateDependencies[key] || templateDependencies[key] === 'latest'
+                                ? key
+                                : key + '@' + templateDependencies[key];
                         }),
                         false,
-                        function(code, command, args) {
+                        function (code, command, args) {
                             if (code !== 0) {
                                 console.error('`' + command + ' ' + args.join(' ') + '` 运行失败');
 
@@ -595,7 +599,7 @@ function isSafeToCreateProjectIn(root) {
 
     return (
         !fs.existsSync(root) ||
-        fs.readdirSync(root).every(function(file) {
+        fs.readdirSync(root).every(function (file) {
             return validFiles.indexOf(file) >= 0;
         })
     );

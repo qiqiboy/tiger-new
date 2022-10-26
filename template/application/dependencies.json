@@ -72,7 +72,6 @@
     "webpack-node-externals": "3"
   },
   "dependencies": {
-    "@loadable/component": "5",
     "axios": "latest",
     "bootstrap": "5",
     "classnames": "latest",
