@@ -87,30 +87,20 @@ function scanner() {
     const destination = path.join(paths.locals, 'xlsx', `${pkg.name}.i18n.xlsx`);
     const langConfig = [];
 
-    lodash.each(i18nJson, ({ translation }, key) => {
-        const langFile = path.join(paths.locals, `${key}.json`);
-        const baseKey = langBaseConfig.find(({ prefix }) => key.startsWith(prefix))?.lang;
-        const baselangFile = baseKey && path.join(paths.locals, `${baseKey}.json`);
-
+    lodash.each(i18nJson, ({ translation }, lang) => {
+        const langFile = path.join(paths.locals, `${lang}.json`);
         const currentLangs = langFile ? requireJson(langFile) : {};
-        const baseLangs = baselangFile ? requireJson(baselangFile) : {};
         const newLangs = lodash.pickBy(currentLangs, (value, key) => key in translation);
 
-        lodash.each(translation, (value, key) => {
-            if (!(key in newLangs) && baseKey === key) {
-                newLangs[key] = baseLangs[key] || value;
-            }
-        });
-
-        fs.outputFile(path.join(paths.locals, `${key}.json`), JSON.stringify(newLangs, '\n', 2));
+        fs.outputFile(path.join(paths.locals, `${lang}.json`), JSON.stringify(newLangs, '\n', 2));
 
         langConfig.push({
-            lang: key,
+            lang,
             config: newLangs
         });
     });
 
-    convertJson2Excel(langConfig, destination);
+    convertJson2Excel(Object.values(Object.values(i18nJson)[0].translation), langConfig, destination);
 
     console.log();
     spinner.warn(chalk.yellow('你可以将生成的excel文件进行翻译后，放回原处。然后运行：'));
@@ -128,14 +118,14 @@ function reader() {
     spinner.succeed(chalk.green('语言包转换成功！'));
 }
 
-function convertJson2Excel(langConfig, destination) {
+function convertJson2Excel(keys, langConfig, destination) {
     const sheets = [
         [`${pkg.name} v${pkg.version}`].concat(langConfig.map(({ lang }) => lang)),
         ['原始文案（禁止修改）'],
         []
     ];
 
-    lodash.each(langConfig[0].config, (text, key) => {
+    lodash.uniq(langConfig.map(({ config }) => Object.keys(config)).flat().concat(keys)).forEach(key => {
         sheets.push([key].concat(langConfig.map(({ config }) => config[key])));
     });
 
