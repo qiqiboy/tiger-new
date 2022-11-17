@@ -164,13 +164,14 @@ function convertExcel2Json(file) {
 
         sheets.slice(2).forEach(item => {
             if (item.length) {
-                if (
-                    item[0] !== item[index + 1] &&
-                    (langBaseIndex < 1 || langBaseIndex === index || item[langBaseIndex + 1] !== item[index + 1])
-                ) {
-                    jsonData[item[0]] = item[index + 1];
+                const key = item[0];
+                const text = item[index + 1];
+                const baseText = item[langBaseIndex + 1];
+
+                if (baseText !== key && (langBase === lang || text !== baseText)) {
+                    jsonData[key] = text;
                 } else {
-                    delete jsonData[item[0]];
+                    delete jsonData[key];
                 }
             }
         });
