@@ -168,7 +168,7 @@ function convertExcel2Json(file) {
                 const text = item[index + 1];
                 const baseText = item[langBaseIndex + 1];
 
-                if (baseText !== key && (langBase === lang || text !== baseText)) {
+                if ((langBase === lang && text !== key) || (langBase !== lang && text !== baseText)) {
                     jsonData[key] = text;
                 } else {
                     delete jsonData[key];
