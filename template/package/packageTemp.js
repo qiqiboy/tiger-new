@@ -15,7 +15,7 @@ module.exports = {
         }
     },
     eslintConfig: {
-        extends: ['react-app', 'react-app/jest', './eslint.config.js']
+        extends: ['react-app', 'react-app/jest', './eslintrc.js']
     },
     commitlint: {
         extends: ['@commitlint/config-conventional'],

@@ -30,20 +30,23 @@ function upgradePackageProject(root) {
     var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
     var cleanDeps = [
         '@babel/cli',
-        '@babel/core'
-        /* '@babel/runtime',
-         * '@typescript-eslint/eslint-plugin',
-         * '@typescript-eslint/parser',
-         * 'babel-eslint',
-         * 'eslint-config-react-app',
-         * 'eslint-plugin-flowtype',
-         * 'eslint-plugin-import',
-         * 'eslint-plugin-jest',
-         * 'eslint-plugin-jsx-a11y',
-         * 'eslint-plugin-react',
-         * 'eslint-plugin-react-hooks',
-         * 'eslint-plugin-testing-library'  */
+        '@babel/core',
+        '@babel/runtime',
+        '@typescript-eslint/eslint-plugin',
+        '@typescript-eslint/parser',
+        'babel-eslint',
+        'eslint-config-react-app',
+        'eslint-plugin-flowtype',
+        'eslint-plugin-import',
+        'eslint-plugin-jest',
+        'eslint-plugin-jsx-a11y',
+        'eslint-plugin-react',
+        'eslint-plugin-react-hooks',
+        'eslint-plugin-testing-library',
+        'jest-resolve',
+        'rollup-plugin-babel'
     ];
+    var cleanFiles = ['eslint.config.js'];
 
     inquirer
         .prompt(
@@ -80,6 +83,11 @@ function upgradePackageProject(root) {
         )
         .then(function (answers) {
             if (answers.upgrade) {
+                // clean unused files
+                cleanFiles.forEach(file => {
+                    fs.removeSync(path.resolve(root, file));
+                });
+
                 fs.copySync(
                     path.resolve(ownPath, 'template/package/rollup.config.js'),
                     path.resolve(root, 'rollup.config.js'),
@@ -89,14 +97,10 @@ function upgradePackageProject(root) {
                 );
                 spinner.succeed(chalk.green('rollup.config.js 已写入！'));
 
-                fs.copySync(
-                    path.resolve(ownPath, 'template/package/eslint.config.js'),
-                    path.resolve(root, 'eslint.config.js'),
-                    {
-                        overwrite: true
-                    }
-                );
-                spinner.succeed(chalk.green('eslint.config.js 已写入！'));
+                fs.copySync(path.resolve(ownPath, 'template/package/eslintrc.js'), path.resolve(root, 'eslintrc.js'), {
+                    overwrite: true
+                });
+                spinner.succeed(chalk.green('eslintrc 已写入！'));
 
                 if (!fs.existsSync(tsconfig) || answers.updateTsconfig) {
                     fs.copySync(path.resolve(ownPath, 'template/package/tsconfig.json'), tsconfig, {
@@ -156,6 +160,15 @@ function upgradePackageProject(root) {
                     package.eslintConfig = pkgTemp.eslintConfig;
                 }
 
+                var eslintConfigIndex = package.eslintConfig.extends.indexOf('./eslint.config.js');
+                var hasEslintUpdate = false;
+
+                if (eslintConfigIndex > -1) {
+                    package.eslintConfig.extends[eslintConfigIndex] = './eslintrc.js';
+
+                    hasEslintUpdate = true;
+                }
+
                 if (package.eslintConfig.extends.indexOf('react-app/jest') < 0) {
                     var reactAppIndex = package.eslintConfig.extends.indexOf('react-app');
 
@@ -165,12 +178,16 @@ function upgradePackageProject(root) {
                         package.eslintConfig = pkgTemp.eslintConfig;
                     }
 
-                    spinner.succeed(chalk.green('eslint配置 已更新！'));
+                    hasEslintUpdate = true;
                 }
 
-                if (package.eslintConfig.extends.indexOf('./eslint.config.js') < 0) {
-                    package.eslintConfig.extends.push('./eslint.config.js');
+                if (package.eslintConfig.extends.indexOf('./eslintrc.js') < 0) {
+                    package.eslintConfig.extends.push('./eslintrc.js');
+
+                    hasEslintUpdate = true;
                 }
+
+                hasEslintUpdate && spinner.succeed(chalk.green('eslint配置 已更新！'));
 
                 if (!package.husky) {
                     package.husky = pkgTemp.husky;
@@ -280,7 +297,9 @@ function upgradeAppProject(root) {
 
     var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
     var newDevDependencies = newDependenciesConfig.devDependencies;
-    var patchDeps = ['url', 'raf-dom', 'react', 'react-dom', 'prop-types'].map(dep => dep + '@' + newDependenciesConfig.dependencies[dep]);
+    var patchDeps = ['url', 'raf-dom', 'react', 'react-dom', 'prop-types'].map(
+        dep => dep + '@' + newDependenciesConfig.dependencies[dep]
+    );
     var cleanDeps = [
         'ora',
         'inquirer',

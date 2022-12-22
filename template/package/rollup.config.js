@@ -28,7 +28,7 @@ const exportName = pkg.exportName || pkg.name.split('/').slice(-1)[0];
 
 function createConfig(env, module) {
     const isProd = env === 'production';
-    const shouldPreserveCss = module === 'esm';
+    const shouldPreserveCss = false;
 
     // for umd globals
     const globals = {
@@ -45,10 +45,14 @@ function createConfig(env, module) {
         external:
             module === 'umd'
                 ? Object.keys(globals)
-                : (id) =>
-                      !externalExclude.some((name) => id.startsWith(name)) &&
-                      !id.startsWith('.') &&
-                      !path.isAbsolute(id),
+                : id => {
+                      return (
+                          !externalExclude.some(name => id.startsWith(name)) &&
+                          !id.startsWith('.') &&
+                          !id.startsWith('src/') &&
+                          !path.isAbsolute(id)
+                      );
+                  },
         output: {
             name: exportName,
             file: `dist/${exportName}.${module}.${env}.js`,
@@ -124,14 +128,14 @@ function createConfig(env, module) {
                     [
                         require('@babel/plugin-proposal-private-methods').default,
                         {
-                            loose: true,
-                        },
+                            loose: true
+                        }
                     ],
                     [
                         require('@babel/plugin-proposal-private-property-in-object').default,
                         {
-                            loose: true,
-                        },
+                            loose: true
+                        }
                     ],
                     [
                         '@babel/plugin-transform-runtime',
@@ -150,11 +154,7 @@ function createConfig(env, module) {
                         {
                             removeImport: true
                         }
-                    ],
-                    require('@babel/plugin-proposal-optional-chaining').default,
-                    require('@babel/plugin-proposal-nullish-coalescing-operator').default,
-                    // Adds Numeric Separators
-                    require('@babel/plugin-proposal-numeric-separator').default
+                    ]
                 ].filter(Boolean)
             }),
             module !== 'umd' &&

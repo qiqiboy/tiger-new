@@ -33,7 +33,9 @@ module.exports = {
         'import/order': [
             1,
             {
-                groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown']
+                groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown'],
+                alphabetize: { order: 'asc', caseInsensitive: true },
+                'newlines-between': 'never'
             }
         ],
         'sort-imports': [

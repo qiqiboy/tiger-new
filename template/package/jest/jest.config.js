@@ -25,7 +25,7 @@ module.exports = {
                 '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
                 '<rootDir>/{src,tests}/**/*.{spec,test}.{js,jsx,ts,tsx}'
             ],
-            testEnvironment: 'jest-environment-jsdom-fourteen',
+            testEnvironment: 'jest-environment-jsdom',
             transform: {
                 '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
                 '^.+\\.(css|less|sass|scss$)': '<rootDir>/jest/cssTransform.js',
