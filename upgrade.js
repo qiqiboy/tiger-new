@@ -29,6 +29,7 @@ function upgradePackageProject(root) {
     var pkgTemp = require(path.resolve(ownPath, 'template/package/packageTemp.js'));
     var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
     var cleanDeps = [
+        '@types/jest',
         '@babel/cli',
         '@babel/core',
         '@babel/runtime',
@@ -44,7 +45,9 @@ function upgradePackageProject(root) {
         'eslint-plugin-react-hooks',
         'eslint-plugin-testing-library',
         'jest-resolve',
-        'rollup-plugin-babel'
+        'jest-environment-jsdom-fourteen',
+        'rollup-plugin-babel',
+        'rollup-plugin-sourcemaps'
     ];
     var cleanFiles = ['eslint.config.js'];
 
@@ -312,6 +315,7 @@ function upgradeAppProject(root) {
         'jest-environment-jsdom-fourteen',
         'jest-environment-jsdom',
         'jest-resolve',
+        '@types/jest',
         'optimize-css-assets-webpack-plugin',
         'postcss-safe-parser',
         'react-dev-utils',

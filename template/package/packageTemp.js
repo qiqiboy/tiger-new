@@ -1,5 +1,5 @@
 module.exports = {
-    files: ['LICENSE', 'README.md', 'dist/', 'src/'],
+    files: ['LICENSE', 'README.md', 'dist/'],
     scripts: {
         build: 'rimraf dist && tsc --emitDeclarationOnly && rollup -c',
         test: 'node jest/test.js',
@@ -9,7 +9,7 @@ module.exports = {
     browserslist: ['>0.2%', 'not dead', 'not op_mini all'],
     husky: {
         hooks: {
-            'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
+            'commit-msg': 'commitlint --edit $HUSKY_GIT_PARAMS',
             'pre-commit':
                 'lint-staged && export StagedFiles=$(git diff --diff-filter AM --name-only --relative --staged | grep -E \'^src/.*\\.m?[jt]sx?$\') && if [ -n "$StagedFiles"  ]; then npm run tsc ; fi'
         }
@@ -48,10 +48,10 @@ module.exports = {
     },
     'lint-staged': {
         'src/**/*.{js,jsx,mjs,ts,tsx}': [
-            'node_modules/.bin/prettier --write',
-            'node_modules/.bin/eslint --fix',
+            'prettier --write',
+            'eslint --fix',
         ],
-        'src/**/*.{css,scss,less,json,html,md}': ['node_modules/.bin/prettier --write']
+        'src/**/*.{css,scss,less,json,html,md}': ['prettier --write']
     },
     stylelint: {
         extends: 'stylelint-config-recommended'

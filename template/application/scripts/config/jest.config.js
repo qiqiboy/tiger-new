@@ -53,7 +53,7 @@ module.exports = {
                 '<rootDir>/app/**/__tests__/**/*.{js,jsx,ts,tsx}',
                 '<rootDir>/{app,tests}/**/*.{spec,test}.{js,jsx,ts,tsx}'
             ],
-            testEnvironment: 'jsdom',
+            testEnvironment: 'node',
             transform: {
                 '^.+\\.(js|jsx|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
                 '^.+\\.(css|less|sass|scss$)': '<rootDir>/scripts/config/jest/cssTransform.js',

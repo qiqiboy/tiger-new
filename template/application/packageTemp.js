@@ -20,11 +20,11 @@ module.exports = {
     browserslist: ['>0.2%', 'not dead', 'not op_mini all', 'ie >= 10'],
     husky: {
         hooks: {
-            'commit-msg': 'node_modules/.bin/commitlint --edit $HUSKY_GIT_PARAMS',
+            'commit-msg': 'commitlint --edit $HUSKY_GIT_PARAMS',
             'pre-commit':
                 'NODE_ENV=development lint-staged && export StagedFiles=$(git diff --name-only --diff-filter AM --relative --staged | grep -E \'.tsx?$\') && if [ -n "$StagedFiles" ]; then npm run tsc; fi',
             'pre-push':
-                'CF=$(git diff --diff-filter AM --name-only @{u}..) || CF=$(git diff --diff-filter AM --name-only origin/master...HEAD); FILES=$(echo "$CF" | grep -E \'^app/.*\\.m?[jt]sx?$\'); if [ -n "$FILES" ]; then NODE_ENV=production node_modules/.bin/eslint $FILES --max-warnings 0; fi'
+                'CF=$(git diff --diff-filter AM --name-only @{u}..) || CF=$(git diff --diff-filter AM --name-only origin/master...HEAD); FILES=$(echo "$CF" | grep -E \'^app/.*\\.m?[jt]sx?$\'); if [ -n "$FILES" ]; then NODE_ENV=production eslint $FILES --max-warnings 0; fi'
         }
     },
     eslintConfig: {
@@ -61,10 +61,10 @@ module.exports = {
     },
     'lint-staged': {
         '{app,tests,static}/**/*.{js,jsx,mjs,ts,tsx}': [
-            'node_modules/.bin/prettier --write',
-            'node_modules/.bin/eslint --fix'
+            'prettier --write',
+            'eslint --fix'
         ],
-        '{app,tests,static}/**/*.{css,scss,less,json,html,md}': ['node_modules/.bin/prettier --write']
+        '{app,tests,static}/**/*.{css,scss,less,json,html,md}': ['prettier --write']
     },
     stylelint: {
         extends: 'stylelint-config-recommended'
