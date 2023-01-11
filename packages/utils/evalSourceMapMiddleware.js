@@ -35,12 +35,12 @@ module.exports = function createEvalSourceMapMiddleware(server) {
       const id = fileName.match(/webpack-internal:\/\/\/(.+)/)[1];
       if (!id || !server.stats) {
         next();
+      } else {
+          const source = getSourceById(server, id);
+          const sourceMapURL = `//# sourceMappingURL=${base64SourceMap(source)}`;
+          const sourceURL = `//# sourceURL=webpack-internal:///${module.id}`;
+          res.end(`${source.source()}\n${sourceMapURL}\n${sourceURL}`);
       }
-
-      const source = getSourceById(server, id);
-      const sourceMapURL = `//# sourceMappingURL=${base64SourceMap(source)}`;
-      const sourceURL = `//# sourceURL=webpack-internal:///${module.id}`;
-      res.end(`${source.source()}\n${sourceMapURL}\n${sourceURL}`);
     } else {
       next();
     }
