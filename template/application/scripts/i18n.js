@@ -3,10 +3,10 @@ const path = require('path');
 const fs = require('fs-extra');
 const glob = require('glob');
 const Parser = require('i18next-scanner').Parser;
+const lodash = require('lodash');
 const xlsx = require('node-xlsx');
 const chalk = require('tiger-new-utils/chalk');
 const ora = require('tiger-new-utils/ora');
-const lodash = require('lodash');
 const paths = require('./config/paths');
 const pkg = paths.appPackageJson;
 
@@ -125,9 +125,16 @@ function convertJson2Excel(keys, langConfig, destination) {
         []
     ];
 
-    lodash.uniq(langConfig.map(({ config }) => Object.keys(config)).flat().concat(keys)).forEach(key => {
-        sheets.push([key].concat(langConfig.map(({ config }) => config[key])));
-    });
+    lodash
+        .uniq(
+            langConfig
+                .map(({ config }) => Object.keys(config))
+                .flat()
+                .concat(keys)
+        )
+        .forEach(key => {
+            sheets.push([key].concat(langConfig.map(({ config }) => config[key])));
+        });
 
     const buffer = xlsx.build([{ name: 'i18n_locals', data: sheets }], {
         '!cols': [{ wch: 50 }].concat(

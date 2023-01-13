@@ -9,17 +9,19 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
-const chalk = require('tiger-new-utils/chalk');
-const webpack = require('webpack');
-const ora = require('tiger-new-utils/ora');
-const WebpackDevServer = require('webpack-dev-server');
-const clearConsole = require('tiger-new-utils/clearConsole');
-const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
-const { prepareUrls } = require('tiger-new-utils/WebpackDevServerUtils');
-const openBrowser = require('tiger-new-utils/openBrowser');
+const path = require('path');
+const lodash = require('lodash');
 const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
-const { choosePort, createCompiler, prepareProxy } = require('tiger-new-utils/WebpackDevServerUtils');
+const chalk = require('tiger-new-utils/chalk');
 const checkMissDependencies = require('tiger-new-utils/checkMissDependencies');
+const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
+const clearConsole = require('tiger-new-utils/clearConsole');
+const openBrowser = require('tiger-new-utils/openBrowser');
+const ora = require('tiger-new-utils/ora');
+const { prepareUrls } = require('tiger-new-utils/WebpackDevServerUtils');
+const { choosePort, createCompiler, prepareProxy } = require('tiger-new-utils/WebpackDevServerUtils');
+const webpack = require('webpack');
+const WebpackDevServer = require('webpack-dev-server');
 const { createDevServerConfig } = require('./config/helper');
 const paths = require('./config/paths');
 const configFactory = require('./config/webpack.config');
@@ -46,7 +48,7 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
         .then(() => {
             return choosePort(HOST, DEFAULT_PORT, spinner);
         })
-        .then(port => {
+        .then(async port => {
             if (port == null) {
                 console.log();
 
@@ -60,8 +62,9 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
                 process.exit(0);
             }
 
-            const config = configFactory('development');
-            const nodeConfig = configFactory('development', 'node');
+            const config = configFactory('development', 'web');
+            const nodeConfig = paths.useNodeEnv ? configFactory('development', 'node') : null;
+
             const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
             const appName = pkg.name;
             const tscCompileOnError = process.env.TSC_COMPILE_ON_ERROR === 'true';
@@ -74,7 +77,7 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
             };
             const compiler = createCompiler({
                 appName,
-                config: paths.useNodeEnv ? [config, nodeConfig] : [config],
+                config: [config, nodeConfig].filter(Boolean),
                 devSocket,
                 urls,
                 tscCompileOnError,

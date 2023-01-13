@@ -1,17 +1,21 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
-const path = require('path');
 const execSync = require('child_process').execSync;
+const path = require('path');
 const fs = require('fs-extra');
 const glob = require('glob');
+const lodash = require('lodash');
 const semver = require('semver');
 const getPublicUrlOrPath = require('tiger-new-utils/getPublicUrlOrPath');
+
 const isDev = process.env.NODE_ENV === 'development';
-const lodash = require('lodash');
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
-const nodePaths = (process.env.NODE_PATH || '').split(path.delimiter).filter(Boolean).map(n => resolveApp(n));
+const nodePaths = (process.env.NODE_PATH || '')
+    .split(path.delimiter)
+    .filter(Boolean)
+    .map(n => resolveApp(n));
 const pkg = fs.readJsonSync(resolveApp('package.json'));
 const publicUrlOrPath = getPublicUrlOrPath(
     process.env.NODE_ENV === 'development' && process.env.WEBPACK_BUILDING !== 'true',
@@ -81,11 +85,14 @@ glob.sync(resolveApp('public/!(_)*.html')).forEach(function(file) {
 });
 
 const moduleAlias = Object.assign(
-    glob.sync(`${resolveApp('app/*')}/`).reduce((alias, file) => {
-        alias[path.basename(file)] = path.resolve(file);
+    glob.sync(`${resolveApp('app/*')}/`).reduce(
+        (alias, file) => {
+            alias[path.basename(file)] = path.resolve(file);
 
-        return alias;
-    }, {}),
+            return alias;
+        },
+        { app: resolveApp('app') }
+    ),
     lodash.mapValues(pkg.alias, function(relativePath) {
         if (fs.pathExistsSync(resolveApp(relativePath))) {
             return resolveApp(relativePath);

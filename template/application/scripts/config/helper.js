@@ -1,12 +1,12 @@
 const fs = require('fs');
 const chalk = require('tiger-new-utils/chalk');
+const devRendererMiddleware = require('tiger-new-utils/devRendererMiddleware');
 const errorOverlayMiddleware = require('tiger-new-utils/errorOverlayMiddleware');
 const evalSourceMapMiddleware = require('tiger-new-utils/evalSourceMapMiddleware');
-const noopServiceWorkerMiddleware = require('tiger-new-utils/noopServiceWorkerMiddleware');
-const redirectServedPath = require('tiger-new-utils/redirectServedPathMiddleware');
 const getHttpsConfig = require('tiger-new-utils/getHttpsConfig');
 const ignoredFiles = require('tiger-new-utils/ignoredFiles');
-const devRendererMiddleware = require('tiger-new-utils/devRendererMiddleware');
+const noopServiceWorkerMiddleware = require('tiger-new-utils/noopServiceWorkerMiddleware');
+const redirectServedPath = require('tiger-new-utils/redirectServedPathMiddleware');
 const paths = require('./paths');
 const pkg = paths.appPackageJson;
 

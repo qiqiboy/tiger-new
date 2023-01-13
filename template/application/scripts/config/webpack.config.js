@@ -41,7 +41,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     const isEnvDevelopment = webpackEnv === 'development';
     const isEnvProduction = webpackEnv === 'production';
     const isEnvProductionProfile = isEnvProduction && process.argv.includes('--profile');
-    const isEnvNode = paths.useNodeEnv && executionEnv === 'node';
+    const isEnvNode = executionEnv === 'node';
     const isEnvWeb = !isEnvNode;
 
     const shouldUseSourceMap = isEnvProduction

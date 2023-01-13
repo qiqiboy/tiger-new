@@ -40,7 +40,7 @@ module.exports = {
             }
         ],
         'import/no-anonymous-default-export': [
-            2,
+            1,
             {
                 allowArray: true,
                 allowArrowFunction: false,
@@ -48,7 +48,8 @@ module.exports = {
                 allowAnonymousFunction: false,
                 allowCallExpression: true, // The true value here is for backward compatibility
                 allowLiteral: true,
-                allowObject: true
+                allowObject: true,
+                allowNew: false
             }
         ],
         'import/no-duplicates': 1,

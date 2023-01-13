@@ -1,14 +1,14 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 const path = require('path');
-const lodash = require('lodash');
 const OSS = require('ali-oss');
 const fs = require('fs-extra');
+const glob = require('glob');
+const lodash = require('lodash');
 const Rsync = require('rsync');
 const chalk = require('tiger-new-utils/chalk');
-const glob = require('glob');
 const ora = require('tiger-new-utils/ora');
-const paths = require('./config/paths');
 const { printServeCommand } = require('./config/helper');
+const paths = require('./config/paths');
 const pkg = paths.appPackageJson;
 
 const staticFileName = 'static.config.json';

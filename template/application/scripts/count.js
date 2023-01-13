@@ -2,8 +2,8 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const chalk = require('tiger-new-utils/chalk');
-const ora = require('tiger-new-utils/ora');
 const clearConsole = require('tiger-new-utils/clearConsole');
+const ora = require('tiger-new-utils/ora');
 const paths = require('./config/paths');
 const pkg = paths.appPackageJson;
 const onlyJS = process.argv[2] === '--js';

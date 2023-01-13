@@ -15,19 +15,19 @@ require('./config/env');
 
 const path = require('path');
 const fs = require('fs-extra');
-const webpack = require('webpack');
-const chalk = require('tiger-new-utils/chalk');
-const ora = require('tiger-new-utils/ora');
-const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
-const FileSizeReporter = require('tiger-new-utils/FileSizeReporter');
-const clearConsole = require('tiger-new-utils/clearConsole');
 const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
-const formatWebpackMessages = require('tiger-new-utils/formatWebpackMessages');
+const chalk = require('tiger-new-utils/chalk');
 const checkMissDependencies = require('tiger-new-utils/checkMissDependencies');
+const checkRequiredFiles = require('tiger-new-utils/checkRequiredFiles');
+const clearConsole = require('tiger-new-utils/clearConsole');
+const FileSizeReporter = require('tiger-new-utils/FileSizeReporter');
+const formatWebpackMessages = require('tiger-new-utils/formatWebpackMessages');
+const ora = require('tiger-new-utils/ora');
 const printBuildError = require('tiger-new-utils/printBuildError');
-const configFactory = require('./config/webpack.config');
-const paths = require('./config/paths');
+const webpack = require('webpack');
 const { printServeCommand } = require('./config/helper');
+const paths = require('./config/paths');
+const configFactory = require('./config/webpack.config');
 const { ensureLocals } = require('./i18n');
 
 const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;

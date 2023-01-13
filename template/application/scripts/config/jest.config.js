@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs-extra');
-const lodash = require('lodash');
 const glob = require('glob');
+const lodash = require('lodash');
 const paths = require('./paths');
 
 const excludeDirs = ['node_modules', 'build', 'buildDev', 'dist'];
