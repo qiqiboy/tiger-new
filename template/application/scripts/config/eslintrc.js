@@ -49,14 +49,14 @@ module.exports = {
                 allowCallExpression: true, // The true value here is for backward compatibility
                 allowLiteral: true,
                 allowObject: true,
-                allowNew: false
+                allowNew: true
             }
         ],
         'import/no-duplicates': 1,
         'import/order': [
             1,
             {
-                groups: ['builtin', 'external', 'internal', ['parent', 'sibling', 'index'], 'object', 'unknown'],
+                groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'unknown'],
                 alphabetize: { order: 'asc', caseInsensitive: true },
                 'newlines-between': 'never'
             }
