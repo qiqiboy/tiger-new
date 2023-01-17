@@ -81,7 +81,7 @@
 -   `IGNORE_CSS_ORDER_WARNINGS` 禁止`mini-css-extract-plugin`插件输出`conflicting order`警告信息
 -   `PUBLIC_URL` 类似 webpack 配置中的`config.publicPath`，可以用来控制生成的代码的入口位置
 -   `BASE_NAME` 指定项目的`basename`，例如`BASE_NAME=/account`
--   `SKIP_CDN` 跳过 CDN 上传阶段；`SKIP_CDN=true npm run pack`即表示本次构建不上传 cdn，仅本地构建
+-   `SKIP_CDN` 本次构建不需要上传CDN，即不使用`package.json`中的`cdn`字段来作为`publicPath`
 -   `BUILD_DIR` 指定项目构建输出目录；不传递该变量情况下，`prodcution`环境输出到`build`目录，`development`环境输出到`buildDev`目录
 -   `SSR` 是否启用`SSR`。默认情况下，当项目存在`SSR`入口文件，将自动启用`SSR`。你可以通过`SSR=false`来禁用这一功能
 -   `RUNTIME` 运行时标记，`web` 或者 `node`
@@ -100,9 +100,8 @@
 **支持的运行命令**
 
 -   `npm start` 启动本地开发服务
--   `npm run build` `npm run pack` 构建生产包(默认输出文件到 build 目录)，其中如果配置了 CDN，则`pack`命令还会调用`npm run cdn`命令执行文件上传；否则两者一致
+-   `npm run build` 构建生产包(默认输出文件到 build 目录)
 -   `npm run build:dev` 构建测试包(默认输出文件到 buildDev 目录)
--   `npm run cdn` 上传构建文件到从 cdn 服务器
 -   `npm test` 运行测试
 -   `npm run serve` 启动本地预览服务器
 -   `npm run i18n-scan` `npm run i18n-read` 读取或者写入 i18n 文件

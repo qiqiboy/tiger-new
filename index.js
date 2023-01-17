@@ -467,9 +467,6 @@ function run(appPath, appName, onSuccess) {
             host: projectCustom.host,
             path: '/' + projectCustom.pathname.replace(/^\//g, '')
         };
-
-        appPackage.scripts.cdn = 'node scripts/cdn.js';
-        appPackage.scripts.pack += ' && npm run cdn';
     }
 
     if (projectCustom.locals) {

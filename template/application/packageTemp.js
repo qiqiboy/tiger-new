@@ -3,7 +3,6 @@ module.exports = {
         start: 'node scripts/start.js',
         build: 'node scripts/build.js',
         'build:dev': 'node scripts/build.js --dev',
-        pack: 'npm run build',
         serve: 'node scripts/serve.js',
         count: 'node scripts/count.js',
         'count:js': 'node scripts/count.js --js',
