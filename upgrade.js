@@ -36,7 +36,6 @@ function upgradePackageProject(root) {
         '@typescript-eslint/eslint-plugin',
         '@typescript-eslint/parser',
         'babel-eslint',
-        'eslint-config-react-app',
         'eslint-plugin-flowtype',
         'eslint-plugin-import',
         'eslint-plugin-jest',
@@ -304,9 +303,11 @@ function upgradeAppProject(root) {
         dep => dep + '@' + newDependenciesConfig.dependencies[dep]
     );
     var cleanDeps = [
+        "ali-oss",
         'ora',
         'inquirer',
         'chalk',
+        'rsync',
         'raf-dom',
         'eslint-loader',
         'raw-loader',
@@ -755,11 +756,6 @@ function upgradeAppProject(root) {
                                 );
                             }
                         } catch (err) {}
-                    }
-
-                    if (package.cdn) {
-                        package.scripts.cdn = 'node scripts/cdn.js';
-                        package.scripts.pack = 'npm run build && npm run cdn';
                     }
 
                     package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
