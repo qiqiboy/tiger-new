@@ -667,7 +667,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         diagnosticOptions: { syntactic: true, semantic: true, declaration: false, global: false }
                     },
                     async: !isBuilding,
-                    logger: { infrastructure: 'silent', issues: 'silent', devServer: false },
+                    devServer: false,
+                    logger: 'webpack-infrastructure',
                     formatter: isBuilding ? typescriptFormatter : undefined
                 }),
             isBuilding &&

@@ -72,7 +72,7 @@ function dataSerializer(data: object | string) {
 
 // @ts-ignore avoid duplicate interceptors
 if (axios?.interceptors.response.handlers?.length === 0) {
-    axios.interceptors.request.use((config: AxiosRequestConfig) => {
+    axios.interceptors.request.use((config) => {
         if (!config.timeout) {
             config.timeout = typeof window === 'undefined' ? 10 * 1000 : 60 * 1000;
         }
