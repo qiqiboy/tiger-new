@@ -70,7 +70,7 @@ const App: React.FC<{}> = () => {
                         </Toolbar>
                     </AppBar>
                     <Box textAlign="center" p={2}>
-                        Edit <Chip icon={<TextSnippet />} size="small" label="app/App/index.tsx" /> and save to reload.
+                        Edit <Chip icon={<TextSnippet />} size="small" label="app/modules/App/index.tsx" /> and save to reload.
                     </Box>
                 </LocalizationProvider>
             </ThemeProvider>

@@ -640,7 +640,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         mode: 'write-references',
                         configFile: paths.appTsConfig,
                         context: paths.root,
-                        build: true,
                         configOverwrite: {
                             compilerOptions: {
                                 sourceMap: shouldUseSourceMap,
