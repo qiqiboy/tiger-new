@@ -197,18 +197,6 @@ if (program.upgrade) {
                         }
                     },
                     {
-                        name: 'libs',
-                        type: 'list',
-                        choices: [
-                            { name: '无框架依赖', value: 0 },
-                            { name: 'jquery 项目', value: 1 },
-                            { name: 'react 项目', value: 2 },
-                            { name: 'jquery + react 项目', value: 3 }
-                        ],
-                        message: '请选择项目框架' + chalk.grey('（将会默认安装所选相关框架依赖）') + ':',
-                        default: 2
-                    },
-                    {
                         name: 'supportDecorator',
                         type: 'confirm',
                         message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
@@ -277,21 +265,6 @@ if (program.upgrade) {
 function createApp(name) {
     var root = path.resolve(name);
     var appName = projectCustom.name;
-    var pkgVendor = [];
-
-    switch (projectCustom.libs) {
-        case 1:
-            pkgVendor.push('jquery');
-            break;
-        case 2:
-            pkgVendor.push('react', 'react-dom');
-            break;
-        case 3:
-            pkgVendor.push('jquery', 'react', 'react-dom');
-            break;
-    }
-
-    pkgVendor.push('./static/css/vendor.scss');
 
     fs.ensureDirSync(name);
 
@@ -305,7 +278,7 @@ function createApp(name) {
         private: true,
         description: projectCustom.description,
         author: projectCustom.author,
-        vendor: pkgVendor,
+        vendor: ['react', 'react-dom', 'react-router-dom'],
         noRewrite: !projectCustom.isSpa,
         proxy: projectCustom.proxy || null
     };

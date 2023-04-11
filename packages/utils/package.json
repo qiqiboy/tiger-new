@@ -1,6 +1,6 @@
 {
   "name": "tiger-new-utils",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "The utils for tiger-new",
   "main": "index.js",
   "scripts": {
@@ -63,7 +63,7 @@
     "escape-string-regexp": "2.0.0",
     "filesize": "6.1.0",
     "find-up": "4.1.0",
-    "fork-ts-checker-webpack-plugin": "^8.0.0",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
     "global-modules": "2.0.0",
     "globby": "11.0.1",
     "gzip-size": "5.1.1",

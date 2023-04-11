@@ -1,257 +1,342 @@
-import React, { Children, cloneElement, Component } from 'react';
-import { ModalProps as BSModalProps, Modal } from 'react-bootstrap';
-import { createPortal, render as reactRender, unmountComponentAtNode } from 'react-dom';
-import { createRoot } from 'react-dom/client';
-import { isValidElementType } from 'react-is';
-import './style.scss';
+import { CheckCircleOutline, ErrorOutlineOutlined, WarningAmberOutlined } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import {
+    AlertColor,
+    Box,
+    ButtonProps,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogProps,
+    DialogTitle,
+    Grow,
+    Modal
+} from '@mui/material';
+import { cloneElement, createElement, ReactElement, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { createRoot as _createRoot } from 'react-dom/client';
 
-const _Modal = Modal;
+export let createRoot = _createRoot;
 
-export default _Modal as INewModal;
+/**
+ * 用于同步组件树上下文，只需要将该组件放在应用组件树中渲染即可
+ */
+export const ModalRoot: React.FC = () => {
+    const [modals, setModals] = useState<Record<string, ReactElement>>({});
+    const rootRef = useRef<HTMLDivElement>();
 
-type INewModal = typeof Modal & {
-    open: (config: ModalProps) => ModalHandler & {
-        result: Promise<any>;
-        render(component: RenderCompoenent): void;
+    if (!rootRef.current) {
+        rootRef.current = document.createElement('div')!;
+        document.body.appendChild(rootRef.current);
+    }
+
+    useEffect(() => {
+        createRoot = () => {
+            const id = `mui-modal${Date.now() + Math.random()}`;
+
+            return {
+                render(element: ReactElement) {
+                    setModals(modals => ({
+                        ...modals,
+                        [id]: cloneElement(element, {
+                            key: id
+                        })
+                    }));
+                },
+                unmount() {
+                    setModals(modals => {
+                        delete modals[id];
+
+                        return { ...modals };
+                    });
+                }
+            };
+        };
+
+        return () => {
+            if (rootRef.current) {
+                document.body.appendChild(rootRef.current);
+            }
+
+            createRoot = _createRoot;
+        };
+    }, []);
+
+    return createPortal(Object.values(modals), rootRef.current);
+};
+
+/**
+ * 扩展Modal组件，使其类似于antd中的Modal组件，以支持以下快速调用：
+ *
+ * Modal.success - 创建成功提示框
+ * Modal.error
+ * Modal.info
+ * Modal.warn
+ *
+ * Modal.confirm - 创建具有ok和cancel两个按钮的确认框
+ *
+ * Modal.open - 快速创建Modal弹窗，该方法是对Modal的一个命令式封装
+ *
+ * 所有的方法均返回promise，可以通过promise获取用户关闭窗口的回调
+ */
+
+export interface DialogSettings
+    extends Omit<DialogProps, 'open' | 'title' | 'children' | 'onClose' | 'keepMounted' | 'content'> {
+    title?: React.ReactNode; // 如果传入字符串，自动使用DialogTitle包装
+    content?: React.ReactNode; // 如果传入字符串，自动使用DialogContent包装
+    okButtonProps?: ButtonProps;
+    cancelButtonProps?: ButtonProps;
+    okText?: string;
+    cancelText?: string;
+    onOK?(): any;
+    onCancel?(): any;
+}
+
+export type ExtendModalObject = typeof Modal & {
+    success(settings: DialogSettings): Promise<any>;
+    error(settings: DialogSettings): Promise<any>;
+    info(settings: DialogSettings): Promise<any>;
+    warning(settings: DialogSettings): Promise<any>;
+    confirm(settings: DialogSettings): Promise<any>;
+    open(settings: ModalSettings): Promise<any>;
+};
+
+type Scenes = AlertColor | 'confirm';
+
+const IconPresets: Record<Scenes, ReactElement> = {
+    success: <CheckCircleOutline color="success" />,
+    error: <ErrorOutlineOutlined color="error" />,
+    info: <ErrorOutlineOutlined color="info" />,
+    warning: <WarningAmberOutlined color="warning" />,
+    confirm: <ErrorOutlineOutlined color="primary" />
+};
+
+const _Modal = Modal as ExtendModalObject;
+
+_Modal.success = createDialog('success');
+_Modal.error = createDialog('error');
+_Modal.info = createDialog('info');
+_Modal.warning = createDialog('warning');
+_Modal.confirm = createDialog('confirm');
+_Modal.open = openModal;
+
+export { _Modal as Modal };
+
+const ExtendDialog: React.FC<
+    DialogSettings & {
+        type: Scenes;
+    }
+> = ({
+    title,
+    content,
+    okText,
+    cancelText,
+    okButtonProps,
+    cancelButtonProps,
+    onOK,
+    onCancel,
+    type,
+    ...dialogProps
+}) => {
+    const [visible, setVisible] = useState(true);
+    const [loading, setLoading] = useState<false | 'ok' | 'cancel'>(false);
+    const hideDialog = () => setVisible(false);
+    const isConfirm = type === 'confirm';
+
+    const handleOKButton = async () => {
+        setLoading('ok');
+
+        try {
+            await onOK?.();
+
+            hideDialog();
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const handleCancelButton = async () => {
+        setLoading('cancel');
+
+        try {
+            await onCancel?.();
+
+            hideDialog();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <Dialog {...dialogProps} open={visible}>
+            <Box display="flex" p={3}>
+                {cloneElement(IconPresets[type], {
+                    fontSize: 'large',
+                    sx: {
+                        mt: 2
+                    }
+                })}
+                <Box>
+                    {title && (typeof title === 'string' ? <DialogTitle>{title}</DialogTitle> : title)}
+                    {content && (typeof content === 'string' ? <DialogContent>{content}</DialogContent> : content)}
+                    <DialogActions>
+                        {isConfirm && (
+                            <LoadingButton
+                                variant="outlined"
+                                size="medium"
+                                {...cancelButtonProps}
+                                onClick={handleCancelButton}
+                                loading={loading === 'cancel'}
+                                disabled={!!loading}>
+                                {cancelText}
+                            </LoadingButton>
+                        )}
+                        <LoadingButton
+                            variant="contained"
+                            size="medium"
+                            {...okButtonProps}
+                            onClick={handleOKButton}
+                            loading={loading === 'ok'}
+                            disabled={!!loading}>
+                            {okText}
+                        </LoadingButton>
+                    </DialogActions>
+                </Box>
+            </Box>
+        </Dialog>
+    );
 };
 
-type RenderCompoenent = React.ComponentType<any> | React.ReactElement<any>;
-
-type ModalProps = Partial<
-    Pick<
-        BSModalProps,
-        | 'size'
-        | 'bsPrefix'
-        | 'centered'
-        | 'backdropClassName'
-        | 'dialogClassName'
-        | 'dialogAs'
-        | 'scrollable'
-        | 'style'
-        | 'className'
-        | 'show'
-        | 'container'
-        | 'onShow'
-        | 'onHide'
-        | 'manager'
-        | 'backdrop'
-        | 'onEscapeKeyDown'
-        | 'onBackdropClick'
-        | 'onExiting'
-        | 'restoreFocusOptions'
-        | 'restoreFocus'
-        | 'enforceFocus'
-        | 'autoFocus'
-        | 'keyboard'
-        | 'containerClassName'
-    >
-> & {
-    component: RenderCompoenent;
-    animation?: boolean | 'slide' | 'fade' | 'drawer';
+ExtendDialog.defaultProps = {
+    okText: 'OK',
+    cancelText: 'Cancel',
+    TransitionComponent: Grow
 };
+
+function createDialog(type: Scenes) {
+    return async (settings: DialogSettings) => {
+        let clearContainer;
+        const result = new Promise((resolve, reject) => {
+            const container = document.createElement('div');
+            const root = createRoot(container);
+
+            document.body.appendChild(container);
+
+            clearContainer = () => {
+                setTimeout(() => {
+                    root.unmount();
+                    document.body.removeChild(container);
+                }, 500);
+            };
+
+            const updateDialog = () => {
+                root.render(
+                    <ExtendDialog
+                        {...settings}
+                        type={type}
+                        onOK={async () => {
+                            let data;
+
+                            data = await settings.onOK?.();
+                            resolve(data);
+                        }}
+                        onCancel={async () => {
+                            let reason;
+
+                            reason = await settings.onCancel?.();
+                            reject(reason);
+                        }}
+                    />
+                );
+            };
+
+            updateDialog();
+        });
+
+        result.finally(clearContainer).catch(() => {});
+
+        return result;
+    };
+}
+
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                        Modal                                                        //
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export interface ModalSettings extends Omit<DialogProps, 'open' | 'children' | 'onClose' | 'keepMounted'> {
+    component: React.ComponentType<ModalHandler>;
+    maskClosable?: boolean; // 禁用backdrop和ESC关闭
+}
 
 export interface ModalHandler {
     close(data?: any): void;
     dismiss(reason?: any): void;
 }
 
-/**
- * 兼容react16、17、18
- */
-let _createRoot =
-    createRoot ||
-    ((container: HTMLElement) => {
-        return {
-            render(reactElement: React.ReactElement<any>) {
-                return reactRender(reactElement, container);
-            },
-            unmount() {
-                return unmountComponentAtNode(container);
-            }
-        };
-    });
+const ExtendModal: React.FC<
+    ModalSettings & {
+        modalHandler: ModalHandler;
+    }
+> = ({ component, maskClosable, modalHandler, ...props }) => {
+    const [visible, setVisible] = useState(true);
+    const hideModal = () => setVisible(false);
 
-const defaultSettings = {
-    animation: true
+    return (
+        <Dialog
+            {...props}
+            open={visible}
+            onClose={(event, reason) => {
+                if (maskClosable || (reason !== 'backdropClick' && reason !== 'escapeKeyDown')) {
+                    modalHandler.dismiss(reason);
+                    hideModal();
+                }
+            }}>
+            {createElement(component, {
+                close(data) {
+                    modalHandler.close(data);
+                    hideModal();
+                },
+                dismiss(reason) {
+                    modalHandler.dismiss(reason);
+                    hideModal();
+                }
+            })}
+        </Dialog>
+    );
 };
 
-/**
- * @desc 给react-bootstrap的Modal扩展一个open方法，用来方便的创建更灵活的modal。
- *       默认的Modal组件依赖于组件声明式受控调用，非常麻烦，尤其是需要从组件内部关闭modal时，需要将关闭句柄向下传递；
- *       并且对于多modal场景下，使用也非常麻烦，需要定义多个状态值对应到不同的modal的visible状态！
- *
- *       新增的Modal.open方法，通过封装隐藏了visible控制，通过对外暴漏以及向下传递close、dismiss句柄以及promise，可以方便的用来从外部、组件内部关闭modal，
- *       并且可以方便的通过promise来处理modal关闭的回调！
- *
- * @usage Modal.open({ component: YourComponent / <YourComponent />, ...ModalProps  })
- *
- *        component参数支持传入组件定义，或者直接传入该组件调用的reactNode。
- *        无论哪种方式，Modal.open都会向其传递close、dismiss属性。
- *        在YourComponent组件内部，你可以方便的通过这两种方法来关闭modal。
- *
- *        close、dismiss两个方法都可以用来关闭modal，不同的是他们对于返回的promise的状态有影响：
- *        close => Promise.resolved
- *        dismiss => Promise.rejected
- *
- * @param {Object} config 配置参数，支持Modal的所有的props参数，另外新增扩展了component参数，具体使用参考上方说明!
- *
- * @return {Object} { close, dismiss, result: Promise }
- *          返回一个对象，包含了close、dismiss两个关闭方法，以及一个result的promise对象，可以通过该promise来访问modal关闭时的回调！
- */
-export const open = ((_Modal as INewModal).open = config => {
-    let destroyed;
-    let withResolve;
-    let withReject;
+async function openModal(settings: ModalSettings) {
+    let clearContainer;
 
-    const settings = { ...defaultSettings, ...config };
+    const result = new Promise((resolve, reject) => {
+        const container = document.createElement('div');
+        const root = createRoot(container);
 
-    const div = document.createElement('div');
-    const root = _createRoot(div);
+        document.body.appendChild(container);
 
-    document.body.appendChild(div);
-
-    function destroy() {
-        if (!destroyed) {
-            destroyed = true;
-
-            root.unmount();
-
-            document.body.removeChild(div);
-        }
-    }
-
-    function close(data?) {
-        render(false, () => withResolve(data));
-    }
-
-    function dismiss(reason?) {
-        render(false, () => withReject(reason));
-    }
-
-    function onHide() {
-        dismiss();
-
-        if (settings.onHide) {
-            settings.onHide();
-        }
-    }
-
-    function render(visible, callback?: () => void) {
-        const { component: TheComponent, animation, ...props } = settings;
-        const childProps = {
-            close,
-            dismiss
+        clearContainer = () => {
+            setTimeout(() => {
+                root.unmount();
+                document.body.removeChild(container);
+            }, 500);
         };
 
-        let children;
-
-        if (isValidElementType(TheComponent)) {
-            children = <TheComponent />;
-        } else {
-            children = TheComponent;
-        }
-
-        root.render(
-            <Modal
-                // @ts-ignore
-                onHide={onHide}
-                {...props}
-                animation={Boolean(animation)}
-                className={[
-                    props.className,
-                    animation && `animation-${typeof animation === 'string' ? animation : 'fade'}`
-                ]
-                    .filter(Boolean)
-                    .join(' ')}
-                show={visible}
-                onExited={() => {
-                    if (!callback) {
-                        callback = withReject;
-                    }
-
-                    callback!();
-                    setTimeout(destroy);
-                }}>
-                {Children.map(children, child => cloneElement(child as React.ReactElement<any>, childProps))}
-            </Modal>
-        );
-
-        // 如果关闭动画，则直接执行回调
-        if (visible === false && animation === false && callback) {
-            callback();
-            destroy();
-        }
-    }
-
-    render(true);
-
-    return {
-        close,
-        dismiss,
-        result: new Promise((resolve, reject) => {
-            withResolve = resolve;
-            withReject = reject;
-        }),
-        render(newContent: RenderCompoenent) {
-            settings.component = newContent;
-
-            render(true);
-        }
-    };
-});
-
-export interface ModalRootState {
-    modals: Record<string, React.ReactElement>;
-}
-
-export class ModalRoot extends Component<{}, ModalRootState> {
-    readonly state: ModalRootState = {
-        modals: {}
-    };
-
-    root: HTMLDivElement;
-
-    public componentDidMount() {
-        _createRoot = () => {
-            const id = `bs-modal-${Date.now() + Math.random()}`;
-
-            return {
-                render: (element: React.ReactElement<ModalProps>) => {
-                    const { modals } = this.state;
-
-                    modals[id] = cloneElement(element, {
-                        key: id
-                    });
-
-                    this.setState({
-                        modals
-                    });
-                },
-                unmount: () => {
-                    const { modals } = this.state;
-
-                    delete modals[id];
-
-                    this.setState({
-                        modals
-                    });
-                }
-            };
+        const updateDialog = () => {
+            root.render(
+                <ExtendModal
+                    {...settings}
+                    modalHandler={{
+                        close: resolve,
+                        dismiss: reject
+                    }}
+                />
+            );
         };
-    }
 
-    public componentWillUnmount() {
-        this.root && document.body.removeChild(this.root);
-    }
+        updateDialog();
+    });
 
-    render() {
-        if (!this.root) {
-            this.root = document.createElement('div');
+    result.finally(clearContainer).catch(() => {});
 
-            document.body.appendChild(this.root);
-        }
-
-        return createPortal(Object.values(this.state.modals), this.root);
-    }
+    return result;
 }

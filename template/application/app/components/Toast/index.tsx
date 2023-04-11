@@ -1,176 +1,140 @@
-import React, { Component } from 'react';
-import { createRoot } from 'react-dom/client';
-import Loading from 'components/Loading';
-import Portal from 'components/Portal';
-import { Fade } from 'components/Transition';
-import { TransitionProps } from 'components/Transition/withTransition';
-import classlist from 'utils/classlist';
-import './style.scss';
-
-export interface ToastProps extends TransitionProps {
-    visible: boolean;
-    children: React.ReactNode;
-    className?: string;
-    backdrop?: 'static' | false | 'transparent';
-}
+import { CloseRounded as CloseIcon } from '@mui/icons-material';
+import { Alert, AlertColor, Backdrop, CircularProgress, IconButton, Slide, Snackbar } from '@mui/material';
+import React from 'react';
+import { createRoot } from '../Modal';
 
 /**
- * @description
- * Toast组件，用来展示无需用户响应的弹出框
+ * 类似于antd中的message，基本用法如下：
  *
- * Toast.show(content, timeout?) 显示content内容，timeout用来控制显示时长，该时间后消失
+ * toast.success('message', 30000, () => console.log('closed'));
  *
- * Toast.loading(isShow) 控制全局的loading
- *
+ * 当使用toast.loading时，需要手动控制关闭：
+ * const destroy = toast.loading('loading...');
+ * setTimeout(() => destroy(), 3000); // 3s后关闭
  */
-class Toast extends Component<ToastProps, { loaded: boolean }> {
-    static defaultProps = {
-        backdrop: 'transparent'
-    };
+export const toast = {
+    message: createToast('message'),
+    success: createToast('success'),
+    error: createToast('error'),
+    info: createToast('info'),
+    warning: createToast('warning'),
+    loading: createToast('loading') as (message: React.ReactNode) => () => void
+};
 
-    state = {
-        loaded: false
-    };
+interface ToastProps {
+    visible: boolean;
+    type: 'message' | AlertColor | 'loading';
+    message: React.ReactNode;
+    duration: number;
+    onClose(): void;
+}
 
-    public componentDidMount() {
-        Toast.allInstances.push(this);
-
-        this.setState({
-            loaded: true
-        });
-    }
-
-    public componentWillUnmount() {
-        Toast.allInstances = Toast.allInstances.filter(item => item !== this);
-    }
-
-    public render() {
-        const { children, visible, className, backdrop, ...props } = this.props;
-        const isShow = visible && this.state.loaded;
-
+const Toast: React.FC<ToastProps> = ({ visible, type, message, duration, onClose }) => {
+    if (type === 'message') {
         return (
-            <Fade in={isShow} {...props}>
-                <Portal>
-                    <div className="toast-root">
-                        {backdrop && <div className={classlist('toast-backdrop', `toast-backdrop-${backdrop}`)} />}
-                        <div className={classlist('toast-body', className)}>{children}</div>
-                    </div>
-                </Portal>
-            </Fade>
+            <Snackbar
+                open={visible}
+                message={message}
+                anchorOrigin={{
+                    horizontal: 'center',
+                    vertical: 'top'
+                }}
+                autoHideDuration={duration}
+                action={
+                    <IconButton size="small" aria-label="close" color="inherit" onClick={onClose}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                }
+                onClose={onClose}
+                TransitionComponent={Slide}
+                ClickAwayListenerProps={{ mouseEvent: false, touchEvent: false }}
+            />
         );
     }
 
-    /**
-     * 显示toast提示
-     */
-    static show = (content: React.ReactNode, timeout: number = 1500) => {
-        if (content instanceof Error) {
-            content = content.message;
+    if (type === 'loading') {
+        return (
+            <>
+                <Snackbar
+                    open={visible}
+                    anchorOrigin={{
+                        horizontal: 'center',
+                        vertical: 'top'
+                    }}
+                    ContentProps={{
+                        sx: {
+                            minWidth: '0 !important',
+                            flexGrow: 0,
+                            flexWrap: 'nowrap'
+                        }
+                    }}
+                    message={message}
+                    action={<CircularProgress size={20} sx={{ mr: 1 }} />}
+                    onClose={onClose}
+                    TransitionComponent={Slide}
+                    ClickAwayListenerProps={{ mouseEvent: false, touchEvent: false }}
+                />
+                <Backdrop invisible sx={{ zIndex: theme => theme.zIndex.drawer + 1 }} open={visible} />
+            </>
+        );
+    }
+
+    return (
+        <Snackbar
+            open={visible}
+            anchorOrigin={{
+                horizontal: 'center',
+                vertical: 'top'
+            }}
+            autoHideDuration={duration}
+            TransitionComponent={Slide}
+            onClose={onClose}
+            ClickAwayListenerProps={{ mouseEvent: false, touchEvent: false }}>
+            <Alert severity={type} elevation={6} variant="filled" sx={{ width: '100%' }} onClose={onClose}>
+                {message}
+            </Alert>
+        </Snackbar>
+    );
+};
+
+function createToast(type: ToastProps['type']) {
+    return (message: ToastProps['message'], duration = 3000, onClose?: () => void) => {
+        if (message instanceof Error) {
+            message = message.message;
         }
 
-        const toast = open(content);
+        const container = document.createElement('div');
+        const root = createRoot(container);
 
-        setTimeout(toast.close, timeout);
+        document.body.appendChild(container);
 
-        return toast.result;
-    };
-
-    static loadingInstance: any = null;
-
-    /**
-     * 显示toast loading
-     */
-    static loading = (visible: boolean, text: string = ''): Promise<never> => {
-        let result;
-
-        if (visible) {
-            const LoadingElement = <Loading tip={text} />;
-
-            if (!Toast.loadingInstance) {
-                Toast.loadingInstance = open(LoadingElement, {
-                    className: 'toast-loading-root',
-                    backdrop: 'static'
-                });
-            } else {
-                Toast.loadingInstance.render(LoadingElement);
-            }
-
-            result = Toast.loadingInstance.result;
-        }
-
-        if (!visible && Toast.loadingInstance) {
-            result = Toast.loadingInstance.result;
-            Toast.loadingInstance.close();
-            Toast.loadingInstance = null;
-        }
-
-        return result;
-    };
-
-    static allInstances: Toast[] = [];
-}
-
-function open(content: React.ReactNode, others?: object) {
-    let destroyed;
-    let withResolve;
-
-    const div = document.createElement('div');
-    const root = createRoot(div);
-
-    document.body.appendChild(div);
-
-    function destroy() {
-        if (!destroyed) {
-            destroyed = true;
-
+        const clearContainer = () => {
             root.unmount();
-
-            document.body.removeChild(div);
-        }
-    }
-
-    function close() {
-        render(false, () => withResolve());
-    }
-
-    function render(visible, callback?: () => void) {
-        const onExited = () => {
-            if (!callback) {
-                callback = withResolve;
-            }
-
-            callback!();
-            setTimeout(destroy)
+            document.body.removeChild(container);
         };
 
-        root.render(
-            <Toast {...others} visible={visible} onExited={onExited}>
-                {content}
-            </Toast>
-        );
+        const updateToast = (visible: boolean) => {
+            root.render(
+                <Toast
+                    visible={visible}
+                    message={message}
+                    duration={duration}
+                    type={type}
+                    onClose={() => {
+                        onClose?.();
+                        hideToast();
+                    }}
+                />
+            );
+        };
 
-        if (!visible) {
-            setTimeout(() => {
-                if (!destroyed) {
-                    onExited();
-                }
-            }, 1000);
-        }
-    }
+        const hideToast = () => {
+            updateToast(false);
+            setTimeout(() => clearContainer(), 500);
+        };
 
-    render(true);
+        updateToast(true);
 
-    return {
-        close,
-        result: new Promise<never>(resolve => {
-            withResolve = resolve;
-        }),
-        render(newContent) {
-            content = newContent;
-
-            render(true);
-        }
+        return hideToast;
     };
 }
-
-export default Toast;

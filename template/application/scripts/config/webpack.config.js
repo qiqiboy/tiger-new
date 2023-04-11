@@ -640,6 +640,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         mode: 'write-references',
                         configFile: paths.appTsConfig,
                         context: paths.root,
+                        build: true,
                         configOverwrite: {
                             compilerOptions: {
                                 sourceMap: shouldUseSourceMap,
@@ -654,6 +655,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 declarationMap: false,
                                 noEmit: true,
                                 incremental: true,
+                                skipLibCheck: true,
                                 tsBuildInfoFile: path.resolve(paths.appNodeModules, '.cache/tsbuildinfo')
                             },
                             exclude: tsconfig.exclude.concat(
@@ -667,8 +669,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         diagnosticOptions: { syntactic: true, semantic: true, declaration: false, global: false }
                     },
                     async: !isBuilding,
-                    devServer: false,
-                    logger: 'webpack-infrastructure',
+                    logger: { infrastructure: 'silent', issues: 'silent', devServer: false },
                     formatter: isBuilding ? typescriptFormatter : undefined
                 }),
             isBuilding &&

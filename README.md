@@ -10,6 +10,7 @@
     - [升级老项目](#升级老项目)
     - [功能说明](#功能说明)
 * [更新日志](#更新日志)
+    - [v8.x 新功能](#v8x-新功能)
     - [v7.x 新功能](#v7x-新功能)
     - [v6.x 新功能](#v6x-新功能)
     - [v5.x 新功能](#v5x-新功能)
@@ -81,7 +82,7 @@
 -   `IGNORE_CSS_ORDER_WARNINGS` 禁止`mini-css-extract-plugin`插件输出`conflicting order`警告信息
 -   `PUBLIC_URL` 类似 webpack 配置中的`config.publicPath`，可以用来控制生成的代码的入口位置
 -   `BASE_NAME` 指定项目的`basename`，例如`BASE_NAME=/account`
--   `SKIP_CDN` 本次构建不需要上传CDN，即不使用`package.json`中的`cdn`字段来作为`publicPath`
+-   `SKIP_CDN` 本次构建不需要上传 CDN，即不使用`package.json`中的`cdn`字段来作为`publicPath`
 -   `BUILD_DIR` 指定项目构建输出目录；不传递该变量情况下，`prodcution`环境输出到`build`目录，`development`环境输出到`buildDev`目录
 -   `SSR` 是否启用`SSR`。默认情况下，当项目存在`SSR`入口文件，将自动启用`SSR`。你可以通过`SSR=false`来禁用这一功能
 -   `RUNTIME` 运行时标记，`web` 或者 `node`
@@ -110,6 +111,11 @@
 **更多功能请创建项目后查看项目的 README.md 文件**
 
 ## 更新日志
+
+### v8.x 新功能
+
+-   支持`typescript@5`
+-   默认模板使用`MUI`组件库
 
 ### v7.x 新功能
 
@@ -466,9 +472,11 @@ export default renderer;
 import React from 'react';
 import withSSR, { SSRProps } from 'utils/withSSR';
 
-const Home: React.FC<SSRProps<{
-    homeData: any;
-}>> = (props) => {
+const Home: React.FC<
+    SSRProps<{
+        homeData: any;
+    }>
+> = props => {
     return <div className="home">{props.homeData}</div>;
 };
 
@@ -530,7 +538,7 @@ function withSSR<SelfProps, More = {}>(
 
 ```typescript
 withSSR(MyComponent, () =>
-    fetch('/data.json').then((resp) => ({
+    fetch('/data.json').then(resp => ({
         data: resp.toJSON()
     }))
 );
@@ -572,7 +580,7 @@ const MyComp: React.FC<
         passToComponentPropName: string;
     }> &
         RouteComponentProps
-> = (props) => {
+> = props => {
     if (props.__loading__) {
         return 'loading...';
     }
