@@ -299,11 +299,11 @@ function upgradeAppProject(root) {
 
     var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
     var newDevDependencies = newDependenciesConfig.devDependencies;
-    var patchDeps = ['url', 'raf-dom', 'react', 'react-dom', 'prop-types'].map(
-        dep => dep + '@' + newDependenciesConfig.dependencies[dep]
+    var patchDeps = ['url', 'raf-dom', 'react', 'react-dom', 'prop-types'].map(dep =>
+        newDependenciesConfig.dependencies[dep] !== 'latest' ? dep + '@' + newDependenciesConfig.dependencies[dep] : dep
     );
     var cleanDeps = [
-        "ali-oss",
+        'ali-oss',
         'ora',
         'inquirer',
         'chalk',
@@ -769,7 +769,9 @@ function upgradeAppProject(root) {
                     Promise.all([
                         install(
                             Object.keys(newDevDependencies).map(function (key) {
-                                return key + '@' + newDevDependencies[key];
+                                return !newDevDependencies[key] || newDevDependencies[key] === 'latest'
+                                    ? key
+                                    : key + '@' + newDevDependencies[key];
                             }),
                             true,
                             function () {
