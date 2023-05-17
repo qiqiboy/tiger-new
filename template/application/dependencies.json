@@ -19,7 +19,7 @@
     "babel-loader": "9",
     "babel-plugin-auto-css-modules-flag": "latest",
     "babel-plugin-named-asset-import": "1.0.0-next.81",
-    "babel-preset-react-app": "10",
+    "babel-preset-react-app-new": "latest",
     "case-sensitive-paths-webpack-plugin": "2",
     "classlist-polyfill": "1",
     "core-js": "3",

@@ -63,7 +63,21 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         babelrc: false,
         configFile: false,
         compact: false,
-        presets: [[require.resolve('babel-preset-react-app/dependencies'), { helpers: true }]],
+        presets: [
+            [
+                require.resolve('babel-preset-react-app-new/dependencies'),
+                {
+                    helpers: true,
+                    presetEnvOptions: isEnvNode
+                        ? {
+                              targets: {
+                                  node: 12
+                              }
+                          }
+                        : undefined
+                }
+            ]
+        ],
         cacheDirectory: true,
         cacheCompression: false,
         sourceMaps: shouldUseSourceMap,
@@ -430,12 +444,19 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                             include: paths.appSrc,
                             loader: require.resolve('babel-loader'),
                             options: {
-                                customize: require.resolve('babel-preset-react-app/webpack-overrides'),
+                                customize: require.resolve('babel-preset-react-app-new/webpack-overrides'),
                                 presets: [
                                     [
-                                        'react-app',
+                                        require.resolve('babel-preset-react-app-new'),
                                         {
-                                            runtime: paths.hasJsxRuntime ? 'automatic' : 'classic'
+                                            runtime: paths.hasJsxRuntime ? 'automatic' : 'classic',
+                                            presetEnvOptions: isEnvNode
+                                                ? {
+                                                      targets: {
+                                                          node: 12
+                                                      }
+                                                  }
+                                                : undefined
                                         }
                                     ]
                                 ],
@@ -445,45 +466,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 ].filter(Boolean),
                                 cacheDirectory: true,
                                 cacheCompression: false,
-                                compact: isEnvProduction,
-                                ...(isEnvWeb
-                                    ? {}
-                                    : {
-                                          babelrc: false,
-                                          configFile: false,
-                                          presets: [
-                                              [
-                                                  require('@babel/preset-env').default,
-                                                  {
-                                                      targets: {
-                                                          node: 12
-                                                      },
-                                                      useBuiltIns: 'entry',
-                                                      corejs: 3,
-                                                      exclude: ['transform-typeof-symbol']
-                                                  }
-                                              ],
-                                              [
-                                                  require('@babel/preset-react').default,
-                                                  {
-                                                      development: isEnvDevelopment,
-                                                      ...(!paths.hasJsxRuntime ? { useBuiltIns: true } : {}),
-                                                      runtime: paths.hasJsxRuntime ? 'automatic' : 'classic'
-                                                  }
-                                              ],
-                                              [require('@babel/preset-typescript').default]
-                                          ],
-                                          plugins: [
-                                              ...(pkg.babel && pkg.babel.plugins),
-                                              [require('@babel/plugin-proposal-class-properties').default],
-                                              isEnvProduction && [
-                                                  require('babel-plugin-transform-react-remove-prop-types').default,
-                                                  {
-                                                      removeImport: true
-                                                  }
-                                              ]
-                                          ].filter(Boolean)
-                                      })
+                                compact: isEnvProduction
                             }
                         },
                         {

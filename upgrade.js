@@ -326,6 +326,7 @@ function upgradeAppProject(root) {
         '@typescript-eslint/eslint-plugin',
         '@typescript-eslint/parser',
         'babel-eslint',
+        'babel-preset-react-app',
         'eslint-config-react-app',
         'eslint-plugin-flowtype',
         'eslint-plugin-import',
@@ -593,6 +594,16 @@ function upgradeAppProject(root) {
                     });
 
                     if (package.babel) {
+                        if (package.babel.presets) {
+                            package.babel.presets = package.babel.presets.filter(
+                                preset => preset !== 'react-app' && preset[0] !== 'react-app'
+                            );
+
+                            if (!package.babel.presets.length) {
+                                delete package.babel.presets;
+                            }
+                        }
+
                         if (!package.babel.plugins) {
                             package.babel.plugins = [];
                         }
@@ -601,16 +612,12 @@ function upgradeAppProject(root) {
                             package.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
                         }
 
-                        if (package.babel.plugins.indexOf('transform-decorators-legacy') > -1) {
-                            package.babel.plugins.splice(
-                                package.babel.plugins.indexOf('transform-decorators-legacy'),
-                                1,
-                                ['@babel/plugin-proposal-decorators', { legacy: true }]
-                            );
-                        }
+                        package.babel.plugins = package.babel.plugins.filter(
+                            plugin => plugin !== 'transform-decorators-legacy' && plugin !== 'react-hot-loader/babel'
+                        );
 
-                        if (package.babel.plugins.indexOf('react-hot-loader/babel') > -1) {
-                            package.babel.plugins.splice(package.babel.plugins.indexOf('react-hot-loader/babel'), 1);
+                        if (!package.babel.plugins.length) {
+                            delete package.babel.plugins;
                         }
                     }
 
