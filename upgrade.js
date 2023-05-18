@@ -512,9 +512,24 @@ function upgradeAppProject(root) {
                         spinner.succeed(chalk.green('tsconfig.json已写入！'));
                     }
 
+                    const tsconfigJson = fs.readJsonSync(tsconfig);
+
+                    if (tsconfigJson.compilerOptions.suppressImplicitAnyIndexErrors) {
+                        delete tsconfigJson.compilerOptions.suppressImplicitAnyIndexErrors;
+
+                        fs.outputJsonSync(tsconfig, tsconfigJson, {
+                            spaces: 2
+                        });
+                    }
+
                     if (fs.existsSync(tslint)) {
                         fs.removeSync(tslint);
                         spinner.succeed(chalk.red('tslint.json已移除！'));
+                    }
+
+                    if (fs.existsSync(jsconfig)) {
+                        fs.removeSync(jsconfig);
+                        spinner.succeed(chalk.red('jsconfig.json已移除！'));
                     }
 
                     if (fs.existsSync(tsconfigLocal)) {
@@ -595,13 +610,9 @@ function upgradeAppProject(root) {
 
                     if (package.babel) {
                         if (package.babel.presets) {
-                            package.babel.presets = package.babel.presets.filter(
-                                preset => preset !== 'react-app' && preset[0] !== 'react-app'
+                            package.babel.presets = package.babel.presets.map(preset =>
+                                preset === 'react-app' ? 'react-app-new' : preset
                             );
-
-                            if (!package.babel.presets.length) {
-                                delete package.babel.presets;
-                            }
                         }
 
                         if (!package.babel.plugins) {

@@ -13,6 +13,7 @@ module.exports = {
             "node -e \"require('fs-extra').outputJsonSync('.git-tsconfig.json',{ extends: './tsconfig.json', include: ['*.d.ts', 'app/utils/i18n/*'].concat(process.env.StagedFiles.split(/\\n+/)) })\" && echo 'TS checking...\\n' && tsc -p .git-tsconfig.json --checkJs false"
     },
     babel: {
+        presets: ['react-app-new'],
         plugins: []
     },
     browserslist: ['>0.2%', 'not dead', 'not op_mini all', 'ie >= 10'],
