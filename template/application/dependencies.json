@@ -65,7 +65,7 @@
     "stylelint-config-recommended": "11",
     "terser-webpack-plugin": "5",
     "tiger-new-utils": "3",
-    "typescript": "5.0",
+    "typescript": "5.1",
     "webpack": "5",
     "webpack-dev-server": "4",
     "webpack-node-externals": "3"
