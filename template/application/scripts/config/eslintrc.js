@@ -264,20 +264,6 @@ module.exports = {
                 '@typescript-eslint/no-misused-new': 2,
                 '@typescript-eslint/no-namespace': 2,
                 '@typescript-eslint/no-non-null-asserted-optional-chain': 1,
-                '@typescript-eslint/no-parameter-properties': [
-                    2,
-                    {
-                        allows: [
-                            'readonly',
-                            'private',
-                            'protected',
-                            'public',
-                            'private readonly',
-                            'protected readonly',
-                            'public readonly'
-                        ]
-                    }
-                ],
                 '@typescript-eslint/no-redeclare': [
                     2,
                     {
