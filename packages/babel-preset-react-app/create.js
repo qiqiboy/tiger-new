@@ -40,7 +40,7 @@ module.exports = function (api, opts, env) {
         absoluteRuntimePath = path.dirname(require.resolve('@babel/runtime/package.json'));
     }
 
-    var corejsVerson = '3.30';
+    var corejsVerson = '3.31';
 
     try {
         corejsVerson = require('core-js/package.json').version;
