@@ -197,12 +197,6 @@ if (program.upgrade) {
                         }
                     },
                     {
-                        name: 'supportDecorator',
-                        type: 'confirm',
-                        message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
-                        default: true
-                    },
-                    {
                         name: 'proxy',
                         type: 'input',
                         message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
@@ -430,10 +424,6 @@ function run(appPath, appName, onSuccess) {
     Object.assign(appPackage, pkgTemp);
 
     appPackage.engines['tiger-new'] = ownPkg.version;
-
-    if (projectCustom.supportDecorator) {
-        appPackage.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
-    }
 
     if (projectCustom.useCdn) {
         appPackage.cdn = {

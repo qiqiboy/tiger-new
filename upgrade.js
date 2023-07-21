@@ -36,6 +36,7 @@ function upgradePackageProject(root) {
         '@typescript-eslint/eslint-plugin',
         '@typescript-eslint/parser',
         'babel-eslint',
+        'eslint-config-react-app',
         'eslint-plugin-flowtype',
         'eslint-plugin-import',
         'eslint-plugin-jest',
@@ -158,38 +159,13 @@ function upgradePackageProject(root) {
                     }
                 }
 
-                if (!package.eslintConfig || !package.eslintConfig.extends) {
+                if (
+                    !package.eslintConfig ||
+                    !package.eslintConfig.extends ||
+                    package.eslintConfig.extends.indexOf('react-app-new') < 0
+                ) {
                     package.eslintConfig = pkgTemp.eslintConfig;
                 }
-
-                var eslintConfigIndex = package.eslintConfig.extends.indexOf('./eslint.config.js');
-                var hasEslintUpdate = false;
-
-                if (eslintConfigIndex > -1) {
-                    package.eslintConfig.extends[eslintConfigIndex] = './eslintrc.js';
-
-                    hasEslintUpdate = true;
-                }
-
-                if (package.eslintConfig.extends.indexOf('react-app/jest') < 0) {
-                    var reactAppIndex = package.eslintConfig.extends.indexOf('react-app');
-
-                    if (reactAppIndex > -1) {
-                        package.eslintConfig.extends.splice(reactAppIndex + 1, 0, 'react-app/jest');
-                    } else {
-                        package.eslintConfig = pkgTemp.eslintConfig;
-                    }
-
-                    hasEslintUpdate = true;
-                }
-
-                if (package.eslintConfig.extends.indexOf('./eslintrc.js') < 0) {
-                    package.eslintConfig.extends.push('./eslintrc.js');
-
-                    hasEslintUpdate = true;
-                }
-
-                hasEslintUpdate && spinner.succeed(chalk.green('eslint配置 已更新！'));
 
                 if (!package.husky) {
                     package.husky = pkgTemp.husky;
@@ -323,6 +299,7 @@ function upgradeAppProject(root) {
         'sw-precache-webpack-plugin',
         '@babel/core',
         '@babel/runtime',
+        '@babel/plugin-proposal-decorators',
         '@typescript-eslint/eslint-plugin',
         '@typescript-eslint/parser',
         'babel-eslint',
@@ -394,15 +371,6 @@ function upgradeAppProject(root) {
                         type: 'confirm',
                         message: '是否需要支持commitlint？',
                         default: true
-                    });
-                }
-
-                if (package.babel && !package.babel.plugins) {
-                    questions.push({
-                        name: 'supportDecorator',
-                        type: 'confirm',
-                        message: '是否开启装饰器' + chalk.grey('@Decoators') + '特性?',
-                        default: false
                     });
                 }
 
@@ -619,12 +587,11 @@ function upgradeAppProject(root) {
                             package.babel.plugins = [];
                         }
 
-                        if (answers.supportDecorator) {
-                            package.babel.plugins.push(['@babel/plugin-proposal-decorators', { legacy: true }]);
-                        }
-
                         package.babel.plugins = package.babel.plugins.filter(
-                            plugin => plugin !== 'transform-decorators-legacy' && plugin !== 'react-hot-loader/babel'
+                            plugin =>
+                                plugin !== 'transform-decorators-legacy' &&
+                                plugin !== 'react-hot-loader/babel' &&
+                                plugin[0] !== '@babel/plugin-proposal-decorators'
                         );
 
                         if (!package.babel.plugins.length) {
@@ -640,16 +607,12 @@ function upgradeAppProject(root) {
                         package['browserslist'] = pkgTemp['browserslist'];
                     }
 
-                    if (!package.eslintConfig || !package.eslintConfig.extends) {
+                    if (
+                        !package.eslintConfig ||
+                        !package.eslintConfig.extends ||
+                        package.eslintConfig.extends.indexOf('react-app-new') < 0
+                    ) {
                         package.eslintConfig = pkgTemp.eslintConfig;
-                    }
-
-                    if (package.eslintConfig.extends.indexOf('react-app/jest') < 0) {
-                        var reactAppIndex = package.eslintConfig.extends.indexOf('react-app');
-
-                        if (reactAppIndex > -1) {
-                            package.eslintConfig.extends.splice(reactAppIndex + 1, 0, 'react-app/jest');
-                        }
                     }
 
                     if (answers.addLocals) {

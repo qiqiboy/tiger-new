@@ -130,8 +130,7 @@ module.exports = function (api, opts, env) {
             //     ],
             //   },
             // ],
-            // Turn on legacy decorators for TypeScript files
-            isTypeScriptEnabled && [require('@babel/plugin-proposal-decorators').default, false],
+            [require('@babel/plugin-proposal-decorators').default, { legacy: true }],
             // class { handleClick = () => { } }
             // Enable loose mode to use assignment instead of defineProperty
             // See discussion in https://github.com/facebook/create-react-app/issues/4263
@@ -193,10 +192,6 @@ module.exports = function (api, opts, env) {
             isFlowEnabled && {
                 exclude: /\.tsx?$/,
                 plugins: [require('@babel/plugin-transform-flow-strip-types').default]
-            },
-            isTypeScriptEnabled && {
-                test: /\.tsx?$/,
-                plugins: [[require('@babel/plugin-proposal-decorators').default, { legacy: true }]]
             }
         ].filter(Boolean)
     };

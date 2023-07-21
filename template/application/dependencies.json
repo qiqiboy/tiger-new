@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "@babel/plugin-proposal-decorators": "7",
     "@commitlint/cli": "17",
     "@commitlint/config-conventional": "17",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5",
@@ -30,7 +29,7 @@
     "dotenv": "16",
     "dotenv-expand": "10",
     "eslint": "8",
-    "eslint-config-react-app": "7",
+    "eslint-config-react-app-new": "0",
     "eslint-webpack-plugin": "4",
     "file-loader": "6",
     "fs-extra": "11",
