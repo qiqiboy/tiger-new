@@ -9,8 +9,6 @@ process.on('unhandledRejection', err => {
 
 require('./config/env');
 
-const path = require('path');
-const lodash = require('lodash');
 const { checkBrowsers } = require('tiger-new-utils/browsersHelper');
 const chalk = require('tiger-new-utils/chalk');
 const checkMissDependencies = require('tiger-new-utils/checkMissDependencies');
@@ -61,6 +59,9 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
                 console.log();
                 process.exit(0);
             }
+
+            process.env.HOST = HOST;
+            process.env.PORT = port;
 
             const config = configFactory('development', 'web');
             const nodeConfig = paths.useNodeEnv ? configFactory('development', 'node') : null;

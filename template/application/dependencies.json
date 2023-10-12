@@ -12,9 +12,9 @@
     "@types/prop-types": "15",
     "@types/react": "18",
     "@types/react-dom": "18",
+    "@types/react-helmet": "6",
     "@types/react-is": "17",
     "@types/react-transition-group": "4",
-    "babel-jest": "29",
     "babel-loader": "9",
     "babel-plugin-auto-css-modules-flag": "latest",
     "babel-plugin-named-asset-import": "1.0.0-next.81",
@@ -47,7 +47,7 @@
     "jest-runner-eslint": "1",
     "jest-watch-typeahead": "2",
     "mini-css-extract-plugin": "2",
-    "sass": "1",
+    "sass": "1.64",
     "node-xlsx": "0.21",
     "null-loader": "4",
     "postcss": "8",
@@ -64,7 +64,7 @@
     "stylelint-config-recommended": "11",
     "terser-webpack-plugin": "5",
     "tiger-new-utils": "3",
-    "typescript": "5.1",
+    "typescript": "5.2",
     "webpack": "5",
     "webpack-dev-server": "4",
     "webpack-node-externals": "3"
@@ -93,7 +93,6 @@
     "react-mui-formutil": "1",
     "react-router-dom": "6",
     "react-transition-group": "4",
-    "swr": "2",
     "url": "latest",
     "use-immer": "0"
   }

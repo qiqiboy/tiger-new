@@ -40,6 +40,15 @@ export default {
                 if (key === 'query') {
                     // @ts-ignore
                     base.query = { ...base.query, ...url.query };
+
+                    // @ts-ignore
+                    Object.keys(base.query).forEach(key => {
+                        // @ts-ignore
+                        if (base.query[key] === null || base.query[key] === undefined) {
+                            // @ts-ignore
+                            delete base.query[key];
+                        }
+                    });
                 } else if (url[key]) {
                     base[key] = url[key];
                 }

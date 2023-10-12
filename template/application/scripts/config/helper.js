@@ -54,7 +54,7 @@ function createDevServerConfig(proxy, allowedHost, host, port, spinner) {
             }
         },
         hot: true,
-        https: getHttpsConfig(paths.root),
+        server: getHttpsConfig(paths.root) || 'http',
         host,
         port,
         historyApiFallback:

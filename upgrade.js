@@ -290,7 +290,6 @@ function upgradeAppProject(root) {
         'url-loader',
         'imagemin-webpack-plugin',
         'jest-environment-jsdom-fourteen',
-        'jest-environment-jsdom',
         'jest-resolve',
         '@types/jest',
         'optimize-css-assets-webpack-plugin',
