@@ -93,7 +93,7 @@
     "react-mui-formutil": "1",
     "react-router-dom": "6",
     "react-transition-group": "4",
-    "url": "latest",
+    "url": "0.11.1",
     "use-immer": "0"
   }
 }
