@@ -15,6 +15,7 @@
     "@types/react-helmet": "6",
     "@types/react-is": "17",
     "@types/react-transition-group": "4",
+    "babel-jest": "29",
     "babel-loader": "9",
     "babel-plugin-auto-css-modules-flag": "latest",
     "babel-plugin-named-asset-import": "1.0.0-next.81",
@@ -64,7 +65,7 @@
     "stylelint-config-recommended": "11",
     "terser-webpack-plugin": "5",
     "tiger-new-utils": "3",
-    "typescript": "5.2",
+    "typescript": "5.4",
     "webpack": "5",
     "webpack-dev-server": "4",
     "webpack-node-externals": "3"
@@ -82,7 +83,6 @@
     "classnames": "2",
     "cookick": "latest",
     "dayjs": "1",
-    "immer": "9",
     "prop-types": "15",
     "raf-dom": "1",
     "react": "18",
@@ -93,7 +93,6 @@
     "react-mui-formutil": "1",
     "react-router-dom": "6",
     "react-transition-group": "4",
-    "url": "0.11.1",
-    "use-immer": "0"
+    "url": "0.11.1"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "tiger-new",
-  "version": "8.1.7",
+  "version": "8.1.8",
   "description": "A cli tool for creating a new react project",
   "main": "index.js",
   "dependencies": {

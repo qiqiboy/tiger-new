@@ -5,8 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-'use strict';
-
 // Fix eslint shareable config (https://github.com/eslint/eslint/issues/3458)
 require('@rushstack/eslint-patch/modern-module-resolution');
 
@@ -15,36 +13,44 @@ require('@rushstack/eslint-patch/modern-module-resolution');
 // to ensure that user-provided configs don't need this boilerplate.
 
 module.exports = {
-  root: true,
+    root: true,
 
-  parser: '@babel/eslint-parser',
+    parser: '@babel/eslint-parser',
 
-  plugins: ['react'],
+    plugins: ['react'],
 
-  env: {
-    browser: true,
-    commonjs: true,
-    es6: true,
-    jest: true,
-    node: true,
-  },
-
-  parserOptions: {
-    sourceType: 'module',
-    requireConfigFile: false,
-    babelOptions: {
-      presets: [require.resolve('babel-preset-react-app-new/prod')],
+    env: {
+        browser: true,
+        commonjs: true,
+        es6: true,
+        jest: true,
+        node: true
     },
-  },
 
-  settings: {
-    react: {
-      version: 'detect',
+    parserOptions: {
+        sourceType: 'module',
+        requireConfigFile: false,
+        babelOptions: {
+            presets: [require.resolve('babel-preset-react-app-new/prod')],
+            plugins: [
+                [
+                    '@babel/plugin-proposal-decorators',
+                    {
+                        legacy: true
+                    }
+                ]
+            ]
+        }
     },
-  },
 
-  rules: {
-    'react/jsx-uses-vars': 'warn',
-    'react/jsx-uses-react': 'warn',
-  },
+    settings: {
+        react: {
+            version: 'detect'
+        }
+    },
+
+    rules: {
+        'react/jsx-uses-vars': 'warn',
+        'react/jsx-uses-react': 'warn'
+    }
 };

@@ -16,7 +16,7 @@ module.exports = {
         presets: ['react-app-new'],
         plugins: []
     },
-    browserslist: ['>0.2%', 'not dead', 'not op_mini all', 'ie >= 10'],
+    browserslist: ['>0.2%', 'not dead', 'not op_mini all'],
     husky: {
         hooks: {
             'commit-msg': 'commitlint --edit $HUSKY_GIT_PARAMS',

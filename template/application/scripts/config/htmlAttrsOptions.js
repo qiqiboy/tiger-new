@@ -1,14 +1,3 @@
-function getAttributeValue(attributes, name) {
-    const lowercasedAttributes = Object.keys(attributes).reduce((keys, k) => {
-        // eslint-disable-next-line no-param-reassign
-        keys[k.toLowerCase()] = k;
-
-        return keys;
-    }, {});
-
-    return attributes[lowercasedAttributes[name.toLowerCase()]];
-}
-
 module.exports = {
     minimize: false,
     esModule: false,

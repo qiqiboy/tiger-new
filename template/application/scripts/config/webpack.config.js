@@ -392,7 +392,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     enforce: 'pre',
                     exclude: /@babel(?:\/|\\{1,2})runtime/,
                     test: /\.(js|mjs|jsx|ts|tsx|css)$/,
-                    use: 'source-map-loader'
+                    use: require.resolve('source-map-loader')
                 },
                 {
                     oneOf: [
@@ -404,16 +404,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         },
                         {
                             test: /\.html$/,
-                            use: [
-                                {
-                                    loader: require.resolve('babel-loader'),
-                                    options: babelOption
-                                },
-                                {
-                                    loader: require.resolve('html-loader'),
-                                    options: htmlAttrsOptions
-                                }
-                            ]
+                            loader: require.resolve('html-loader'),
+                            options: htmlAttrsOptions
                         },
                         {
                             test: /\.svg$/,
