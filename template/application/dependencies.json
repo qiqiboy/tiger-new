@@ -31,7 +31,7 @@
     "dotenv-expand": "10",
     "eslint": "8",
     "eslint-config-react-app-new": "0",
-    "eslint-webpack-plugin": "4",
+    "eslint-webpack-plugin": "4.0",
     "file-loader": "6",
     "fs-extra": "11",
     "glob": "8",

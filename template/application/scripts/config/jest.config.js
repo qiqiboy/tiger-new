@@ -21,6 +21,7 @@ const rootDirs = glob
         return mapper;
     }, {});
 
+/** @type {import('jest').Config} */
 module.exports = {
     projects: [
         {
@@ -82,10 +83,10 @@ module.exports = {
                     rootDirs
                 )
             ),
-            moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node'],
-            verbose: false,
+            moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node']
             // resetMocks: true,
-            watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname']
         }
-    ]
+    ],
+    verbose: true,
+    watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname']
 };

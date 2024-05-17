@@ -2,6 +2,7 @@
 // https://jestjs.io/docs/en/configuration.html
 const fs = require('fs-extra');
 
+/** @type {import('jest').Config} */
 module.exports = {
     projects: [
         {
@@ -40,10 +41,10 @@ module.exports = {
                 '^react-native$': 'react-native-web',
                 '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy'
             },
-            moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node'],
-            verbose: true,
+            moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node']
             // resetMocks: true,
-            watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname']
         }
-    ]
+    ],
+    verbose: true,
+    watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname']
 };

@@ -211,6 +211,12 @@ module.exports = {
     },
     overrides: [
         {
+            files: ['app/**/*'],
+            rules: {
+                'no-console': 1
+            }
+        },
+        {
             files: ['**/__tests__/**/*', '**/*.{spec,test}.*'],
             rules: {
                 'jest/consistent-test-it': [1, { fn: 'test' }],
