@@ -97,67 +97,8 @@ module.exports = function (api, opts, env) {
             isTypeScriptEnabled && [require('@babel/preset-typescript').default]
         ].filter(Boolean),
         plugins: [
-            // Strip flow types before any other transform, emulating the behavior
-            // order as-if the browser supported all of the succeeding features
-            // https://github.com/facebook/create-react-app/pull/5182
-            // We will conditionally enable this plugin below in overrides as it clashes with
-            // @babel/plugin-proposal-decorators when using TypeScript.
-            // https://github.com/facebook/create-react-app/issues/5741
-            isFlowEnabled && [require('@babel/plugin-transform-flow-strip-types').default, false],
-            // Experimental macros support. Will be documented after it's had some time
-            // in the wild.
-            require('babel-plugin-macros'),
-            // Disabled as it's handled automatically by preset-env, and `selectiveLoose` isn't
-            // yet merged into babel: https://github.com/babel/babel/pull/9486
-            // Related: https://github.com/facebook/create-react-app/pull/8215
-            // [
-            //   require('@babel/plugin-transform-destructuring').default,
-            //   {
-            //     // Use loose mode for performance:
-            //     // https://github.com/facebook/create-react-app/issues/5602
-            //     loose: false,
-            //     selectiveLoose: [
-            //       'useState',
-            //       'useEffect',
-            //       'useContext',
-            //       'useReducer',
-            //       'useCallback',
-            //       'useMemo',
-            //       'useRef',
-            //       'useImperativeHandle',
-            //       'useLayoutEffect',
-            //       'useDebugValue',
-            //     ],
-            //   },
-            // ],
             [require('@babel/plugin-proposal-decorators').default, { legacy: true }],
-            // class { handleClick = () => { } }
-            // Enable loose mode to use assignment instead of defineProperty
-            // See discussion in https://github.com/facebook/create-react-app/issues/4263
-            // Note:
-            // 'loose' mode configuration must be the same for
-            // * @babel/plugin-proposal-class-properties
-            // * @babel/plugin-proposal-private-methods
-            // * @babel/plugin-proposal-private-property-in-object
-            // (when they are enabled)
-            [
-                require('@babel/plugin-proposal-class-properties').default,
-                {
-                    loose: true
-                }
-            ],
-            [
-                require('@babel/plugin-proposal-private-methods').default,
-                {
-                    loose: true
-                }
-            ],
-            [
-                require('@babel/plugin-proposal-private-property-in-object').default,
-                {
-                    loose: true
-                }
-            ],
+
             // Polyfills the runtime needed for async/await, generators, and friends
             // https://babeljs.io/docs/en/babel-plugin-transform-runtime
             [
@@ -179,20 +120,7 @@ module.exports = function (api, opts, env) {
                     // https://github.com/babel/babel/blob/090c364a90fe73d36a30707fc612ce037bdbbb24/packages/babel-plugin-transform-runtime/src/index.js#L35-L42
                     absoluteRuntime: absoluteRuntimePath
                 }
-            ],
-            isEnvProduction && [
-                // Remove PropTypes from production build
-                require('babel-plugin-transform-react-remove-prop-types').default,
-                {
-                    removeImport: true
-                }
             ]
-        ].filter(Boolean),
-        overrides: [
-            isFlowEnabled && {
-                exclude: /\.tsx?$/,
-                plugins: [require('@babel/plugin-transform-flow-strip-types').default]
-            }
         ].filter(Boolean)
     };
 };
