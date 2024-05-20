@@ -98,7 +98,19 @@ module.exports = function (api, opts, env) {
         ].filter(Boolean),
         plugins: [
             [require('@babel/plugin-proposal-decorators').default, { legacy: true }],
-
+            [
+                require('@babel/plugin-transform-class-properties').default,
+                {
+                    loose: true
+                }
+            ],
+            [require('@babel/plugin-transform-private-methods').default, { loose: true }],
+            [
+                require('@babel/plugin-proposal-private-property-in-object').default,
+                {
+                    loose: true
+                }
+            ],
             // Polyfills the runtime needed for async/await, generators, and friends
             // https://babeljs.io/docs/en/babel-plugin-transform-runtime
             [
