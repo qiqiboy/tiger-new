@@ -84,36 +84,35 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         inputSourceMap: shouldUseSourceMap
     };
 
-    const getStyleLoaders = (importLoaders = 0, cssModules = false, preProcessor = null) => {
-        const cssLoader = {
-            loader: require.resolve('css-loader'),
-            options: {
-                sourceMap: shouldUseSourceMap,
-                importLoaders,
-                modules: {
-                    mode: cssModules ? 'local' : 'icss',
-                    getLocalIdent: getCSSModuleLocalIdent,
-                    exportOnlyLocals: isEnvNode
-                }
-            }
-        };
-
-        if (isEnvNode) {
-            return cssModules ? [cssLoader] : [require.resolve('null-loader')];
+    const getStyleLoaders = (cssModules = false, preProcessor = null) => {
+        if (isEnvNode && !cssModules) {
+            return [require.resolve('null-loader')];
         }
 
         const loaders = [
-            isBuilding
-                ? {
-                      loader: MiniCssExtractPlugin.loader,
-                      options: {
-                          publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
-                          esModule: true
+            !isEnvNode &&
+                (isBuilding
+                    ? {
+                          loader: MiniCssExtractPlugin.loader,
+                          options: {
+                              publicPath: shouldUseRelativeAssetPath ? '../../' : undefined,
+                              esModule: true
+                          }
                       }
-                  }
-                : require.resolve('style-loader'),
-            cssLoader,
+                    : require.resolve('style-loader')),
             {
+                loader: require.resolve('css-loader'),
+                options: {
+                    sourceMap: shouldUseSourceMap,
+                    importLoaders: (preProcessor ? 2 : 1) - (isEnvNode ? 1 : 0),
+                    modules: {
+                        mode: cssModules ? 'local' : 'icss',
+                        getLocalIdent: getCSSModuleLocalIdent,
+                        exportOnlyLocals: isEnvNode
+                    }
+                }
+            },
+            !isEnvNode && {
                 loader: require.resolve('postcss-loader'),
                 options: {
                     postcssOptions: {
@@ -142,11 +141,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     },
                     sourceMap: shouldUseSourceMap
                 }
-            }
-        ].filter(Boolean);
-
-        if (preProcessor) {
-            loaders.push({
+            },
+            preProcessor && {
                 loader: require.resolve(preProcessor),
                 options: Object.assign(
                     {},
@@ -163,8 +159,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                               implementation: require('sass')
                           }
                 )
-            });
-        }
+            }
+        ].filter(Boolean);
 
         return loaders;
     };
@@ -480,31 +476,31 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         {
                             test: cssRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders(1, true)
+                            use: getStyleLoaders(true)
                         },
                         {
                             test: cssRegex,
-                            use: getStyleLoaders(1),
+                            use: getStyleLoaders(false),
                             sideEffects: true
                         },
                         {
                             test: sassRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders(2, true, 'sass-loader')
+                            use: getStyleLoaders( true, 'sass-loader')
                         },
                         {
                             test: sassRegex,
-                            use: getStyleLoaders(2, false, 'sass-loader'),
+                            use: getStyleLoaders( false, 'sass-loader'),
                             sideEffects: true
                         },
                         {
                             test: lessRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders(2, true, 'less-loader')
+                            use: getStyleLoaders(true, 'less-loader')
                         },
                         {
                             test: lessRegex,
-                            use: getStyleLoaders(2, false, 'less-loader'),
+                            use: getStyleLoaders( false, 'less-loader'),
                             sideEffects: true
                         },
                         {
