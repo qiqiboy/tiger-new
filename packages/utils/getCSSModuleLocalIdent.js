@@ -18,7 +18,7 @@ module.exports = function getLocalIdent(
 ) {
   // Use the filename or folder name, based on some uses the index.js / index.module.(css|scss|sass) project style
   const fileNameOrFolder = context.resourcePath.match(
-    /(index|style)(\.module)?\.(css|scss|sass)$/
+    /(index|style)(\.module)?\.(css|scss|sass|less)$/
   )
     ? '[folder]'
     : '[name]';
