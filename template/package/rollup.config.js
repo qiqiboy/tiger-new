@@ -93,7 +93,6 @@ function createConfig(env, module) {
             babel({
                 exclude: 'node_modules/**',
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
-                babelHelpers: 'runtime',
                 babelrc: false,
                 configFile: false,
                 presets: [

@@ -84,9 +84,22 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         inputSourceMap: shouldUseSourceMap
     };
 
-    const getStyleLoaders = (cssOptions, preProcessor) => {
+    const getStyleLoaders = (importLoaders = 0, cssModules = false, preProcessor = null) => {
+        const cssLoader = {
+            loader: require.resolve('css-loader'),
+            options: {
+                sourceMap: shouldUseSourceMap,
+                importLoaders,
+                modules: {
+                    mode: cssModules ? 'local' : 'icss',
+                    getLocalIdent: getCSSModuleLocalIdent,
+                    exportOnlyLocals: isEnvNode
+                }
+            }
+        };
+
         if (isEnvNode) {
-            return [require.resolve('null-loader')];
+            return cssModules ? [cssLoader] : [require.resolve('null-loader')];
         }
 
         const loaders = [
@@ -99,10 +112,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                       }
                   }
                 : require.resolve('style-loader'),
-            {
-                loader: require.resolve('css-loader'),
-                options: Object.assign({ sourceMap: shouldUseSourceMap }, cssOptions)
-            },
+            cssLoader,
             {
                 loader: require.resolve('postcss-loader'),
                 options: {
@@ -253,7 +263,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                       {}
                   )
               ),
-        target: isEnvWeb ? 'browserslist' : 'node12.0',
+        target: isEnvWeb ? 'browserslist' : 'node16.0',
         output: {
             library: isEnvNode
                 ? {
@@ -445,7 +455,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                             presetEnvOptions: isEnvNode
                                                 ? {
                                                       targets: {
-                                                          node: 12
+                                                          node: 16
                                                       }
                                                   }
                                                 : undefined
@@ -470,76 +480,31 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         {
                             test: cssRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders({
-                                importLoaders: 1,
-                                modules: {
-                                    getLocalIdent: getCSSModuleLocalIdent,
-                                    mode: 'local'
-                                }
-                            })
+                            use: getStyleLoaders(1, true)
                         },
                         {
                             test: cssRegex,
-                            use: getStyleLoaders({
-                                importLoaders: 1,
-                                modules: {
-                                    mode: 'icss'
-                                }
-                            }),
+                            use: getStyleLoaders(1),
                             sideEffects: true
                         },
                         {
                             test: sassRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders(
-                                {
-                                    importLoaders: 2,
-                                    modules: {
-                                        getLocalIdent: getCSSModuleLocalIdent,
-                                        mode: 'local'
-                                    }
-                                },
-                                'sass-loader'
-                            )
+                            use: getStyleLoaders(2, true, 'sass-loader')
                         },
                         {
                             test: sassRegex,
-                            use: getStyleLoaders(
-                                {
-                                    importLoaders: 2,
-                                    modules: {
-                                        mode: 'icss'
-                                    }
-                                },
-                                'sass-loader'
-                            ),
+                            use: getStyleLoaders(2, false, 'sass-loader'),
                             sideEffects: true
                         },
                         {
                             test: lessRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders(
-                                {
-                                    importLoaders: 2,
-                                    modules: {
-                                        getLocalIdent: getCSSModuleLocalIdent,
-                                        mode: 'local'
-                                    }
-                                },
-                                'less-loader'
-                            )
+                            use: getStyleLoaders(2, true, 'less-loader')
                         },
                         {
                             test: lessRegex,
-                            use: getStyleLoaders(
-                                {
-                                    importLoaders: 2,
-                                    modules: {
-                                        mode: 'icss'
-                                    }
-                                },
-                                'less-loader'
-                            ),
+                            use: getStyleLoaders(2, false, 'less-loader'),
                             sideEffects: true
                         },
                         {

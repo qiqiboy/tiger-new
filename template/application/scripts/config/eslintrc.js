@@ -219,6 +219,7 @@ module.exports = {
         {
             files: ['**/__tests__/**/*', '**/*.{spec,test}.*'],
             rules: {
+                'no-console': 0,
                 'jest/consistent-test-it': [1, { fn: 'test' }],
                 'jest/expect-expect': 1,
                 'jest/no-deprecated-functions': 2
