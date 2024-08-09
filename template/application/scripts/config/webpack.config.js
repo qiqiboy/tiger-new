@@ -78,6 +78,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                 }
             ]
         ],
+        plugins: [require.resolve('babel-plugin-auto-css-modules-flag')],
         cacheDirectory: true,
         cacheCompression: false,
         sourceMaps: shouldUseSourceMap,
