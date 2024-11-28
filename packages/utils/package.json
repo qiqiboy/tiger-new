@@ -76,7 +76,7 @@
     "immer": "8.0.4",
     "inquirer": "8.1.2",
     "is-root": "2.1.0",
-    "loader-utils": "2.0.0",
+    "loader-utils": "2.0.4",
     "open": "7.0.2",
     "ora": "5.4.1",
     "pkg-up": "3.1.0",
