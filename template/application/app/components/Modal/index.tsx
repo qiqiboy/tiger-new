@@ -9,7 +9,6 @@ import {
     DialogContent,
     DialogProps,
     DialogTitle,
-    Grow,
     Modal
 } from '@mui/material';
 import { cloneElement, createElement, ReactElement, useEffect, useRef, useState } from 'react';
@@ -23,7 +22,7 @@ export let createRoot = _createRoot;
  */
 export const ModalRoot: React.FC = () => {
     const [modals, setModals] = useState<Record<string, ReactElement>>({});
-    const rootRef = useRef<HTMLDivElement>();
+    const rootRef = useRef<HTMLDivElement>(null);
 
     if (!rootRef.current) {
         rootRef.current = document.createElement('div')!;
@@ -170,7 +169,7 @@ const ExtendDialog: React.FC<
     return (
         <Dialog {...dialogProps} open={visible}>
             <Box display="flex" p={3}>
-                {cloneElement(IconPresets[type], {
+                {cloneElement<any>(IconPresets[type], {
                     fontSize: 'large',
                     sx: {
                         mt: 2
@@ -207,12 +206,6 @@ const ExtendDialog: React.FC<
     );
 };
 
-ExtendDialog.defaultProps = {
-    okText: 'OK',
-    cancelText: 'Cancel',
-    TransitionComponent: Grow
-};
-
 function createDialog(type: Scenes) {
     return async (settings: DialogSettings) => {
         let clearContainer;
@@ -235,15 +228,13 @@ function createDialog(type: Scenes) {
                         {...settings}
                         type={type}
                         onOK={async () => {
-                            let data;
+                            const data = await settings.onOK?.();
 
-                            data = await settings.onOK?.();
                             resolve(data);
                         }}
                         onCancel={async () => {
-                            let reason;
+                            const reason = await settings.onCancel?.();
 
-                            reason = await settings.onCancel?.();
                             reject(reason);
                         }}
                     />

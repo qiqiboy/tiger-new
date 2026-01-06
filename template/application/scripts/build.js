@@ -1,5 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: 0 */
-
 const useDevConfig = process.argv[2] === '--dev';
 
 process.env.BABEL_ENV = useDevConfig ? 'development' : 'production';

@@ -1,16 +1,13 @@
 {
   "name": "babel-preset-react-app-new",
-  "version": "1.0.1",
-  "description": "Babel preset used by Create React App",
+  "version": "2.0.6",
+  "description": "Babel preset used by tiger-new",
   "repository": {
     "type": "git",
-    "url": "https://github.com/facebook/create-react-app.git",
+    "url": "git+https://github.com/qiqiboy/tiger-new.git",
     "directory": "packages/babel-preset-react-app"
   },
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/facebook/create-react-app/issues"
-  },
   "files": [
     "create.js",
     "dependencies.js",
@@ -21,15 +18,13 @@
     "test.js"
   ],
   "dependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/plugin-proposal-decorators": "^7.24.1",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@babel/plugin-transform-class-properties": "^7.24.1",
-    "@babel/plugin-transform-private-methods": "^7.24.1",
-    "@babel/plugin-transform-runtime": "^7.24.3",
-    "@babel/preset-env": "^7.24.5",
-    "@babel/preset-react": "^7.24.1",
-    "@babel/preset-typescript": "^7.24.1",
-    "@babel/runtime": "^7.24.5"
+    "@babel/core": "^7.28.5",
+    "@babel/plugin-proposal-decorators": "^7.28.0",
+    "@babel/plugin-transform-class-properties": "^7.27.1",
+    "@babel/plugin-transform-runtime": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@babel/runtime": "^7.28.4"
   }
 }

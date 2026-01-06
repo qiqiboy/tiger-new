@@ -11,6 +11,7 @@ declare module 'axios' {
         noToken?: boolean;
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
     interface AxiosResponse {
         [key: string]: any;
     }
@@ -72,7 +73,7 @@ function dataSerializer(data: object | string) {
 
 // @ts-ignore avoid duplicate interceptors
 if (axios?.interceptors.response.handlers?.length === 0) {
-    axios.interceptors.request.use((config) => {
+    axios.interceptors.request.use(config => {
         if (!config.timeout) {
             config.timeout = typeof window === 'undefined' ? 10 * 1000 : 60 * 1000;
         }
@@ -101,7 +102,7 @@ if (axios?.interceptors.response.handlers?.length === 0) {
     });
 
     axios.interceptors.response.use((response: AxiosResponse) => {
-        let data = response.data;
+        const data = response.data;
 
         if (data && typeof data === 'object') {
             if (data.is_succ === false) {

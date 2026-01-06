@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES6",
     "allowJs": true,
     "checkJs": true,
     "module": "ESNext",
@@ -19,7 +19,6 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": false,
-    "importHelpers": true,
     "strictNullChecks": true,
     "noUnusedLocals": false,
     "baseUrl": ".",

@@ -1,63 +1,32 @@
-# babel-preset-react-app
+# babel-preset-react-app-new
 
-This package includes the Babel preset used by [Create React App](https://github.com/facebook/create-react-app).<br>
-Please refer to its documentation:
+`babel-preset-react-app-new` 是从官方的 [`babel-preset-react-app`](https://github.com/facebook/create-react-app/tree/main/packages/babel-preset-react-app) **fork** 而来的 Babel 预设配置。它主要用于 `tiger-new` 及其相关生态，或作为独立项目的通用 React Babel 预设。
 
-- [Getting Started](https://facebook.github.io/create-react-app/docs/getting-started) – How to create a new app.
-- [User Guide](https://facebook.github.io/create-react-app/) – How to develop apps bootstrapped with Create React App.
+---
 
-## Usage in Create React App Projects
+## 在 tiger-new 项目中的使用
 
-The easiest way to use this configuration is with [Create React App](https://github.com/facebook/create-react-app), which includes it by default. **You don’t need to install it separately in Create React App projects.**
+如果你使用的是 **`tiger-new` 脚手架创建的项目**，
+**通常不需要手动安装或配置本 preset**。
 
-## Usage Outside of Create React App
+`tiger-new` 会在内部自动引入并配置 `babel-preset-react-app-new`。
 
-If you want to use this Babel preset in a project not built with Create React App, you can install it with the following steps.
+---
 
-First, [install Babel](https://babeljs.io/docs/setup/).
+## 在非 tiger-new 项目中的使用
 
-Then install babel-preset-react-app-new.
+### 1. 安装 preset
 
 ```sh
-npm install babel-preset-react-app-new --save-dev
+$ npm install babel-preset-react-app-new --save-dev
 ```
 
-Then create a file named `.babelrc` with following contents in the root folder of your project:
+### 2. 配置 Babel
+
+在你的 Babel 配置文件（如 `.babelrc` 或 `babel.config.js`）中，添加 `babel-preset-react-app-new` 作为预设：
 
 ```json
 {
-  "presets": ["react-app-new"]
-}
-```
-
-This preset uses the `useBuiltIns` option with [transform-object-rest-spread](https://babeljs.io/docs/plugins/transform-object-rest-spread/) and [transform-react-jsx](https://babeljs.io/docs/plugins/transform-react-jsx/), which assumes that `Object.assign` is available or polyfilled.
-
-## Usage with Flow
-
-Make sure you have a `.flowconfig` file at the root directory. You can also use the `flow` option on `.babelrc`:
-
-```json
-{
-  "presets": [["react-app-new", { "flow": true, "typescript": false }]]
-}
-```
-
-## Usage with TypeScript
-
-Make sure you have a `tsconfig.json` file at the root directory. You can also use the `typescript` option on `.babelrc`:
-
-```json
-{
-  "presets": [["react-app-new", { "flow": false, "typescript": true }]]
-}
-```
-
-## Absolute Runtime Paths
-
-Absolute paths are enabled by default for imports. To use relative paths instead, set the `absoluteRuntime` option in `.babelrc` to `false`:
-
-```
-{
-  "presets": [["react-app-new", { "absoluteRuntime": false }]]
+    "presets": ["react-app-new"]
 }
 ```

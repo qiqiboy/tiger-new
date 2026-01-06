@@ -13,240 +13,10 @@ var spinner = ora();
 
 var ownPath = __dirname;
 
-function appUpgrade(projectName, mode) {
+function appUpgrade(projectName) {
     var root = path.resolve(projectName);
 
-    if (mode === 'application' || (!mode && fs.pathExistsSync(path.join(root, 'scripts')))) {
-        upgradeAppProject(root);
-    } else {
-        upgradePackageProject(root);
-    }
-}
-
-function upgradePackageProject(root) {
-    var package = require(path.resolve(root, 'package.json'));
-    var tsconfig = path.resolve(root, 'tsconfig.json');
-    var pkgTemp = require(path.resolve(ownPath, 'template/package/packageTemp.js'));
-    var newDevDependencies = require(path.join(ownPath, 'template/package/dependencies.json')).devDependencies;
-    var cleanDeps = [
-        '@types/jest',
-        '@babel/cli',
-        '@babel/core',
-        '@babel/runtime',
-        '@typescript-eslint/eslint-plugin',
-        '@typescript-eslint/parser',
-        'babel-eslint',
-        'eslint-config-react-app',
-        'eslint-plugin-flowtype',
-        'eslint-plugin-import',
-        'eslint-plugin-jest',
-        'eslint-plugin-jsx-a11y',
-        'eslint-plugin-react',
-        'eslint-plugin-react-hooks',
-        'eslint-plugin-testing-library',
-        'jest-resolve',
-        'jest-environment-jsdom-fourteen',
-        'rollup-plugin-babel',
-        'rollup-plugin-sourcemaps'
-    ];
-    var cleanFiles = ['eslint.config.js'];
-
-    inquirer
-        .prompt(
-            [
-                {
-                    name: 'upgrade',
-                    type: 'confirm',
-                    message:
-                        '请确认是否要将 ' +
-                        package.name +
-                        ' 升级到最新？\n' +
-                        chalk.dim('1. 向package.json的devDependencies字段下写入需要的依赖') +
-                        '\n' +
-                        chalk.dim('2. 覆盖原来的构建配置 rollup.config.js') +
-                        '\n',
-                    default: true
-                },
-                {
-                    when: function (answers) {
-                        return answers.upgrade && fs.existsSync(tsconfig);
-                    },
-                    name: 'updateTsconfig',
-                    type: 'confirm',
-                    message: '是否更新tsconfig.json？',
-                    default: false
-                },
-                _.some(package.devDependencies, (v, k) => cleanDeps.includes(k)) && {
-                    name: 'cleanDeps',
-                    type: 'confirm',
-                    message: '是否清理过期的devDependencies依赖项？',
-                    default: true
-                }
-            ].filter(Boolean)
-        )
-        .then(function (answers) {
-            if (answers.upgrade) {
-                // clean unused files
-                cleanFiles.forEach(file => {
-                    fs.removeSync(path.resolve(root, file));
-                });
-
-                fs.copySync(
-                    path.resolve(ownPath, 'template/package/rollup.config.js'),
-                    path.resolve(root, 'rollup.config.js'),
-                    {
-                        overwrite: true
-                    }
-                );
-                spinner.succeed(chalk.green('rollup.config.js 已写入！'));
-
-                fs.copySync(path.resolve(ownPath, 'template/package/eslintrc.js'), path.resolve(root, 'eslintrc.js'), {
-                    overwrite: true
-                });
-                spinner.succeed(chalk.green('eslintrc 已写入！'));
-
-                if (!fs.existsSync(tsconfig) || answers.updateTsconfig) {
-                    fs.copySync(path.resolve(ownPath, 'template/package/tsconfig.json'), tsconfig, {
-                        overwrite: true
-                    });
-                    spinner.succeed(chalk.green('tsconfig.json已写入！'));
-                }
-
-                fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
-                    overwrite: true
-                });
-                spinner.succeed(chalk.green('jest配置 已更新！'));
-
-                if (!fs.existsSync(path.resolve(root, 'jest'))) {
-                    fs.copySync(path.resolve(ownPath, 'template/package/jest'), path.resolve(root, 'jest'), {
-                        overwrite: true
-                    });
-                }
-
-                if (answers.cleanDeps) {
-                    cleanDeps.forEach(key => {
-                        delete package.devDependencies[key];
-                    });
-                }
-
-                ['build:bundle', 'build:declaration', 'clear', 'lint'].forEach(name => {
-                    if (package.scripts[name]) {
-                        delete package.scripts[name];
-                    }
-                });
-
-                if (
-                    !package.scripts.build ||
-                    /build:bundle|build:declaration|npm run lint/.test(package.scripts.build)
-                ) {
-                    package.scripts.build = pkgTemp.scripts.build;
-                }
-
-                if (!package.scripts.test) {
-                    package.scripts.test = pkgTemp.scripts.test;
-                }
-
-                if (!package.prettier) {
-                    package.prettier = pkgTemp.prettier;
-                } else {
-                    if (!package.prettier.arrowParens) {
-                        package.prettier.arrowParens = pkgTemp.prettier.arrowParens;
-                    }
-
-                    if (package.prettier.jsxBracketSameLine) {
-                        delete package.prettier.jsxBracketSameLine;
-                        package.prettier.bracketSameLine = pkgTemp.prettier.bracketSameLine;
-                    }
-                }
-
-                if (
-                    !package.eslintConfig ||
-                    !package.eslintConfig.extends ||
-                    package.eslintConfig.extends.indexOf('react-app-new') < 0
-                ) {
-                    package.eslintConfig = pkgTemp.eslintConfig;
-                }
-
-                if (!package.husky) {
-                    package.husky = pkgTemp.husky;
-                } else {
-                    if (!package.husky.hooks['commit-msg']) {
-                        package.husky.hooks['commit-msg'] = pkgTemp.husky.hooks['commit-msg'];
-                    }
-
-                    if (!package.husky.hooks['pre-commit']) {
-                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
-                    }
-                }
-
-                if (!package.commitlint) {
-                    package['commitlint'] = pkgTemp['commitlint'];
-                }
-
-                if (!package['lint-staged']) {
-                    package['lint-staged'] = pkgTemp['lint-staged'];
-                } else {
-                    package['lint-staged'] = _.mapKeys(package['lint-staged'], (value, key) => {
-                        if (value.indexOf('git add') > -1) {
-                            value.splice(value.indexOf('git add'), 1);
-                        }
-
-                        if (!/\,tests/.test(key)) {
-                            return key.replace(/^\{(.*)\}\//, '{$1,tests}/');
-                        }
-
-                        return key;
-                    });
-                }
-
-                if (!package.scripts.test) {
-                    package.scripts.test = pkgTemp.scripts.test;
-                }
-
-                if (!package.scripts.tsc) {
-                    package.scripts.tsc = pkgTemp.scripts.tsc;
-                }
-
-                if (!package.stylelint) {
-                    package['stylelint'] = pkgTemp['stylelint'];
-                }
-
-                if (!package.browserslist) {
-                    package['browserslist'] = pkgTemp['browserslist'];
-                }
-
-                if (!package.config) {
-                    package.config = {};
-                }
-
-                if (!package.config.commitizen) {
-                    package.config.commitizen = pkgTemp.config.commitizen;
-                }
-
-                package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
-                    'tiger-new': ownPkg.version
-                });
-
-                fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(package, null, 2));
-
-                process.chdir(root);
-
-                install(
-                    Object.keys(newDevDependencies).map(function (key) {
-                        return !newDevDependencies[key] || newDevDependencies[key] === 'latest'
-                            ? key
-                            : key + '@' + newDevDependencies[key];
-                    }),
-                    true,
-                    function () {
-                        console.log();
-                        spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');
-                    }
-                );
-            } else {
-                spinner.fail('升级已取消！');
-            }
-        });
+    upgradeAppProject(root);
 }
 
 function upgradeAppProject(root) {
@@ -260,6 +30,8 @@ function upgradeAppProject(root) {
     var tsconfigLocal = path.resolve(root, 'tsconfig.local.json');
     var tslint = path.resolve(root, 'tslint.json');
     var globalDeclare = path.resolve(root, 'global.d.ts');
+    var eslintConfig = path.resolve(root, 'eslint.config.js');
+    var husky = path.resolve(root, '.husky');
 
     if (!fs.existsSync(root)) {
         spinner.fail(chalk.red(root) + ' 貌似不存在！');
@@ -272,12 +44,16 @@ function upgradeAppProject(root) {
     }
 
     var package = require(packageJson);
-
     var newDependenciesConfig = require(path.join(ownPath, 'template/application/dependencies.json'));
-    var newDevDependencies = newDependenciesConfig.devDependencies;
-    var patchDeps = ['url', 'raf-dom', 'react', 'react-dom', 'prop-types'].map(dep =>
-        newDependenciesConfig.dependencies[dep] !== 'latest' ? dep + '@' + newDependenciesConfig.dependencies[dep] : dep
-    );
+
+    var pickDependencies = function (keys, type) {
+        const dependencies = newDependenciesConfig[type || 'dependencies'] || {};
+
+        return keys.map(function (key) {
+            return !dependencies[key] || dependencies[key] === 'latest' ? key : key + '@' + dependencies[key];
+        });
+    };
+
     var cleanDeps = [
         'ali-oss',
         'ora',
@@ -286,6 +62,7 @@ function upgradeAppProject(root) {
         'rsync',
         'raf-dom',
         'eslint-loader',
+        'tslib',
         'raw-loader',
         'url-loader',
         'imagemin-webpack-plugin',
@@ -310,9 +87,29 @@ function upgradeAppProject(root) {
         'eslint-plugin-jsx-a11y',
         'eslint-plugin-react',
         'eslint-plugin-react-hooks',
-        'eslint-plugin-testing-library'
+        'eslint-plugin-testing-library',
+        'source-map-loader',
+        'babel-plugin-named-asset-import',
+        'source-map-loader',
+        'html-webpack-plugin',
+        '@pmmmwh/react-refresh-webpack-plugin',
+        'case-sensitive-paths-webpack-plugin',
+        'fork-ts-checker-webpack-plugin',
+        'css-minimizer-webpack-plugin',
+        'directory-named-webpack-plugin',
+        'eslint-webpack-plugin',
+        'mini-css-extract-plugin',
+        'terser-webpack-plugin',
+        'webpack-node-externals',
+        'postcss-flexbugs-fixes'
     ];
-    var cleanFiles = ['config/tslintrc.json', 'config/checkMissDependencies.js'];
+    var cleanFiles = [
+        'scripts/config/tslintrc.json',
+        'scripts/config/eslintrc.js',
+        'scripts/config/checkMissDependencies.js',
+        '.tern-project',
+        '.tern-webpack-config.js'
+    ];
 
     inquirer
         .prompt([
@@ -373,6 +170,15 @@ function upgradeAppProject(root) {
                     });
                 }
 
+                if (!package.husky) {
+                    questions.push({
+                        name: 'updateHusky',
+                        type: 'confirm',
+                        message: '是否更新husky？',
+                        default: false
+                    });
+                }
+
                 if (!package.locals || !package.scripts['i18n-scan']) {
                     questions.push(
                         {
@@ -426,12 +232,12 @@ function upgradeAppProject(root) {
                 }
 
                 try {
-                    if (package.dependencies && semver.lt(package.dependencies.react || '0.0.0', '17.0.0')) {
+                    if (package.dependencies && semver.lt(package.dependencies.react || '0.0.0', '19.0.0')) {
                         questions.push({
                             name: 'upgradeReact',
                             type: 'confirm',
-                            message: '是否升级react@17.x ？',
-                            default: true
+                            message: '是否升级react@19.x ？',
+                            default: false
                         });
                     }
                 } catch (e) {}
@@ -450,7 +256,7 @@ function upgradeAppProject(root) {
 
                     // clean unused files
                     cleanFiles.forEach(file => {
-                        fs.removeSync(path.resolve(root, 'scripts', file));
+                        fs.removeSync(path.resolve(root, file));
                     });
 
                     copyScripts(root);
@@ -479,11 +285,17 @@ function upgradeAppProject(root) {
                         spinner.succeed(chalk.green('tsconfig.json已写入！'));
                     }
 
-                    const tsconfigJson = fs.readJsonSync(tsconfig);
+                    var tsconfigJson = fs.readJsonSync(tsconfig);
+                    var tscUpdated = false;
 
-                    if (tsconfigJson.compilerOptions.suppressImplicitAnyIndexErrors) {
-                        delete tsconfigJson.compilerOptions.suppressImplicitAnyIndexErrors;
+                    ['suppressImplicitAnyIndexErrors', 'importHelpers'].forEach(option => {
+                        if (tsconfigJson.compilerOptions[option]) {
+                            delete tsconfigJson.compilerOptions[option];
+                            tscUpdated = true;
+                        }
+                    });
 
+                    if (tscUpdated) {
                         fs.outputJsonSync(tsconfig, tsconfigJson, {
                             spaces: 2
                         });
@@ -522,6 +334,12 @@ function upgradeAppProject(root) {
                         });
                     }
 
+                    if (!fs.existsSync(eslintConfig)) {
+                        fs.copySync(path.resolve(ownPath, 'template/application/eslint.config.js'), eslintConfig, {
+                            overwrite: true
+                        });
+                    }
+
                     if (answers.addJestMocks) {
                         fs.copySync(
                             path.resolve(ownPath, 'template/application/tests/__mocks__/axios'),
@@ -539,41 +357,27 @@ function upgradeAppProject(root) {
                         spinner.succeed(chalk.green('过时的 webpack.config.*.js 文件已移除！'));
                     }
 
-                    if (!package.husky) {
-                        package.husky = {
-                            hooks: {}
-                        };
+                    if (package.scripts.tsc) {
+                        delete package.scripts.tsc;
+                    }
 
-                        if (package.scripts.precommit) {
-                            delete package.scripts.precommit;
-                            package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
-                        }
+                    if (package.husky || answers.updateHusky) {
+                        delete package.husky;
 
-                        if (package.scripts.commitmsg) {
-                            delete package.scripts.commitmsg;
-                            package.husky.hooks['commit-msg'] = pkgTemp.husky.hooks['commit-msg'];
-                        }
+                        fs.copySync(path.resolve(ownPath, 'template/application/husky'), husky, {
+                            overwrite: true
+                        });
+
+                        spinner.succeed(chalk.green('已升级 husky 到v9 ！'));
                     }
 
                     if (answers.addPrettier) {
-                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
                         package.prettier = pkgTemp.prettier;
                     }
 
                     if (answers.addCommitlint) {
-                        package.husky.hooks['commit-msg'] = pkgTemp.husky.hooks['commit-msg'];
                         package.commitlint = pkgTemp.commitlint;
                     }
-
-                    if (!package.husky.hooks['pre-push']) {
-                        package.husky.hooks['pre-push'] = pkgTemp.husky.hooks['pre-push'];
-                    }
-
-                    ['pre-commit', 'pre-push'].forEach(function (hook) {
-                        if (!/NODE_ENV=/.test(package.husky.hooks[hook])) {
-                            package.husky.hooks[hook] = pkgTemp.husky.hooks[hook];
-                        }
-                    });
 
                     if (package.babel) {
                         if (package.babel.presets) {
@@ -606,12 +410,8 @@ function upgradeAppProject(root) {
                         package['browserslist'] = pkgTemp['browserslist'];
                     }
 
-                    if (
-                        !package.eslintConfig ||
-                        !package.eslintConfig.extends ||
-                        package.eslintConfig.extends.indexOf('react-app-new') < 0
-                    ) {
-                        package.eslintConfig = pkgTemp.eslintConfig;
+                    if (package.eslintConfig) {
+                        delete package.eslintConfig;
                     }
 
                     if (answers.addLocals) {
@@ -719,25 +519,6 @@ function upgradeAppProject(root) {
                         }
                     });
 
-                    if (!package.scripts.tsc || /^node -pe/.test(package.scripts.tsc)) {
-                        package.scripts.tsc = pkgTemp.scripts.tsc;
-                        package.husky.hooks['pre-commit'] = pkgTemp.husky.hooks['pre-commit'];
-
-                        try {
-                            var gitignorePath = path.join(root, '.gitignore');
-                            var gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
-
-                            if (gitignoreContent.split(/\n+/g).indexOf('.git-tsconfig.json') < 0) {
-                                fs.outputFileSync(
-                                    gitignorePath,
-                                    gitignoreContent.replace(/[\s\n]+$/, '') +
-                                        '\n\n# git pre-commit tsc lint\n' +
-                                        '.git-tsconfig.json'
-                                );
-                            }
-                        } catch (err) {}
-                    }
-
                     package.engines = Object.assign({}, package.engines, pkgTemp.engines, {
                         'tiger-new': ownPkg.version
                     });
@@ -748,32 +529,56 @@ function upgradeAppProject(root) {
 
                     Promise.all([
                         install(
-                            Object.keys(newDevDependencies).map(function (key) {
-                                return !newDevDependencies[key] || newDevDependencies[key] === 'latest'
-                                    ? key
-                                    : key + '@' + newDevDependencies[key];
-                            }),
+                            pickDependencies(
+                                _.difference(Object.keys(newDependenciesConfig.devDependencies), [
+                                    '@types/react',
+                                    '@types/react-dom'
+                                ]),
+                                'devDependencies'
+                            ),
                             true,
                             function () {
                                 console.log();
                                 spinner.succeed('项目开发依赖已更新！');
                                 console.log();
                             }
-                        ),
-                        install(patchDeps, false)
+                        )
                     ])
                         .then(function () {
                             if (answers.upgradeReact) {
-                                return install(
-                                    ['react@latest', 'react-dom@latest', 'react-formutil@latest'],
-                                    false,
-                                    function () {
-                                        console.log();
-                                        spinner.succeed('升级react成功！');
-                                        console.log();
-                                    }
-                                );
+                                return Promise.all([
+                                    install(
+                                        pickDependencies(['react', 'react-dom', 'react-formutil'], 'dependencies'),
+                                        false
+                                    ),
+                                    install(
+                                        pickDependencies(['@types/react', '@types/react-dom', 'devDependencies']),
+                                        true
+                                    )
+                                ]).then(function () {
+                                    console.log();
+                                    spinner.succeed('升级react成功！');
+                                    console.log();
+                                });
                             }
+                        })
+                        .then(function () {
+                            try {
+                                const react = require(require.resolve('react', { paths: [root] }));
+                                const reactVersion = react.version;
+
+                                if (semver.lt(reactVersion, '19.0.0')) {
+                                    return install(
+                                        pickDependencies(['react-compiler-runtime'], 'extraDependencies'),
+                                        false,
+                                        function () {
+                                            console.log();
+                                            spinner.succeed('安装 react-compiler-runtime成功！');
+                                            console.log();
+                                        }
+                                    );
+                                }
+                            } catch {}
                         })
                         .then(function () {
                             spinner.succeed('恭喜！项目升级成功！全部依赖已成功重新安装！');

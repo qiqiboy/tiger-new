@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: 0 */
 const execSync = require('child_process').execSync;
 const path = require('path');
 const fs = require('fs-extra');
@@ -9,8 +8,6 @@ const getPublicUrlOrPath = require('tiger-new-utils/getPublicUrlOrPath');
 
 const isDev = process.env.NODE_ENV === 'development';
 
-// Make sure any symlinks in the project folder are resolved:
-// https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
 const nodePaths = (process.env.NODE_PATH || '')
     .split(path.delimiter)
@@ -27,6 +24,26 @@ const publicUrlOrPath = getPublicUrlOrPath(
 );
 const moduleFileExtensions = ['mjs', 'js', 'ts', 'tsx', 'jsx'];
 
+const reactVersion = (() => {
+    try {
+        const react = require(require.resolve('react'));
+
+        return react.version;
+    } catch {}
+
+    return (pkg.dependencies && pkg.dependencies.react && pkg.dependencies.react.replace(/^[^\d]*/, '')) || '19.0.0';
+})();
+
+const useReactRefresh = (() => {
+    try {
+        if (process.env.DISABLE_FAST_REFRESH !== 'true') {
+            return semver.gte(reactVersion, '16.9.0');
+        }
+    } catch {}
+
+    return false;
+})();
+
 const hasJsxRuntime = (() => {
     try {
         if (process.env.DISABLE_NEW_JSX_TRANSFORM !== 'true') {
@@ -34,21 +51,11 @@ const hasJsxRuntime = (() => {
 
             return true;
         }
-    } catch (e) {}
 
-    return false;
-})();
+        return false;
+    } catch {}
 
-const useReactRefresh = (() => {
-    try {
-        if (process.env.DISABLE_FAST_REFRESH !== 'true') {
-            const react = require(require.resolve('react'));
-
-            return semver.gt(react.version, '16.9.0');
-        }
-    } catch (e) {}
-
-    return false;
+    return semver.gte(reactVersion, '17.0.0');
 })();
 
 const webModuleFileExtensions = moduleFileExtensions.map(ext => `web.${ext}`).concat(moduleFileExtensions, 'json');
@@ -145,7 +152,8 @@ module.exports = {
     npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
     useNodeEnv,
     hasJsxRuntime,
-    useReactRefresh
+    useReactRefresh,
+    reactVersion
 };
 
 function hasInstall(command) {

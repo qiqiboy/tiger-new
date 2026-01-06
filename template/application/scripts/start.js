@@ -90,9 +90,16 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
             const serverConfig = createDevServerConfig(proxyConfig, urls.lanUrlForConfig, HOST, port, spinner);
             const devServer = new WebpackDevServer(serverConfig, compiler);
 
-            devServer.startCallback(() => {
+            devServer.startCallback(err => {
                 if (isInteractive) {
                     clearConsole();
+                }
+
+                if (err) {
+                    spinner.fail(chalk.red('无法启动测试服务器:'));
+                    console.log(err);
+
+                    process.exit();
                 }
 
                 spinner.text = chalk.cyan('正在启动测试服务器...');
@@ -102,15 +109,18 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
             ['SIGINT', 'SIGTERM'].forEach(function(sig) {
                 process.on(sig, function() {
                     spinner.stop();
-                    devServer.close();
-                    process.exit();
+
+                    devServer.stopCallback(() => {
+                        process.exit();
+                    });
                 });
             });
 
             if (isInteractive || process.env.CI !== 'true') {
                 process.stdin.on('end', function() {
-                    devServer.close();
-                    process.exit();
+                    devServer.stopCallback(() => {
+                        process.exit();
+                    });
                 });
 
                 process.stdin.resume();

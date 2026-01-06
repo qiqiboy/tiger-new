@@ -20,6 +20,15 @@ const validateBoolOption = (name, value, defaultValue) => {
     return value;
 };
 
+const hasJsxRuntime = (() => {
+    try {
+        require.resolve('react/jsx-runtime');
+        return true;
+    } catch {
+        return false;
+    }
+})();
+
 module.exports = function (api, opts, env) {
     if (!opts) {
         opts = {};
@@ -30,7 +39,6 @@ module.exports = function (api, opts, env) {
     var isEnvTest = env === 'test';
 
     var useESModules = validateBoolOption('useESModules', opts.useESModules, isEnvDevelopment || isEnvProduction);
-    var isFlowEnabled = validateBoolOption('flow', opts.flow, true);
     var isTypeScriptEnabled = validateBoolOption('typescript', opts.typescript, true);
     var areHelpersEnabled = validateBoolOption('helpers', opts.helpers, true);
     var useAbsoluteRuntime = validateBoolOption('absoluteRuntime', opts.absoluteRuntime, true);
@@ -39,6 +47,8 @@ module.exports = function (api, opts, env) {
     if (useAbsoluteRuntime) {
         absoluteRuntimePath = path.dirname(require.resolve('@babel/runtime/package.json'));
     }
+
+    var reactRuntime = opts.runtime || (hasJsxRuntime ? 'automatic' : 'classic');
 
     var corejsVerson = '3.31';
 
@@ -57,6 +67,10 @@ module.exports = function (api, opts, env) {
     }
 
     return {
+        assumptions: {
+            setPublicClassFields: true,
+            privateFieldsAsProperties: true
+        },
         presets: [
             isEnvTest && [
                 // ES features necessary for user's Node version
@@ -90,27 +104,15 @@ module.exports = function (api, opts, env) {
                     development: isEnvDevelopment || isEnvTest,
                     // Will use the native built-in instead of trying to polyfill
                     // behavior for any plugins that require one.
-                    ...(opts.runtime !== 'automatic' ? { useBuiltIns: true } : {}),
-                    runtime: opts.runtime || 'classic'
+                    ...(reactRuntime !== 'automatic' ? { useBuiltIns: true } : {}),
+                    runtime: reactRuntime
                 }
             ],
             isTypeScriptEnabled && [require('@babel/preset-typescript').default]
         ].filter(Boolean),
         plugins: [
             [require('@babel/plugin-proposal-decorators').default, { legacy: true }],
-            [
-                require('@babel/plugin-transform-class-properties').default,
-                {
-                    loose: true
-                }
-            ],
-            [require('@babel/plugin-transform-private-methods').default, { loose: true }],
-            [
-                require('@babel/plugin-proposal-private-property-in-object').default,
-                {
-                    loose: true
-                }
-            ],
+            [require('@babel/plugin-transform-class-properties').default],
             // Polyfills the runtime needed for async/await, generators, and friends
             // https://babeljs.io/docs/en/babel-plugin-transform-runtime
             [

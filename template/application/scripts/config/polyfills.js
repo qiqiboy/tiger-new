@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: 0 */
 if (typeof window !== 'undefined') {
     // classList
     require('classlist-polyfill');

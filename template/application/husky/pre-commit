@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -e
+
+npx lint-staged
+
+export STAGED_FILES=$(git diff --name-only --diff-filter AM --relative --staged | grep -E '\.tsx?$'  || true)
+
+if [ -z "$STAGED_FILES" ]; then
+  echo "✔ No staged files for TS checking"
+  exit 0
+fi
+
+node <<'EOF'
+const fs = require('fs-extra');
+
+const staged = process.env.STAGED_FILES
+  .split(/\n+/)
+  .filter(Boolean);
+
+fs.outputJsonSync(
+  '.git-tsconfig.json',
+  {
+    extends: './tsconfig.json',
+    include: [
+      '*.d.ts',
+      'app/utils/i18n/*',
+      ...staged
+    ]
+  }
+);
+EOF
+
+echo "TS checking..."
+npx tsc -p .git-tsconfig.json --checkJs false

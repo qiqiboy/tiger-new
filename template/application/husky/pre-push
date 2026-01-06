@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+CHANGED_FILES=$(git diff --diff-filter=AM --name-only @{u}.. 2>/dev/null || git diff --diff-filter=AM --name-only origin/master...HEAD)
+
+FILES=$(echo "$CHANGED_FILES" | grep -E '^app/.*\.m?[jt]sx?$' || true)
+
+if [ -z "$FILES" ]; then
+  echo "✔ No files changed"
+  exit 0
+fi
+
+NODE_ENV=production npx eslint --max-warnings 0 $FILES

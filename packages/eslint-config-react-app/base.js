@@ -1,56 +1,35 @@
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
+const react = require('eslint-plugin-react');
+const babelParser = require('@babel/eslint-parser');
+const globals = require('globals');
 
-// Fix eslint shareable config (https://github.com/eslint/eslint/issues/3458)
-require('@rushstack/eslint-patch/modern-module-resolution');
+if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'development';
+}
 
-// This file contains the minimum ESLint configuration required for Create
-// React App support, and is used as the `baseConfig` for `eslint-loader`
-// to ensure that user-provided configs don't need this boilerplate.
-
-module.exports = {
-    root: true,
-
-    parser: '@babel/eslint-parser',
-
-    plugins: ['react'],
-
-    env: {
-        browser: true,
-        commonjs: true,
-        es6: true,
-        jest: true,
-        node: true
-    },
-
-    parserOptions: {
-        sourceType: 'module',
-        requireConfigFile: false,
-        babelOptions: {
-            presets: [require.resolve('babel-preset-react-app-new/prod')],
-            plugins: [
-                [
-                    '@babel/plugin-proposal-decorators',
-                    {
-                        legacy: true
-                    }
-                ]
-            ]
+module.exports = [
+    {
+        languageOptions: {
+            parser: babelParser,
+            parserOptions: {
+                requireConfigFile: false,
+                sourceType: 'module',
+                babelOptions: {
+                    babelrc: false,
+                    configFile: false,
+                    presets: [require.resolve('babel-preset-react-app-new/prod')]
+                }
+            },
+            // true means writeable, false means readonly, 'off' means disabled
+            globals: {
+                ...globals.browser,
+                ...globals.node,
+                ...globals.commonjs,
+                ...globals.es2018,
+                __: 'readonly',
+                __SSR__: 'readonly',
+                __DEV__: 'readonly',
+                __LOCAL_DEV__: 'readonly'
+            }
         }
-    },
-
-    settings: {
-        react: {
-            version: 'detect'
-        }
-    },
-
-    rules: {
-        'react/jsx-uses-vars': 'warn',
-        'react/jsx-uses-react': 'warn'
     }
-};
+];

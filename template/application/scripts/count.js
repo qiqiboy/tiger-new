@@ -1,4 +1,3 @@
-/* eslint @typescript-eslint/no-var-requires: 0 */
 const { execSync } = require('child_process');
 const fs = require('fs');
 const chalk = require('tiger-new-utils/chalk');
