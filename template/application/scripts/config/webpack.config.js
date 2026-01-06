@@ -1,24 +1,24 @@
 const fs = require('fs');
 const path = require('path');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const DirectoryNamedWebpackPlugin = require('directory-named-webpack-plugin');
-const ESLintPlugin = require('eslint-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const resolve = require('resolve');
-const TerserPlugin = require('terser-webpack-plugin');
+const CaseSensitivePathsPlugin = require('tiger-new-utils/CaseSensitivePathsWebpackPlugin');
 const createEnvironmentHash = require('tiger-new-utils/createEnvironmentHash');
+const CssMinimizerPlugin = require('tiger-new-utils/CssMinimizerWebpackPlugin');
+const DirectoryNamedWebpackPlugin = require('tiger-new-utils/DirectoryNamedWebpackPlugin');
+const ESLintPlugin = require('tiger-new-utils/EslintWebpackPlugin');
 const ForkTsCheckerWebpackPlugin = require('tiger-new-utils/ForkTsCheckerWebpackPlugin');
 const getCSSModuleLocalIdent = require('tiger-new-utils/getCSSModuleLocalIdent');
+const HtmlWebpackPlugin = require('tiger-new-utils/HtmlWebpackPlugin');
 const ImageMinimizerPlugin = require('tiger-new-utils/ImageMinimizerPlugin');
 const InlineChunkHtmlPlugin = require('tiger-new-utils/InlineChunkHtmlPlugin');
 const InterpolateHtmlPlugin = require('tiger-new-utils/InterpolateHtmlPlugin');
+const MiniCssExtractPlugin = require('tiger-new-utils/MiniCssExtractPlugin');
 const ModuleNotFoundPlugin = require('tiger-new-utils/ModuleNotFoundPlugin');
+const ReactRefreshWebpackPlugin = require('tiger-new-utils/ReactRefreshWebpackPlugin');
+const TerserPlugin = require('tiger-new-utils/TerserWebpackPlugin');
 const typescriptFormatter = require('tiger-new-utils/typescriptFormatter');
+const nodeExternals = require('tiger-new-utils/webpackNodeExternals');
 const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
 const getClientEnvironment = require('./env');
 const htmlAttrsOptions = require('./htmlAttrsOptions');
 const paths = require('./paths');
@@ -50,6 +50,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
     const shouldUseSW = process.env.GENERATE_SW === 'true' || !!pkg.pwa;
     const shouldUseReactRefresh = paths.useReactRefresh;
     const shouldUseWebpackCache = process.env.DISABLE_WEBPACK_CACHE !== 'true';
+    const shouldUseReactCompiler = process.env.DISABLE_REACT_COMPILER !== 'true';
 
     const env = getClientEnvironment({
         PUBLIC_URL: paths.publicUrlOrPath.slice(0, -1),
@@ -128,7 +129,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                     mediaQuery: false
                                 }
                             ],
-                            'postcss-flexbugs-fixes',
                             [
                                 'postcss-preset-env',
                                 {
@@ -239,7 +239,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         ? 'source-map'
                         : 'hidden-source-map'
                     : 'cheap-module-source-map'
-                : 'cheap-module-source-map'
+                : 'eval-cheap-module-source-map'
             : false,
         entry: isEnvNode
             ? paths.nodeEntries
@@ -395,12 +395,6 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         module: {
             strictExportPresence: true,
             rules: [
-                shouldUseSourceMap && {
-                    enforce: 'pre',
-                    exclude: /@babel(?:\/|\\{1,2})runtime/,
-                    test: /\.(js|mjs|jsx|ts|tsx|css)$/,
-                    use: require.resolve('source-map-loader')
-                },
                 {
                     oneOf: [
                         {
@@ -461,18 +455,28 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                                 ],
                                 plugins: [
                                     require.resolve('babel-plugin-auto-css-modules-flag'),
+                                    shouldUseReactCompiler && [
+                                        require.resolve('babel-plugin-react-compiler'),
+                                        // https://react.dev/reference/react-compiler/configuration
+                                        {
+                                            compilationMode: 'infer',
+                                            target: paths.reactVersion.split('.')[0]
+                                        }
+                                    ],
                                     !isBuilding && isEnvWeb && shouldUseReactRefresh && 'react-refresh/babel'
                                 ].filter(Boolean),
                                 cacheDirectory: true,
                                 cacheCompression: false,
                                 compact: isEnvProduction
-                            }
+                            },
+                            extractSourceMap: true
                         },
                         {
                             test: /\.(js|mjs)$/,
                             exclude: /@babel(?:\/|\\{1,2})runtime/,
                             loader: require.resolve('babel-loader'),
-                            options: babelOption
+                            options: babelOption,
+                            extractSourceMap: true
                         },
                         {
                             test: cssRegex,
@@ -487,11 +491,11 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         {
                             test: sassRegex,
                             resourceQuery: /modules/,
-                            use: getStyleLoaders( true, 'sass-loader')
+                            use: getStyleLoaders(true, 'sass-loader')
                         },
                         {
                             test: sassRegex,
-                            use: getStyleLoaders( false, 'sass-loader'),
+                            use: getStyleLoaders(false, 'sass-loader'),
                             sideEffects: true
                         },
                         {
@@ -501,7 +505,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         },
                         {
                             test: lessRegex,
-                            use: getStyleLoaders( false, 'less-loader'),
+                            use: getStyleLoaders(false, 'less-loader'),
                             sideEffects: true
                         },
                         {
@@ -558,10 +562,12 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                     }
                 }),
             new ESLintPlugin({
+                configType: 'flat',
                 extensions: ['js', 'mjs', 'jsx', 'ts', 'tsx'],
                 formatter: require.resolve('tiger-new-utils/eslintFormatter'),
                 eslintPath: require.resolve('eslint'),
                 context: paths.appSrc,
+                failOnError: isBuilding,
                 cache: true,
                 cacheLocation: path.resolve(paths.appNodeModules, '.cache/eslint'),
                 cwd: paths.root,
@@ -574,7 +580,7 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         typescriptPath: resolve.sync('typescript', {
                             basedir: paths.appNodeModules
                         }),
-                        mode: 'write-references',
+                        mode: 'readonly',
                         configFile: paths.appTsConfig,
                         context: paths.root,
                         configOverwrite: {
@@ -605,7 +611,8 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
                         diagnosticOptions: { syntactic: true, semantic: true, declaration: false, global: false }
                     },
                     async: !isBuilding,
-                    logger: { infrastructure: 'silent', issues: 'silent', devServer: false },
+                    logger: { log: () => {}, error: () => {} },
+                    devServer: false,
                     formatter: isBuilding ? typescriptFormatter : undefined
                 }),
             isBuilding &&
@@ -619,6 +626,9 @@ module.exports = function(webpackEnv, executionEnv = 'web') {
         stats: 'none',
         snapshot: {
             managedPaths: [/node_modules\/.*\/(node_modules)/]
+        },
+        watchOptions: {
+            ignored: /node_modules/
         },
         // Turn off performance processing because we utilize
         // our own hints via the FileSizeReporter

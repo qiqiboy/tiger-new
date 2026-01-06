@@ -39,12 +39,20 @@ const hasJsxRuntime = (() => {
     return false;
 })();
 
+const reactVersion = (() => {
+    try {
+        const react = require(require.resolve('react'));
+
+        return react.version;
+    } catch {
+        return '19.0.0';
+    }
+})();
+
 const useReactRefresh = (() => {
     try {
         if (process.env.DISABLE_FAST_REFRESH !== 'true') {
-            const react = require(require.resolve('react'));
-
-            return semver.gt(react.version, '16.9.0');
+            return semver.gte(reactVersion, '16.9.0');
         }
     } catch (e) {}
 
@@ -61,7 +69,7 @@ function resolveApp(...relativePaths) {
 const webJSEntries = {};
 const nodeJSEntries = {};
 
-glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function(file) {
+glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function (file) {
     const basename = path.basename(file).replace(/(\.web|\.node)?\.[jt]sx?$/, '');
 
     if (/\.node\.[jt]sx?$/.test(file)) {
@@ -74,7 +82,7 @@ glob.sync(resolveApp('app/!(_)*.{j,t}s?(x)')).forEach(function(file) {
 const webHtmlEntries = {};
 const nodeHtmlEntries = {};
 
-glob.sync(resolveApp('public/!(_)*.html')).forEach(function(file) {
+glob.sync(resolveApp('public/!(_)*.html')).forEach(function (file) {
     const basename = path.basename(file).replace(/(\.web|\.node)?\.html$/, '');
 
     if (/\.node\.html$/.test(file)) {
@@ -93,7 +101,7 @@ const moduleAlias = Object.assign(
         },
         { app: resolveApp('app') }
     ),
-    lodash.mapValues(pkg.alias, function(relativePath) {
+    lodash.mapValues(pkg.alias, function (relativePath) {
         if (fs.pathExistsSync(resolveApp(relativePath))) {
             return resolveApp(relativePath);
         }
@@ -145,7 +153,8 @@ module.exports = {
     npmCommander: ['tnpm', 'cnpm', 'npm'].find(hasInstall),
     useNodeEnv,
     hasJsxRuntime,
-    useReactRefresh
+    useReactRefresh,
+    reactVersion
 };
 
 function hasInstall(command) {

@@ -99,7 +99,7 @@ const setlangByStorage = (key, lang) => localStorage.setItem(key, lang);
  * 注意，在server端，所有用户共享默认的同一种语言。server端应当通过withI18n高阶组件调用i18n对象，
  * 并且所有的语言文案都应当在组件生命周期内创建，即不可直接声明组件外的变量作为多语言文案
  */
-let defaultI18n = isBrowser
+const defaultI18n = isBrowser
     ? createI18n(window.location.href, window.navigator.language)
     : createI18n('/', allowedLangs[0], () => '');
 

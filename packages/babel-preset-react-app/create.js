@@ -30,7 +30,6 @@ module.exports = function (api, opts, env) {
     var isEnvTest = env === 'test';
 
     var useESModules = validateBoolOption('useESModules', opts.useESModules, isEnvDevelopment || isEnvProduction);
-    var isFlowEnabled = validateBoolOption('flow', opts.flow, true);
     var isTypeScriptEnabled = validateBoolOption('typescript', opts.typescript, true);
     var areHelpersEnabled = validateBoolOption('helpers', opts.helpers, true);
     var useAbsoluteRuntime = validateBoolOption('absoluteRuntime', opts.absoluteRuntime, true);
@@ -57,6 +56,11 @@ module.exports = function (api, opts, env) {
     }
 
     return {
+        assumptions: {
+            setPublicClassFields: true,
+            privateFieldsAsProperties: true,
+            setPublicClassFields: true
+        },
         presets: [
             isEnvTest && [
                 // ES features necessary for user's Node version
@@ -98,19 +102,6 @@ module.exports = function (api, opts, env) {
         ].filter(Boolean),
         plugins: [
             [require('@babel/plugin-proposal-decorators').default, { legacy: true }],
-            [
-                require('@babel/plugin-transform-class-properties').default,
-                {
-                    loose: true
-                }
-            ],
-            [require('@babel/plugin-transform-private-methods').default, { loose: true }],
-            [
-                require('@babel/plugin-proposal-private-property-in-object').default,
-                {
-                    loose: true
-                }
-            ],
             // Polyfills the runtime needed for async/await, generators, and friends
             // https://babeljs.io/docs/en/babel-plugin-transform-runtime
             [

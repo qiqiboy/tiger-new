@@ -26,9 +26,6 @@ module.exports = {
                 'CF=$(git diff --diff-filter AM --name-only @{u}..) || CF=$(git diff --diff-filter AM --name-only origin/master...HEAD); FILES=$(echo "$CF" | grep -E \'^app/.*\\.m?[jt]sx?$\'); if [ -n "$FILES" ]; then NODE_ENV=production eslint $FILES --max-warnings 0; fi'
         }
     },
-    eslintConfig: {
-        extends: ['react-app-new', 'react-app-new/jest', './scripts/config/eslintrc.js']
-    },
     commitlint: {
         extends: ['@commitlint/config-conventional'],
         rules: {
@@ -68,5 +65,5 @@ module.exports = {
     stylelint: {
         extends: 'stylelint-config-recommended'
     },
-    engines: { node: '>=12.0.0' }
+    engines: { node: '>=18.20.0' }
 };

@@ -12,23 +12,23 @@ const address = require('address');
 const chalk = require('chalk');
 const detect = require('detect-port-alt');
 const clearConsole = require('./clearConsole');
-const formatWebpackMessages = require('./formatWebpackMessages');
-const typescriptFormatter = require('./typescriptFormatter.js');
-const getProcessForPort = require('./getProcessForPort');
 const forkTsCheckerWebpackPlugin = require('./ForkTsCheckerWebpackPlugin');
+const formatWebpackMessages = require('./formatWebpackMessages');
+const getProcessForPort = require('./getProcessForPort');
 const inquirer = require('./inquirer');
+const typescriptFormatter = require('./typescriptFormatter.js');
 
 const isInteractive = process.stdout.isTTY;
 
 function prepareUrls(protocol, host, port, pathname = '/') {
-    const formatUrl = (hostname) =>
+    const formatUrl = hostname =>
         url.format({
             protocol,
             hostname,
             port,
             pathname
         });
-    const prettyPrintUrl = (hostname) =>
+    const prettyPrintUrl = hostname =>
         url.format({
             protocol,
             hostname,
@@ -78,6 +78,23 @@ function prepareUrls(protocol, host, port, pathname = '/') {
 function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, webpack, spinner }) {
     let compiler;
     let stime = Date.now();
+    let clearInvalidInterval = () => {};
+    let clearDelayMsgInterval = () => {};
+    const useTimer = (isTotal = false) => chalk.grey(`(${isTotal ? '总' : '已'}耗时: ${(Date.now() - stime) / 1000}s)`);
+    const asyncInterval = (callbaclk, interval) => {
+        let timer = 0;
+
+        const run = () => {
+            timer = setTimeout(() => {
+                callbaclk();
+                run();
+            }, interval);
+        };
+
+        run();
+
+        return () => clearTimeout(timer);
+    };
 
     try {
         compiler = webpack(config);
@@ -94,8 +111,15 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
             clearConsole();
         }
 
+        clearInvalidInterval();
+        clearDelayMsgInterval();
+
         stime = Date.now();
-        spinner.text = chalk.cyan('重新编译...');
+        spinner.text = chalk.cyan('重新编译...') + useTimer();
+
+        clearInvalidInterval = asyncInterval(() => {
+            spinner.text = chalk.cyan('重新编译...') + useTimer();
+        }, 100);
     });
 
     let isFirstCompile = true;
@@ -133,8 +157,8 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
             clearConsole();
         }
 
-        const useTimer = (isTotal = false) =>
-            chalk.grey(`(编译${isTotal ? '总' : '已'}耗时: ${(Date.now() - stime) / 1000}s)`);
+        clearInvalidInterval();
+        clearDelayMsgInterval();
 
         const statsData = stats.toJson({
             all: false,
@@ -159,14 +183,14 @@ function createCompiler({ appName, config, devSocket, urls, tscCompileOnError, w
         }
 
         if (statsData.errors.length === 0) {
-            const delayedMsg = setTimeout(() => {
+            clearDelayMsgInterval = asyncInterval(() => {
                 spinner.text = chalk.cyan('文件已编译，正在TSC检查...') + useTimer();
             }, 100);
 
             const messages =
                 process.env.DISABLE_TSC_CHECK === 'true' ? { errors: [], warnings: [] } : await tsMessagesPromise;
 
-            clearTimeout(delayedMsg);
+            clearDelayMsgInterval();
 
             if (tscCompileOnError) {
                 statsData.warnings.push(...messages.errors);
@@ -345,7 +369,7 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
                             (mayProxy(pathname) && req.headers.accept && req.headers.accept.indexOf('text/html') === -1)
                         );
                     },
-                    onProxyReq: (proxyReq) => {
+                    onProxyReq: proxyReq => {
                         if (proxyReq.getHeader('origin')) {
                             proxyReq.setHeader('origin', target);
                         }
@@ -366,7 +390,7 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
         // https://github.com/facebook/create-react-app/issues/6720
         const sockPath = process.env.WDS_SOCKET_PATH || '/ws';
         const isDefaultSockHost = !process.env.WDS_SOCKET_HOST;
-        const maybePublicPath = path.resolve(appPublicFolder, pathname.replace(new RegExp('^' + servedPathname), ''));
+        const maybePublicPath = path.resolve(appPublicFolder, pathname.replace(new RegExp(`^${servedPathname}`), ''));
         const isPublicFileRequest = fs.existsSync(maybePublicPath);
         // used by webpackHotDevClient
         const isWdsEndpointRequest = isDefaultSockHost && pathname.startsWith(sockPath);
@@ -403,7 +427,7 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
                     (mayProxy(pathname) && req.headers.accept && req.headers.accept.indexOf('text/html') === -1)
                 );
             },
-            onProxyReq: (proxyReq) => {
+            onProxyReq: proxyReq => {
                 // Browsers may send Origin headers even with same-origin
                 // requests. To prevent CORS issues, we have to change
                 // the Origin to match the target URL.
@@ -422,8 +446,8 @@ function prepareProxy(proxy, appPublicFolder, servedPathname) {
 
 function choosePort(host, defaultPort, spinner) {
     return detect(defaultPort, host).then(
-        (port) =>
-            new Promise((resolve) => {
+        port =>
+            new Promise(resolve => {
                 if (port === defaultPort) {
                     return resolve(port);
                 }
@@ -441,7 +465,7 @@ function choosePort(host, defaultPort, spinner) {
                     default: true
                 };
 
-                inquirer.prompt(question).then((answer) => {
+                inquirer.prompt(question).then(answer => {
                     if (answer.shouldChangePort) {
                         resolve(port);
                         console.log();
@@ -452,7 +476,7 @@ function choosePort(host, defaultPort, spinner) {
                     }
                 });
             }),
-        (err) => {
+        err => {
             throw new Error(
                 `${chalk.red(`无法为 ${chalk.bold(host)} 找到可用的端口.`)}\n${`错误信息: ${err.message}` || err}\n`
             );

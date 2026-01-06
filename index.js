@@ -42,14 +42,6 @@ var program = commander
     .arguments('<project-directory>')
     .usage(chalk.green('<project-directory>') + ' [options]')
     .option('-u, --upgrade', '升级项目到tiger-new最新构建版本')
-    .option('-m, --mode <mode>', '选择模板类型，application 或 package', function (val) {
-        if (['application', 'package'].indexOf(val) < 0) {
-            spinner.fail('参数错误：-m --mode 只能是 application 或 package');
-            process.exit(1);
-        }
-
-        return val;
-    })
     .action(function (name, mode) {
         projectName = name;
     })
@@ -65,10 +57,8 @@ if (typeof projectName === 'undefined') {
     process.exit(1);
 }
 
-var mode = program.mode;
-
 if (program.upgrade) {
-    appUpgrade(projectName, mode);
+    appUpgrade(projectName);
 } else if (!isSafeToCreateProjectIn(path.resolve(projectName))) {
     spinner.fail('该文件夹（' + chalk.green(projectName) + '）已经存在，且存在导致冲突的文件.');
     console.log('  请使用一个新的文件夹名，或者使用升级命令将项目构建方式升级到最新版本：');
@@ -77,183 +67,123 @@ if (program.upgrade) {
     console.log();
     process.exit(1);
 } else {
-    inquirer
-        .prompt([
-            {
-                name: 'type',
-                type: 'list',
-                choices: [
-                    { name: '普通项目(application)', value: 'application' },
-                    { name: 'npm包项目(package)', value: 'package' }
-                ],
-                message: '请选择该项目用途？',
-                default: 'application',
-                when: !mode
+    const questions = [
+        {
+            name: 'version',
+            type: 'input',
+            message: '请输入项目版本号(version):',
+            default: '1.0.0',
+            validate: function (input) {
+                return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号';
             }
-        ])
-        .then(function (answers) {
-            if (!answers.type) {
-                answers.type = mode;
-            }
+        },
+        {
+            name: 'name',
+            type: 'input',
+            message: '请输入项目名称(name):',
+            default: path.basename(path.resolve(projectName)),
+            validate: function (input) {
+                const result = validatePkgName(input);
 
-            Object.assign(projectCustom, answers);
-
-            const questions = [
-                {
-                    name: 'version',
-                    type: 'input',
-                    message: '请输入项目版本号(version):',
-                    default: answers.type === 'application' ? '1.0.0' : '0.0.1',
-                    validate: function (input) {
-                        return semver.valid(input) ? true : chalk.cyan(input) + ' 不是一个有效的版本号';
-                    }
-                },
-                {
-                    name: 'name',
-                    type: 'input',
-                    message: '请输入项目名称(name):',
-                    default: path.basename(path.resolve(projectName)),
-                    validate: function (input) {
-                        const result = validatePkgName(input);
-
-                        if (result.validForNewPackages) {
-                            return true;
-                        } else {
-                            return (
-                                chalk.cyan(input) +
-                                ' 不是一个有效的package名称：\n' +
-                                chalk.red((result.errors || result.warnings).map(text => '* ' + text).join('\n'))
-                            );
-                        }
-                    }
-                },
-                {
-                    name: 'description',
-                    type: 'input',
-                    message: '请输入项目描述(description):'
-                },
-                {
-                    name: 'author',
-                    type: 'input',
-                    message: '请输入项目所属者（组织）的名字或邮箱:',
-                    validate: function (input) {
-                        return !!input || '该字段不能为空';
-                    }
-                }
-            ];
-
-            if (answers.type === 'application') {
-                questions.push(
-                    {
-                        name: 'useCdn',
-                        type: 'confirm',
-                        message:
-                            '该项目是否需要托管静态资源到cdn服务器?' +
-                            chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
-                        default: false
-                    },
-                    {
-                        name: 'host',
-                        type: 'input',
-                        message: '请输入cdn服务器host地址:',
-                        default: 'https://static.example.com',
-                        validate: function (input) {
-                            return /^http/.test(input) ? true : '请输入一个服务器地址';
-                        },
-                        when: function (answers) {
-                            return answers.useCdn;
-                        }
-                    },
-                    {
-                        name: 'pathname',
-                        type: 'input',
-                        message: '请输入项目在cdn服务器上的存储文件夹名:',
-                        default: '/' + path.basename(projectName),
-                        validate: function (input) {
-                            return /\s|\//.test(input.replace(/^\//, ''))
-                                ? '文件夹名不能包含 空格、/ 等其它字符'
-                                : true;
-                        },
-                        when: function (answers) {
-                            return answers.useCdn;
-                        }
-                    },
-                    {
-                        name: 'useLocals',
-                        type: 'confirm',
-                        message: '是否要支持多语言/国际化？',
-                        default: false
-                    },
-                    {
-                        name: 'locals',
-                        type: 'input',
-                        message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
-                        default: 'zh_CN,en_US',
-                        validate: function (input) {
-                            return input ? true : '该字段不能为空';
-                        },
-                        when: function (answers) {
-                            return answers.useLocals;
-                        }
-                    },
-                    {
-                        name: 'proxy',
-                        type: 'input',
-                        message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
-                        validate: function (input) {
-                            return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
-                        }
-                    },
-                    {
-                        name: 'isSpa',
-                        type: 'confirm',
-                        message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
-                        default: true
-                    },
-                    {
-                        name: 'useRem',
-                        type: 'confirm',
-                        message: '是否使用页面等比例缩放模式（使用rem）？',
-                        default: false
-                    }
-                );
-            }
-
-            if (answers.type === 'package') {
-                questions.push(
-                    {
-                        name: 'entryFile',
-                        type: 'input',
-                        default: 'src/index.ts',
-                        message: '请输入项目入口文件:',
-                        validate: function (input) {
-                            return !!input || '该字段不能为空';
-                        }
-                    },
-                    {
-                        name: 'exportName',
-                        type: 'input',
-                        default: function (answers) {
-                            return answers.name.split('/').slice(-1)[0];
-                        },
-                        message: '请输入模块导出名称:',
-                        validate: function (input) {
-                            return /^[\w-]+$/.test(input) || '只能输入数字、字母和短横杠字符';
-                        }
-                    }
-                );
-            }
-
-            return inquirer.prompt(questions).then(function (answers) {
-                Object.assign(projectCustom, answers);
-
-                if (projectCustom.type === 'application') {
-                    createApp(projectName);
+                if (result.validForNewPackages) {
+                    return true;
                 } else {
-                    createLibrary(projectName);
+                    return (
+                        chalk.cyan(input) +
+                        ' 不是一个有效的package名称：\n' +
+                        chalk.red((result.errors || result.warnings).map(text => '* ' + text).join('\n'))
+                    );
                 }
-            });
-        });
+            }
+        },
+        {
+            name: 'description',
+            type: 'input',
+            message: '请输入项目描述(description):'
+        },
+        {
+            name: 'author',
+            type: 'input',
+            message: '请输入项目所属者（组织）的名字或邮箱:',
+            validate: function (input) {
+                return !!input || '该字段不能为空';
+            }
+        },
+        {
+            name: 'useCdn',
+            type: 'confirm',
+            message: '该项目是否需要托管静态资源到cdn服务器?' + chalk.grey('（默认仅支持ssh rsync方式上传到cdn）'),
+            default: false
+        },
+        {
+            name: 'host',
+            type: 'input',
+            message: '请输入cdn服务器host地址:',
+            default: 'https://static.example.com',
+            validate: function (input) {
+                return /^http/.test(input) ? true : '请输入一个服务器地址';
+            },
+            when: function (answers) {
+                return answers.useCdn;
+            }
+        },
+        {
+            name: 'pathname',
+            type: 'input',
+            message: '请输入项目在cdn服务器上的存储文件夹名:',
+            default: '/' + path.basename(projectName),
+            validate: function (input) {
+                return /\s|\//.test(input.replace(/^\//, '')) ? '文件夹名不能包含 空格、/ 等其它字符' : true;
+            },
+            when: function (answers) {
+                return answers.useCdn;
+            }
+        },
+        {
+            name: 'useLocals',
+            type: 'confirm',
+            message: '是否要支持多语言/国际化？',
+            default: false
+        },
+        {
+            name: 'locals',
+            type: 'input',
+            message: '请输入要支持的语言' + chalk.grey('（半角逗号相隔）') + '：',
+            default: 'zh_CN,en_US',
+            validate: function (input) {
+                return input ? true : '该字段不能为空';
+            },
+            when: function (answers) {
+                return answers.useLocals;
+            }
+        },
+        {
+            name: 'proxy',
+            type: 'input',
+            message: '项目接口代理服务器地址' + chalk.grey('（没有请留空）') + '：',
+            validate: function (input) {
+                return !input || /^http/.test(input) ? true : '请输入一个服务器地址';
+            }
+        },
+        {
+            name: 'isSpa',
+            type: 'confirm',
+            message: '该项目是否为SPA' + chalk.grey('（单页面应用）') + '?',
+            default: true
+        },
+        {
+            name: 'useRem',
+            type: 'confirm',
+            message: '是否使用页面等比例缩放模式（使用rem）？',
+            default: false
+        }
+    ];
+
+    return inquirer.prompt(questions).then(function (answers) {
+        Object.assign(projectCustom, answers);
+
+        createApp(projectName);
+    });
 }
 
 function createApp(name) {
@@ -288,7 +218,7 @@ function createApp(name) {
     console.log('即将安装package依赖，这将花费几分钟时间...');
     console.log();
 
-    run(root, appName, function () {
+    run(root, function () {
         console.log();
         spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(root));
         console.log();
@@ -302,60 +232,6 @@ function createApp(name) {
         console.log();
         console.log(chalk.cyan('  npm run pack'));
         console.log('    构建线上包，部署线上.');
-        console.log();
-        console.log('运行下面的命令切换到项目目录开始工作:');
-        console.log(chalk.green('  cd ' + path.relative(oldPath, root)));
-    });
-}
-
-function createLibrary(name) {
-    var root = path.resolve(name);
-    var appName = projectCustom.name;
-
-    fs.ensureDirSync(name);
-
-    console.log();
-    console.log('即将在 ' + chalk.green(root) + ' 下创建新的开发项目');
-    console.log();
-
-    var appPackage = {
-        name: appName,
-        version: projectCustom.version,
-        description: projectCustom.description,
-        author: projectCustom.author,
-        main: 'dist/index.cjs.js',
-        module: 'dist/index.esm.js',
-        browser: 'dist/index.esm.js',
-        types: 'dist/' + path.basename(projectCustom.entryFile, path.extname(projectCustom.entryFile)) + '.d.ts',
-        entryFile: projectCustom.entryFile,
-        exportName: projectCustom.exportName
-    };
-
-    fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(appPackage, null, 2));
-
-    process.chdir(root);
-
-    console.log('即将安装package依赖，这将花费几分钟时间...');
-    console.log();
-
-    run(root, appName, function () {
-        console.log();
-        spinner.succeed('项目 ' + chalk.green(appName) + ' 已创建成功，路径：' + chalk.green(root));
-        console.log();
-        console.log('在该项目，你可以运行以下几个命令：');
-        console.log();
-        console.log(chalk.cyan('  npm run build:lint'));
-        console.log('    进行lint检查');
-        console.log();
-        console.log(chalk.cyan('  npm run build:declaration'));
-        console.log('    生成.d.ts文件');
-        console.log();
-        console.log(chalk.cyan('  npm run build:bundle'));
-        console.log('    生成发布包');
-        console.log();
-        console.log(chalk.cyan('  npm run build'));
-        console.log('    按顺序执行以上所有命令');
-        console.log();
         console.log();
         console.log('运行下面的命令切换到项目目录开始工作:');
         console.log(chalk.green('  cd ' + path.relative(oldPath, root)));
@@ -407,8 +283,8 @@ function getGitRepoUrl() {
     }
 }
 
-function run(appPath, appName, onSuccess) {
-    var templatePath = path.join(ownPath, 'template', projectCustom.type);
+function run(appPath, onSuccess) {
+    var templatePath = path.join(ownPath, 'template', 'application');
 
     if (fs.existsSync(templatePath)) {
         fs.copySync(templatePath, appPath);
@@ -454,11 +330,7 @@ function run(appPath, appName, onSuccess) {
     fs.writeFileSync(path.join(appPath, 'package.json'), JSON.stringify(appPackage, null, 2));
 
     var dotfiles = [
-        'tern-project',
-        'tern-webpack-config.js',
         'editorconfig',
-        'babelrc',
-        'eslintrc',
         'gitignore',
         'npmignore'
     ];

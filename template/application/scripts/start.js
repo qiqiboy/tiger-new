@@ -102,15 +102,18 @@ checkMissDependencies(paths.root, paths.npmCommander, spinner).then(() => {
             ['SIGINT', 'SIGTERM'].forEach(function(sig) {
                 process.on(sig, function() {
                     spinner.stop();
-                    devServer.close();
-                    process.exit();
+
+                    devServer.stopCallback(() => {
+                        process.exit();
+                    });
                 });
             });
 
             if (isInteractive || process.env.CI !== 'true') {
                 process.stdin.on('end', function() {
-                    devServer.close();
-                    process.exit();
+                    devServer.stopCallback(() => {
+                        process.exit();
+                    });
                 });
 
                 process.stdin.resume();
